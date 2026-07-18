@@ -1,0 +1,77 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+    id "com.gradleup.shadow" version "9.0.0"
+}
+
+group 'me.deftware'
+version '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+def donorBuild = project.hasProperty('donorbuild') ? project.property('donorbuild').toString() : "false"
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    if (JavaVersion.current().isJava9Compatible()) {
+        it.options.release = 8
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes (
+                "Manifest-Version": "1.0",
+                "Main-Class": "me.deftware.installer.Main"
+        )
+    }
+}
+
+dependencies {
+    def version = "3.3.1"
+    def modules = [ "lwjgl", "lwjgl-glfw", "lwjgl-opengl", "lwjgl-tinyfd", "lwjgl-nanovg", "lwjgl-stb" ]
+    def platforms = [ "windows", "windows-x86", "macos", "macos-arm64", "linux" ]
+
+    modules.each {
+        implementation group: 'org.lwjgl', name: it, version: version
+    }
+
+    platforms.each { platform ->
+        modules.each {
+            runtimeOnly group: 'org.lwjgl', name: it, version: version, classifier: "natives-$platform"
+        }
+    }
+
+    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.10'
+
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.4'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.4'
+}
+
+def commit = System.getenv("CI_COMMIT_SHORT_SHA") ?: "unknown"
+
+processResources {
+    filesMatching("config.json") {
+        // from 'src/main/resources'
+        filter(ReplaceTokens, tokens: [ hash: commit, donor: donorBuild ])
+    }
+}
+
+shadowJar.doLast {
+    def file = shadowJar.getArchiveFile().get().asFile
+    copy {
+        from file
+        into 'packager/'
+        rename(file.name, "Aristois-Donor.jar")
+    }
+}

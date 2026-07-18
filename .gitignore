@@ -1,0 +1,35 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+.DS_Store
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+classes/
+
+packager/*
+!packager/Aristois-Donor.jar
+installer.log
+*.log
+
+# seedcracker build
+seedcracker/build/
+seedcracker/.gradle/
+
+/local.properties
