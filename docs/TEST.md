@@ -1,5 +1,30 @@
 # Test Plan — AristoSeedCrack v1.1.0
 
+## Versioni Minecraft Supportate
+
+| Versione Minecraft | Aristois Installer | SeedCrackerX | Slime Chunk | Anti-Detection |
+|--------------------|:--:|:--:|:--:|:--:|
+| **1.21.x** (latest) | ✅ | ✅ | ✅ | ✅ |
+| **1.20.x** | ✅ | ✅ | ✅ | ✅ |
+| **1.19.x** | ✅ | ✅ | ✅ | ✅ |
+| **1.18.x** | ✅ | ✅ | ✅ | ✅ |
+| **1.17.x** | ✅ | ✅ | ✅ | ✅ |
+| **1.16.x** | ✅ | ✅ | ✅ | ✅ |
+| **1.15.x** | ✅ | ✅ | ✅ | ✅ |
+| **1.14.x** | ✅ | ✅ | ✅ | ✅ |
+| **1.13.x** | ✅ | ❌ | ❌ | ✅ |
+| **1.12.x** | ✅ | ❌ | ❌ | ✅ |
+| **1.8–1.11** | ✅ | ❌ | ❌ | ✅ |
+
+> **Nota:** SeedCrackerX richiede Fabric → solo Minecraft 1.14+. Slime Chunk Cracking usa meccaniche stabili dalla 1.14. Anti-Detection funziona su tutte le versioni (patcha solo metadata JAR).<br>
+> **Aristois mod** funziona su tutte le versioni (1.8+). L'installer recupera la lista versioni in tempo reale da Mojang PistonMeta.
+
+### Versioni prioritarie da testare
+- [ ] **1.21.4** — ultima stabile (test principale)
+- [ ] **1.20.6** — stabile precedente
+- [ ] **1.16.5** — versione "legacy" più usata (Forge test)
+- [ ] **1.14.4** — limite inferiore SeedCrackerX
+
 ## Setup test
 
 - [ ] **Ambiente pulito** — rimuovere cartella `.minecraft/versions/*-Aristois` e `.minecraft/mods/Aristois*` prima di ogni test

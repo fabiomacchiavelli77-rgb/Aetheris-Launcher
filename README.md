@@ -48,6 +48,15 @@ L'installer originale Aristois limitava alcune funzionalità solo agli utenti "d
 - Minecraft Java Edition
 - Launcher: Vanilla, MultiMC, o Prism
 
+### Versioni Minecraft Supportate
+
+| Componente | Versioni |
+|------------|----------|
+| **Aristois Installer** | Tutte (1.8 → latest) — lista versioni da Mojang PistonMeta |
+| **SeedCrackerX** | 1.14 → 1.21.x (richiede Fabric) |
+| **Slime Chunk Cracking** | 1.14 → 1.21.x |
+| **Anti-Detection** | Tutte le versioni |
+
 ## Build
 
 ### Installer
