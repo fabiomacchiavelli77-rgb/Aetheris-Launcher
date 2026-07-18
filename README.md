@@ -14,6 +14,9 @@
 
 ## Novità v1.1.0
 
+### Donor Mode Sbloccato
+L'installer originale Aristois limitava alcune funzionalità solo agli utenti "donor" (a pagamento). **Abbiamo rimosso completamente il sistema donor** — tutte le funzionalità sono sbloccate per tutti. Nessun login, nessuna chiave, nessun paywall.
+
 ### Seed Cracker Migliorato
 - **Slime Chunk Cracking** — cracca il seed senza bisogno di strutture, osservando solo slime spawn
 - **256 punti/chunk** — raccolta biomi 16x più densa dell'originale (16 → 256)

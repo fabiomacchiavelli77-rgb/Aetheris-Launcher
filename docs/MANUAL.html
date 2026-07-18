@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>AristoSeedCrack v1.1.0 — Manuale Utente</title>
+<style>
+  :root {
+    --bg: #fff;
+    --text: #1a1a1a;
+    --muted: #555;
+    --accent: #7c3aed;
+    --accent2: #4f46e5;
+    --border: #e5e7eb;
+    --code-bg: #f3f4f6;
+    --table-stripe: #f9fafb;
+    --warning-bg: #fef3c7;
+    --warning-border: #f59e0b;
+    --info-bg: #dbeafe;
+    --info-border: #3b82f6;
+    --success-bg: #d1fae5;
+    --success-border: #10b981;
+    --danger-bg: #fee2e2;
+    --danger-border: #ef4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.7;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 30px;
+  }
+
+  /* Cover page */
+  .cover {
+    text-align: center;
+    padding: 80px 0 60px;
+    page-break-after: always;
+    border-bottom: 3px solid var(--accent);
+    margin-bottom: 40px;
+  }
+  .cover h1 {
+    font-size: 2.8em;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .cover .subtitle { font-size: 1.3em; color: var(--muted); margin-bottom: 30px; }
+  .cover .version {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    padding: 6px 24px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.95em;
+    margin-bottom: 40px;
+  }
+  .cover .meta {
+    color: var(--muted);
+    font-size: 0.9em;
+    line-height: 2;
+  }
+  .cover .meta strong { color: var(--text); }
+
+  /* TOC */
+  nav.toc {
+    background: var(--code-bg);
+    padding: 30px 35px;
+    border-radius: 12px;
+    margin: 40px 0;
+    page-break-after: always;
+  }
+  nav.toc h2 { margin-top: 0; font-size: 1.4em; color: var(--accent); }
+  nav.toc ol { padding-left: 20px; }
+  nav.toc li { margin: 8px 0; }
+  nav.toc a { color: var(--text); text-decoration: none; }
+  nav.toc a:hover { color: var(--accent); }
+
+  /* Sections */
+  h2 {
+    font-size: 1.6em;
+    margin: 40px 0 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    color: var(--accent2);
+  }
+  h3 { font-size: 1.2em; margin: 25px 0 10px; color: var(--text); }
+  h4 { font-size: 1.05em; margin: 18px 0 8px; color: var(--muted); }
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 24px; margin: 10px 0; }
+  li { margin: 5px 0; }
+  a { color: var(--accent); }
+
+  /* Callout boxes */
+  .callout {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid;
+  }
+  .callout.info    { background: var(--info-bg);    border-color: var(--info-border); }
+  .callout.warning { background: var(--warning-bg); border-color: var(--warning-border); }
+  .callout.success { background: var(--success-bg); border-color: var(--success-border); }
+  .callout.danger  { background: var(--danger-bg);  border-color: var(--danger-border); }
+  .callout strong { display: block; margin-bottom: 5px; }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  tr:nth-child(even) td { background: var(--table-stripe); }
+
+  /* Code */
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+  }
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 18px 22px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.88em;
+    line-height: 1.6;
+    margin: 15px 0;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+
+  /* Keybinding */
+  kbd {
+    background: #e5e7eb;
+    border: 1px solid #d1d5db;
+    border-bottom: 2px solid #9ca3af;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-family: inherit;
+    font-size: 0.9em;
+    font-weight: 600;
+  }
+
+  /* Page break helpers */
+  .page-break { page-break-before: always; }
+
+  /* Footer */
+  .footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85em;
+  }
+
+  /* Glossary */
+  .glossary dt { font-weight: 700; margin-top: 12px; color: var(--accent2); }
+  .glossary dd { margin-left: 0; color: var(--muted); }
+
+  /* Print styles */
+  @media print {
+    body { padding: 0; max-width: none; font-size: 11pt; }
+    .cover { padding: 40px 0 30px; }
+    .cover h1 { font-size: 2.2em; -webkit-text-fill-color: #7c3aed; }
+    nav.toc { page-break-after: always; }
+    h2 { page-break-before: always; }
+    h2:first-of-type { page-break-before: avoid; }
+    pre { white-space: pre-wrap; word-wrap: break-word; }
+    a { color: var(--text); }
+    @page { margin: 2cm; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <h1>AristoSeedCrack</h1>
+  <div class="subtitle">Aristois Installer + SeedCrackerX Enhanced</div>
+  <div class="version">v1.1.0</div>
+  <div class="meta">
+    <strong>Licenza:</strong> MIT<br>
+    <strong>Piattaforma:</strong> Windows / Linux / macOS<br>
+    <strong>Minecraft:</strong> Java Edition (Fabric / Forge)<br>
+    <strong>Luglio 2026</strong>
+  </div>
+</div>
+
+<!-- ==================== TOC ==================== -->
+<nav class="toc">
+  <h2>Indice</h2>
+  <ol>
+    <li><a href="#intro">Introduzione</a></li>
+    <li><a href="#donor">Donor Mode Sbloccato</a></li>
+    <li><a href="#install">Installazione</a></li>
+    <li><a href="#seedcracker">Seed Cracker Migliorato</a>
+      <ol>
+        <li><a href="#sc-diff">Differenze con l'originale</a></li>
+        <li><a href="#sc-slime">Metodo Slime Chunk</a></li>
+        <li><a href="#sc-structure">Metodo Strutture</a></li>
+        <li><a href="#sc-end">Metodo End</a></li>
+        <li><a href="#sc-commands">Comandi</a></li>
+        <li><a href="#sc-gui">Interfaccia Grafica</a></li>
+        <li><a href="#sc-technical">Dettagli Tecnici</a></li>
+      </ol>
+    </li>
+    <li><a href="#antidetection">Anti-Detection Patching</a></li>
+    <li><a href="#structure">Struttura File Installati</a></li>
+    <li><a href="#build">Build da Sorgente</a></li>
+    <li><a href="#troubleshoot">Risoluzione Problemi</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#credits">Crediti</a></li>
+  </ol>
+</nav>
+
+<!-- ==================== 1. INTRO ==================== -->
+<h2 id="intro">1. Introduzione</h2>
+
+<p><strong>AristoSeedCrack</strong> è la versione potenziata dell'installer Aristois per Minecraft. Include tre miglioramenti fondamentali rispetto all'installer originale:</p>
+
+<div class="callout info">
+  <strong>🔓 Donor Mode Sbloccato</strong>
+  Tutte le funzionalità Aristois disponibili senza restrizioni. Nessun pagamento, nessuna chiave, nessun login.
+</div>
+
+<div class="callout success">
+  <strong>🌱 Seed Cracker Migliorato</strong>
+  Fork di SeedCrackerX con slime chunk cracking (16× più denso), biome finder avanzato, cracking automatico.
+</div>
+
+<div class="callout warning">
+  <strong>🛡️ Anti-Detection</strong>
+  Offuscamento automatico dei metadata JAR per rendere più difficile il rilevamento da parte di plugin anti-cheat.
+</div>
+
+<!-- ==================== 2. DONOR MODE ==================== -->
+<h2 id="donor" class="page-break">2. Donor Mode Sbloccato</h2>
+
+<h3>Cosa abbiamo rimosso</h3>
+
+<p>L'installer originale Aristois implementava un sistema "donor" che limitava l'accesso a determinate funzionalità del mod in base a un abbonamento a pagamento. Questo sistema richiedeva:</p>
+
+<ul>
+  <li>Login con account Aristois</li>
+  <li>Chiave di licenza valida</li>
+  <li>Connessione internet per la verifica</li>
+  <li>Rinnovo periodico del pagamento</li>
+</ul>
+
+<h3>Cosa abbiamo fatto</h3>
+
+<p>Abbiamo <strong>completamente rimosso</strong> il sistema donor dall'installer. Nello specifico:</p>
+
+<table>
+  <tr><th>Componente</th><th>Stato</th><th>Descrizione</th></tr>
+  <tr><td>Verifica licenza</td><td>❌ Rimossa</td><td>Nessuna chiamata API di validazione</td></tr>
+  <tr><td>Login obbligatorio</td><td>❌ Rimosso</td><td>Nessun account richiesto</td></tr>
+  <tr><td>Feature gate</td><td>❌ Rimosso</td><td>Tutte le funzionalità sempre attive</td></tr>
+  <tr><td>Telemetria</td><td>❌ Rimossa</td><td>Nessun dato inviato a server esterni</td></tr>
+  <tr><td>Modalità XRay</td><td>✅ Sbloccata</td><td>Disponibile per tutti</td></tr>
+  <tr><td>FullBright</td><td>✅ Sbloccata</td><td>Disponibile per tutti</td></tr>
+  <tr><td>ESP / Tracers</td><td>✅ Sbloccati</td><td>Disponibili per tutti</td></tr>
+  <tr><td>AutoTool / AutoArmor</td><td>✅ Sbloccati</td><td>Disponibili per tutti</td></tr>
+  <tr><td>Baritone integration</td><td>✅ Sbloccata</td><td>Disponibile per tutti</td></tr>
+</table>
+
+<div class="callout success">
+  <strong>✅ Risultato</strong>
+  Installi Aristois → hai TUTTE le funzionalità. Nessuna eccezione.
+</div>
+
+<!-- ==================== 3. INSTALLAZIONE ==================== -->
+<h2 id="install" class="page-break">3. Installazione</h2>
+
+<h3>3.1 Requisiti</h3>
+<table>
+  <tr><th>Componente</th><th>Requisito</th></tr>
+  <tr><td>Sistema Operativo</td><td>Windows 7+, Linux, macOS 10.14+</td></tr>
+  <tr><td>Java</td><td>Java 8 o superiore (Java 21+ raccomandato)</td></tr>
+  <tr><td>Minecraft</td><td>Java Edition (qualsiasi versione dalla 1.8 alla 1.21)</td></tr>
+  <tr><td>Launcher</td><td>Vanilla, MultiMC, Prism Launcher</td></tr>
+  <tr><td>Spazio disco</td><td>~15 MB (installer) + ~150 MB (Aristois + dipendenze)</td></tr>
+</table>
+
+<h3>3.2 Procedura Passo-Passo</h3>
+
+<ol>
+  <li>
+    <strong>Scarica l'installer</strong><br>
+    Scarica <code>Aristois-Donor.jar</code> dalla pagina <a href="https://github.com/fabiomacchiavelli77-rgb/AristoSeedCrack/releases">Releases</a>.
+  </li>
+  <li>
+    <strong>Avvia l'installer</strong><br>
+    Doppio click sul JAR, oppure da terminale:
+    <pre><code>java -jar Aristois-Donor.jar</code></pre>
+  </li>
+  <li>
+    <strong>Seleziona versione Minecraft</strong><br>
+    Scegli la versione desiderata dal menu a tendina. L'installer recupera automaticamente le versioni disponibili.
+  </li>
+  <li>
+    <strong>Scegli il launcher</strong><br>
+    <ul>
+      <li><strong>Vanilla</strong> — Launcher ufficiale Minecraft</li>
+      <li><strong>MultiMC / Prism</strong> — Launcher third-party (istanze multiple)</li>
+    </ul>
+  </li>
+  <li>
+    <strong>Opzioni di installazione</strong>
+    <table>
+      <tr><th>Opzione</th><th>Effetto</th></tr>
+      <tr>
+        <td><code>Clean install</code></td>
+        <td>Rimuove versioni precedenti di Aristois prima di installare</td>
+      </tr>
+      <tr>
+        <td><code>Forge</code></td>
+        <td>Installa con supporto Forge (EMC Framework). <strong>Nota:</strong> SeedCrackerX è solo Fabric — viene automaticamente disabilitato con Forge</td>
+      </tr>
+      <tr>
+        <td><code>Install SeedCrackerX</code></td>
+        <td>Installa il seed cracker migliorato nella cartella mods</td>
+      </tr>
+      <tr>
+        <td><code>Anti-detection patch</code></td>
+        <td>Applica offuscamento metadata ai JAR installati (vedi <a href="#antidetection">Sezione 5</a>)</td>
+      </tr>
+    </table>
+  </li>
+  <li>
+    <strong>Seleziona cartella launcher</strong><br>
+    L'installer rileva automaticamente i path standard:
+    <ul>
+      <li>Windows: <code>%APPDATA%\.minecraft</code></li>
+      <li>Linux: <code>~/.minecraft</code></li>
+      <li>macOS: <code>~/Library/Application Support/minecraft</code></li>
+      <li>MultiMC: rilevamento automatico cartella istanze</li>
+    </ul>
+  </li>
+  <li>
+    <strong>Clicca "Install"</strong><br>
+    La barra di progresso mostra lo stato. Al termine appare "Done" — clicca per uscire.
+  </li>
+</ol>
+
+<h3>3.3 Installazione Silenziosa (Headless)</h3>
+<p>Per ambienti server o automazione:</p>
+<pre><code>java -jar Aristois-Donor.jar --auto \\
+  --launcher vanilla \\
+  --version 1.21.4 \\
+  --path /home/user/.minecraft \\
+  --clean \\
+  --seedcracker \\
+  --antidetection</code></pre>
+
+<p>Flag disponibili:</p>
+<table>
+  <tr><th>Flag</th><th>Descrizione</th></tr>
+  <tr><td><code>--auto</code></td><td>Modalità automatica (nessuna UI)</td></tr>
+  <tr><td><code>--launcher &lt;tipo&gt;</code></td><td><code>vanilla</code> o <code>multimc</code></td></tr>
+  <tr><td><code>--version &lt;ver&gt;</code></td><td>Versione Minecraft (es. <code>1.21.4</code>)</td></tr>
+  <tr><td><code>--path &lt;dir&gt;</code></td><td>Cartella .minecraft</td></tr>
+  <tr><td><code>--clean</code></td><td>Clean install</td></tr>
+  <tr><td><code>--seedcracker</code></td><td>Installa SeedCrackerX</td></tr>
+  <tr><td><code>--antidetection</code></td><td>Applica anti-detection patch</td></tr>
+  <tr><td><code>--forge</code></td><td>Installazione Forge</td></tr>
+</table>
+
+<!-- ==================== 4. SEED CRACKER ==================== -->
+<h2 id="seedcracker" class="page-break">4. Seed Cracker Migliorato</h2>
+
+<h3 id="sc-diff">4.1 Differenze con l'Originale</h3>
+
+<table>
+  <tr><th>Feature</th><th>SeedCrackerX Originale</th><th>AristoSeedCrack</th></tr>
+  <tr>
+    <td>Raccolta dati biomi</td>
+    <td>16 punti per chunk</td>
+    <td><strong>256 punti per chunk</strong> — 16× più denso</td>
+  </tr>
+  <tr>
+    <td>Slime chunk cracking</td>
+    <td>❌ Non supportato</td>
+    <td>✅ <strong>Slime chunk reversal</strong> — cracca da solo slime</td>
+  </tr>
+  <tr>
+    <td>Biome finder</td>
+    <td>Disabilitato di default</td>
+    <td><strong>Abilitato di default</strong></td>
+  </tr>
+  <tr>
+    <td>Distribuzione</td>
+    <td>Download da GitHub (esterno)</td>
+    <td><strong>Embedded nell'installer</strong> — offline-ready</td>
+  </tr>
+  <tr>
+    <td>Mixin Slime</td>
+    <td>❌ Assente</td>
+    <td>✅ <strong>SlimeEntityMixin</strong> — rilevamento spawn automatico</td>
+  </tr>
+  <tr>
+    <td>Trial Chambers</td>
+    <td>Supporto base</td>
+    <td><strong>Supporto completo</strong> (1.21+)</td>
+  </tr>
+  <tr>
+    <td>Warped Fungus</td>
+    <td>Non implementato</td>
+    <td><strong>Supporto Nether</strong> — dati da funghi distorti</td>
+  </tr>
+  <tr>
+    <td>Cuboid rendering</td>
+    <td>Colori standard</td>
+    <td>🟢 Verde = struttura | 🔵 Blu = slime chunk | 🟡 Giallo = minerale</td>
+  </tr>
+</table>
+
+<h3 id="sc-slime">4.2 Metodo 1: Slime Chunk (Nessuna Struttura Richiesta)</h3>
+
+<div class="callout success">
+  <strong>🌟 Metodo rivoluzionario</strong>
+  Non servono templi, villaggi o strutture. Basta esplorare e osservare gli slime. Funziona su QUALSIASI mondo, anche appena generato.
+</div>
+
+<h4>Come funziona</h4>
+<p>In Minecraft, gli slime spawnano solo in chunk specifici (1 su 10). Questi "slime chunk" sono deterministici — dipendono dal seed del mondo. Osservando dove gli slime spawnano, il mod può invertire la matematica e calcolare il seed.</p>
+
+<h4>Procedura</h4>
+<ol>
+  <li>Entra in un mondo Minecraft (singleplayer o server)</li>
+  <li>Vai in un bioma palude, oppure in una caverna sotto Y=40</li>
+  <li>Esplora normalmente</li>
+  <li>Quando uno <strong>slime spawna naturalmente</strong>, il mod registra automaticamente quel chunk</li>
+  <li>Un <strong>cuboid blu</strong> appare sul chunk — indica "slime chunk confermato"</li>
+  <li>Continua a esplorare fino ad accumulare <strong>15-18 slime chunk</strong></li>
+  <li>Il seed viene calcolato automaticamente</li>
+</ol>
+
+<div class="callout info">
+  <strong>💡 Consiglio</strong>
+  Le paludi (swamp) sono il bioma migliore: slime spawnano anche sopra Y=40 di notte. Le caverne vanno bene ma solo sotto Y=40 indipendentemente dalla luce.
+</div>
+
+<h3 id="sc-structure">4.3 Metodo 2: Strutture (Metodo Classico)</h3>
+
+<p>Il metodo tradizionale usa le strutture generate dal mondo. Ogni struttura trovata fornisce bit di informazione sul seed.</p>
+
+<h4>Strutture supportate</h4>
+<table>
+  <tr><th>Struttura</th><th>Bit forniti</th><th>Note</th></tr>
+  <tr><td>🕌 Tempio del deserto</td><td>24 bit</td><td>Molto comune, facile da trovare</td></tr>
+  <tr><td>🏛️ Tempio della giungla</td><td>24 bit</td><td>Raro, ma ad alta densità di bit</td></tr>
+  <tr><td>🏠 Capanna della palude</td><td>24 bit</td><td>Utile in combo con slime chunk</td></tr>
+  <tr><td>⛵ Nave affondata</td><td>20 bit</td><td>Comune negli oceani</td></tr>
+  <tr><td>🏰 Monumento oceanico</td><td>24 bit</td><td>Visibile da superficie</td></tr>
+  <tr><td>🗼 Avamposto</td><td>24 bit</td><td>Comune, facile da individuare</td></tr>
+  <tr><td>🏔️ Igloo</td><td>24 bit</td><td>Biomi freddi</td></tr>
+  <tr><td>🏙️ Città dell'End</td><td>24 bit</td><td>Endgame, ma molto potente</td></tr>
+  <tr><td>🏴‍☠️ Tesoro sepolto</td><td>8 bit</td><td>Pochi bit ma facilissimo</td></tr>
+  <tr><td>🏛️ Trial Chambers</td><td>24 bit</td><td>Novità 1.21</td></tr>
+</table>
+
+<h4>Procedura</h4>
+<ol>
+  <li>Esplora il mondo cercando strutture</li>
+  <li>I <strong>cuboid verdi</strong> indicano strutture rilevate</li>
+  <li>Servono <strong>32 bit regolari + 40 bit liftable</strong> per avviare il cracking</li>
+  <li>Più strutture trovi, più dati raccogli</li>
+  <li>Il cracking inizia automaticamente quando hai abbastanza bit</li>
+</ol>
+
+<h3 id="sc-end">4.4 Metodo 3: End</h3>
+
+<p>L'End fornisce dati di altissima qualità attraverso due meccanismi:</p>
+<ul>
+  <li><strong>Pilastri dell'End</strong> — analizzati automaticamente all'arrivo, forniscono dati precisi sulla generazione del terreno</li>
+  <li><strong>Città dell'End</strong> — forniscono bit come strutture normali, ma nell'End sono più facili da trovare (generazione a griglia)</li>
+</ul>
+
+<h3 id="sc-commands">4.5 Comandi</h3>
+
+<table>
+  <tr><th>Comando</th><th>Descrizione</th><th>Esempio</th></tr>
+  <tr>
+    <td><code>/seedcracker gui</code></td>
+    <td>Apre l'interfaccia grafica di configurazione</td>
+    <td><code>/seedcracker gui</code></td>
+  </tr>
+  <tr>
+    <td><code>/seedcracker data</code></td>
+    <td>Mostra tutti i dati raccolti (strutture, slime, biomi)</td>
+    <td><code>/seedcracker data</code></td>
+  </tr>
+  <tr>
+    <td><code>/seedcracker finder</code></td>
+    <td>Mostra lo stato dei finder attivi</td>
+    <td><code>/seedcracker finder</code></td>
+  </tr>
+  <tr>
+    <td><code>/seedcracker render</code></td>
+    <td>Attiva/disattiva il rendering dei cuboid nel mondo</td>
+    <td><code>/seedcracker render</code></td>
+  </tr>
+  <tr>
+    <td><code>/seedcracker database &lt;azione&gt;</code></td>
+    <td>Gestisce il database seed locale</td>
+    <td><code>/seedcracker database list</code></td>
+  </tr>
+  <tr>
+    <td><code>/seedcracker version</code></td>
+    <td>Mostra la versione del mod</td>
+    <td><code>/seedcracker version</code></td>
+  </tr>
+</table>
+
+<h3 id="sc-gui">4.6 Interfaccia Grafica</h3>
+
+<p>La GUI (<kbd>/seedcracker gui</kbd>) è organizzata in tab:</p>
+<ul>
+  <li><strong>Data</strong> — Riepilogo dati raccolti: bit regolari, bit liftable, slime chunk count</li>
+  <li><strong>Finders</strong> — Elenco finder attivi con stato (RUNNING / PAUSED / DONE)</li>
+  <li><strong>Slime Chunks</strong> — Mappa slime chunk raccolti, progresso verso soglia cracking</li>
+  <li><strong>Biomes</strong> — Mappa biomi registrati con i 256 punti/chunk</li>
+  <li><strong>Config</strong> — Opzioni: toggle rendering, soglie, debug mode</li>
+  <li><strong>Database</strong> — Seed craccati salvati localmente</li>
+</ul>
+
+<h3 id="sc-technical">4.7 Dettagli Tecnici</h3>
+
+<h4>BiomeFinder: 256 punti vs 16 punti</h4>
+<p>L'originale campiona 16 punti per chunk (griglia 4×4). La nostra versione campiona 256 punti (griglia 16×16) — ogni blocco del chunk è un potenziale punto dati. Questo significa:</p>
+<ul>
+  <li><strong>16× più dati</strong> per chunk esplorato</li>
+  <li>Cracking <strong>più veloce</strong> (meno chunk da visitare)</li>
+  <li>Maggiore <strong>precisione</strong> in biomi di transizione</li>
+</ul>
+
+<h4>SlimeChunkCracker: Reversal Algoritmo</h4>
+<p>Basato su <strong>ChunkRandomReversal</strong> di mjtb49. L'algoritmo:</p>
+<ol>
+  <li>Osserva la sequenza di chunk slime/non-slime incontrati</li>
+  <li>Inverte il generatore di numeri pseudo-casuali di Minecraft (Java Random)</li>
+  <li>Risale al seed originale che avrebbe prodotto quella sequenza</li>
+  <li>Con 15-18 osservazioni, lo spazio di ricerca collassa su un seed unico</li>
+</ol>
+
+<!-- ==================== 5. ANTI-DETECTION ==================== -->
+<h2 id="antidetection" class="page-break">5. Anti-Detection Patching</h2>
+
+<h3>5.1 Cosa Fa</h3>
+
+<p>L'opzione "Anti-detection patch" modifica i JAR installati per rendere più difficile il fingerprinting da parte di plugin anti-cheat.</p>
+
+<h4>Modifiche applicate</h4>
+<table>
+  <tr><th>File</th><th>Modifica</th><th>Esempio</th></tr>
+  <tr>
+    <td><code>fabric.mod.json</code></td>
+    <td><code>id</code> → suffisso random di 6 caratteri</td>
+    <td><code>aristois</code> → <code>aristois_a3f8k1</code></td>
+  </tr>
+  <tr>
+    <td><code>mcmod.info</code></td>
+    <td><code>modid</code> e <code>name</code> offuscati</td>
+    <td><code>Aristois</code> → <code>Aristois (Optimization)</code></td>
+  </tr>
+  <tr>
+    <td>Nome JAR</td>
+    <td>Rinominato con suffisso</td>
+    <td><code>Aristois.jar</code> → <code>Aristois_a3f8k1.jar</code></td>
+  </tr>
+</table>
+
+<h3>5.2 Come Funziona</h3>
+<ol>
+  <li>L'installer completa l'installazione normale</li>
+  <li>Scansiona la cartella di installazione alla ricerca di file <code>.jar</code></li>
+  <li>Per ogni JAR trovato:
+    <ul>
+      <li>Apre il JAR come archivio ZIP in memoria</li>
+      <li>Cerca <code>fabric.mod.json</code> e <code>mcmod.info</code></li>
+      <li>Appende un suffisso random (6 caratteri UUID) all'ID mod</li>
+      <li>Scrive il JAR modificato tramite file temporaneo + move atomica</li>
+    </ul>
+  </li>
+  <li>L'operazione è <strong>atomica</strong>: se crasha, il JAR originale è intatto</li>
+</ol>
+
+<h3>5.3 Compatibilità</h3>
+<table>
+  <tr><th>Scenario</th><th>Compatibilità</th></tr>
+  <tr><td>Fabric (non-Forge)</td><td>✅ Pienamente supportato</td></tr>
+  <tr><td>Forge (EMC Framework)</td><td>✅ Supportato — patch sia Aristois.jar che EMC.jar</td></tr>
+  <tr><td>JAR senza <code>fabric.mod.json</code></td><td>⚠️ Saltato con warning nel log</td></tr>
+  <tr><td>Caricamento Minecraft</td><td>✅ Il mod ID è solo per identificazione, non per loading</td></tr>
+</table>
+
+<h3>5.4 Limitazioni</h3>
+<div class="callout warning">
+  <strong>⚠️ Importante</strong>
+  L'anti-detection NON è una protezione garantita. È uno strato di offuscamento aggiuntivo.
+</div>
+<ul>
+  <li>Non modifica il bytecode della mod</li>
+  <li>Plugin anti-cheat avanzati (Grim, Spartan, Vulcan) possono usare altri metodi:
+    <ul>
+      <li>Analisi dei pacchetti di rete</li>
+      <li>Pattern di movimento (reach, aimbot detection)</li>
+      <li>Analisi della frequenza di click</li>
+    </ul>
+  </li>
+  <li>Server con <strong>GrimAC</strong> o <strong>Spartan</strong>: l'anti-detection aiuta ma non bypassa completamente</li>
+</ul>
+
+<h3>5.5 Anti-Cheat Specifici</h3>
+<table>
+  <tr><th>Anti-Cheat</th><th>Efficacia</th><th>Note</th></tr>
+  <tr><td>Vanilla / NoCheatPlus</td><td>🟢 Alta</td><td>Il fingerprinting base è completamente eluso</td></tr>
+  <tr><td>Matrix</td><td>🟢 Alta</td><td>Fingerprinting mod ID aggirato</td></tr>
+  <tr><td>GrimAC</td><td>🟡 Media</td><td>Grim usa analisi predittiva del movimento — il nome del mod è irrilevante</td></tr>
+  <tr><td>Spartan</td><td>🟡 Media</td><td>Può rilevare pattern di rete indipendentemente dal mod ID</td></tr>
+  <tr><td>Vulcan</td><td>🟡 Media</td><td>Analisi euristica + fingerprinting combinati</td></tr>
+  <tr><td>Intave</td><td>🔴 Bassa</td><td>Analisi comportamentale avanzata, indipendente dal nome mod</td></tr>
+</table>
+
+<!-- ==================== 6. STRUTTURA FILE ==================== -->
+<h2 id="structure" class="page-break">6. Struttura File Installati</h2>
+
+<h3>6.1 Installazione Vanilla (Fabric)</h3>
+<pre><code>.minecraft/
+├── versions/
+│   └── {versione}-Aristois/
+│       ├── {versione}-Aristois.json    ← Profilo di lancio
+│       └── {versione}-Aristois.jar     ← Aristois Mod (patchato se anti-detection)
+├── mods/
+│   └── Aristois-Seed-Cracker.jar       ← Seed Cracker migliorato
+└── launcher_profiles.json              ← Profilo "Aristois" aggiunto</code></pre>
+
+<h3>6.2 Installazione Forge</h3>
+<pre><code>.minecraft/
+├── mods/
+│   ├── Aristois-Seed-Cracker.jar       ← Seed Cracker (Fabric-only: non si carica con Forge)
+│   └── EMC.jar                         ← EMC Framework (patchato se anti-detection)
+└── libraries/
+    └── EMC/
+        └── {versione}/
+            └── Aristois.jar            ← Aristois Mod (patchato se anti-detection)</code></pre>
+
+<div class="callout warning">
+  <strong>⚠️ Nota Forge</strong>
+  SeedCrackerX è un mod Fabric e NON si carica con Forge. Se installi con Forge, la checkbox SeedCrackerX viene automaticamente disabilitata. Il seed cracker funziona solo con installazione Vanilla/Fabric.
+</div>
+
+<h3>6.3 File di Log</h3>
+<p>L'installer scrive un file <code>installer.log</code> nella cartella dell'installer. Contiene:</p>
+<ul>
+  <li>Versione Minecraft selezionata</li>
+  <li>Opzioni attivate</li>
+  <li>Path di installazione</li>
+  <li>Stato download JAR Aristois</li>
+  <li>Stato installazione SeedCrackerX</li>
+  <li>Stato patching anti-detection (quali JAR, esito)</li>
+  <li>Eventuali errori con stack trace completo</li>
+</ul>
+
+<!-- ==================== 7. BUILD ==================== -->
+<h2 id="build" class="page-break">7. Build da Sorgente</h2>
+
+<h3>7.1 Requisiti</h3>
+<table>
+  <tr><th>Componente</th><th>Versione</th></tr>
+  <tr><td>JDK</td><td>25+ (per SeedCrackerX con Fabric Loom)</td></tr>
+  <tr><td>Git</td><td>Qualsiasi versione recente</td></tr>
+  <tr><td>Gradle</td><td>Incluso (wrapper) — non serve installarlo</td></tr>
+  <tr><td>Internet</td><td>Richiesto per dipendenze Fabric/Minecraft al primo build</td></tr>
+</table>
+
+<h3>7.2 Compilazione Installer</h3>
+<pre><code>git clone https://github.com/fabiomacchiavelli77-rgb/AristoSeedCrack.git
+cd AristoSeedCrack
+./gradlew shadowJar
+# Output: packager/Aristois-Donor.jar</code></pre>
+
+<h3>7.3 Compilazione SeedCrackerX</h3>
+<pre><code>cd seedcracker
+./gradlew build
+# Output: seedcracker/build/libs/seedcrackerX-2.16.1.jar</code></pre>
+
+<h3>7.4 Aggiornare il Seed Cracker nell'Installer</h3>
+<pre><code># Dopo aver buildato il seedcracker:
+cp seedcracker/build/libs/seedcrackerX-2.16.1.jar \
+   src/main/resources/aristois-seed-cracker.jar
+
+# Ri-buildare l'installer con il nuovo JAR embedded:
+cd ..
+./gradlew shadowJar</code></pre>
+
+<h3>7.5 Struttura del Progetto Sorgente</h3>
+<pre><code>AristoSeedCrack/
+├── build.gradle              ← Build installer
+├── settings.gradle
+├── src/                      ← Sorgente Installer
+│   └── main/java/me/deftware/installer/
+│       ├── Main.java
+│       ├── model/
+│       │   ├── Configuration.java
+│       │   ├── JarPatcher.java
+│       │   ├── Config.java
+│       │   ├── Manifest.java
+│       │   ├── launcher/
+│       │   │   ├── Launcher.java
+│       │   │   ├── PistonMeta.java
+│       │   │   ├── VanillaLauncher.java
+│       │   │   └── PrismLauncher.java
+│       │   ├── process/
+│       │   │   ├── LauncherProcess.java
+│       │   │   └── WindowsProcess.java
+│       │   └── provider/
+│       │       ├── Provider.java
+│       │       └── HttpProvider.java
+│       └── view/
+│           ├── Window.java
+│           ├── SceneManager.java
+│           ├── components/
+│           │   ├── Button.java, CheckBox.java, ComboBox.java
+│           │   ├── ProgressBar.java, TextRenderer.java
+│           │   └── Component.java, Image.java, ListComponent.java
+│           └── scenes/
+│               ├── SetupScene.java
+│               ├── WelcomeScene.java
+│               ├── InstallingScene.java
+│               ├── LocationSetupScene.java
+│               ├── UpdateScene.java
+│               └── Scene.java
+├── seedcracker/              ← Sorgente SeedCrackerX Fork
+│   └── src/main/java/kaptainwutax/seedcrackerX/
+│       ├── SeedCracker.java
+│       ├── Features.java
+│       ├── api/
+│       ├── command/
+│       ├── config/
+│       ├── cracker/
+│       │   ├── SlimeChunkCracker.java    ← ✨ NUOVO
+│       │   ├── SlimeChunkData.java       ← ✨ NUOVO
+│       │   ├── BiomeData.java
+│       │   ├── HashedSeedData.java
+│       │   └── PillarData.java
+│       ├── finder/
+│       │   ├── SlimeChunkFinder.java     ← ✨ NUOVO
+│       │   ├── BiomeFinder.java
+│       │   ├── BlockFinder.java
+│       │   └── Finder.java
+│       ├── mixin/
+│       │   ├── SlimeEntityMixin.java     ← ✨ NUOVO
+│       │   ├── ClientLevelMixin.java
+│       │   └── LocalPlayerMixin.java
+│       ├── render/
+│       └── util/
+└── docs/                    ← Documentazione</code></pre>
+
+<!-- ==================== 8. TROUBLESHOOTING ==================== -->
+<h2 id="troubleshoot" class="page-break">8. Risoluzione Problemi</h2>
+
+<table>
+  <tr><th>Problema</th><th>Causa Probabile</th><th>Soluzione</th></tr>
+  <tr>
+    <td>Installer non si apre</td>
+    <td>Java non installato o versione troppo vecchia</td>
+    <td>Installa Java 8+ da <a href="https://adoptium.net">Adoptium</a></td>
+  </tr>
+  <tr>
+    <td>"Java Runtime Environment not found"</td>
+    <td>Java non nel PATH</td>
+    <td>Aggiungi Java al PATH o usa percorso completo: <code>"C:\Program Files\Java\jdk-21\bin\java.exe" -jar Aristois-Donor.jar</code></td>
+  </tr>
+  <tr>
+    <td>SeedCrackerX non trovato dopo install</td>
+    <td>Hai installato con Forge</td>
+    <td>SeedCrackerX è Fabric-only. Reinstalla senza Forge.</td>
+  </tr>
+  <tr>
+    <td>Nessun cuboid blu visibile</td>
+    <td>Sei fuori dal bioma corretto</td>
+    <td>Vai in palude (swamp) o sottoterra Y&lt;40 in qualsiasi bioma</td>
+  </tr>
+  <tr>
+    <td>Seed non cracca dopo tanti slime</td>
+    <td>Pochi dati</td>
+    <td>Servono 15-18 slime chunk. Controlla progresso con <code>/seedcracker gui</code></td>
+  </tr>
+  <tr>
+    <td>Minecraft crasha all'avvio</td>
+    <td>Conflitto mod o versione errata</td>
+    <td>Controlla <code>installer.log</code>, reinstalla con Clean Install</td>
+  </tr>
+  <tr>
+    <td>Anti-detection non applicata</td>
+    <td>JAR senza fabric.mod.json</td>
+    <td>Normale per JAR Forge puri. Il log indica quali JAR sono stati saltati.</td>
+  </tr>
+  <tr>
+    <td>Installer bloccato su "Fetching versions"</td>
+    <td>API Minecraft lenta o irraggiungibile</td>
+    <td>Verifica connessione. L'installer usa PistonMeta (launcher meta). Timeout automatico dopo 30s.</td>
+  </tr>
+  <tr>
+    <td>Gradle build fallisce (JDK 25 richiesto)</td>
+    <td>JDK &lt; 25</td>
+    <td>Installa JDK 25+ da <a href="https://jdk.java.net/25/">jdk.java.net</a></td>
+  </tr>
+</table>
+
+<!-- ==================== 9. FAQ ==================== -->
+<h2 id="faq" class="page-break">9. FAQ — Domande Frequenti</h2>
+
+<dl class="glossary">
+  <dt>Il seed cracker funziona su server?</dt>
+  <dd>Sì. Il seed cracking funziona su <strong>qualsiasi</strong> server. Il server non può impedirti di osservare strutture e biomi — sono dati che il server DEVE inviarti per farti giocare. Il mod è interamente lato client.</dd>
+
+  <dt>Perché il seed cracker non trova subito il seed?</dt>
+  <dd>Servono abbastanza dati. Con slime chunk: 15-18 osservazioni. Con strutture: 32+40 bit. Continua a esplorare. Il cracking è computazionalmente intenso e viene eseguito in background.</dd>
+
+  <dt>Perché non vedo cuboid blu (slime chunk)?</dt>
+  <dd>Devi essere in un bioma dove gli slime spawnano: palude (qualsiasi Y, di notte) o sottoterra (Y &lt; 40, qualsiasi bioma, luce &lt; 7). Inoltre il rendering deve essere attivo: <code>/seedcracker render</code>.</dd>
+
+  <dt>Posso usare SeedCrackerX senza Aristois?</dt>
+  <dd>Sì, il seed cracker è un mod Fabric standard. Funziona con qualsiasi installazione Fabric. Il JAR standalone si trova in <code>seedcracker/build/libs/</code> dopo il build.</dd>
+
+  <dt>L'anti-detection mi rende invisibile agli anti-cheat?</dt>
+  <dd><strong>No.</strong> Rende più difficile il rilevamento tramite fingerprint, ma anti-cheat sofisticati possono usare altri metodi (analisi pacchetti, pattern di movimento). È uno strato di protezione aggiuntivo, non una soluzione completa.</dd>
+
+  <dt>Devo pagare per usare Aristois?</dt>
+  <dd><strong>No.</strong> Abbiamo rimosso il sistema donor. Tutte le funzionalità sono sbloccate per tutti, senza eccezioni.</dd>
+
+  <dt>Il seed cracker funziona su versioni vecchie di Minecraft?</dt>
+  <dd>Sì, supporta dalla 1.14 alla 1.21+. Il supporto per ogni versione dipende dalle strutture disponibili e dall'API Fabric.</dd>
+
+  <dt>Cosa succede se installo con Forge E spunto SeedCrackerX?</dt>
+  <dd>L'installer mostra un warning nel log: "SeedCrackerX is Fabric-only, skipped (Forge install)". Il seed cracker NON viene installato. Puoi comunque usare Anti-detection.</dd>
+
+  <dt>Posso craccare il seed di un mondo già craccato?</dt>
+  <dd>Sì. Il database integrato salva i seed craccati. Puoi verificare se un seed è già conosciuto con <code>/seedcracker database check</code>.</dd>
+
+  <dt>Il mod viene rilevato dagli screenshot?</dt>
+  <dd>No. Il mod non aggiunge watermark visibili. I cuboid sono rendering OpenGL che non appaiono negli screenshot (a meno che non usi mod di screenshot che catturano l'overlay).</dd>
+</dl>
+
+<!-- ==================== 10. CREDITS ==================== -->
+<h2 id="credits" class="page-break">10. Crediti</h2>
+
+<table>
+  <tr><th>Progetto</th><th>Autori</th><th>Contributo</th></tr>
+  <tr>
+    <td>Aristois Installer</td>
+    <td>Deftware &amp; community Aristois</td>
+    <td>Installer originale</td>
+  </tr>
+  <tr>
+    <td>SeedCrackerX</td>
+    <td>KaptainWutax, 19MisterX98</td>
+    <td>Seed cracker originale</td>
+  </tr>
+  <tr>
+    <td>ChunkRandomReversal</td>
+    <td>mjtb49</td>
+    <td>Algoritmo inversione slime chunk</td>
+  </tr>
+  <tr>
+    <td>LattiCG / SeedFinding</td>
+    <td>Community seedfinding</td>
+    <td>Librerie cracking seed</td>
+  </tr>
+  <tr>
+    <td>FabricMC / Fabric Loom</td>
+    <td>Fabric Team</td>
+    <td>Framework modding</td>
+  </tr>
+  <tr>
+    <td><strong>AristoSeedCrack v1.1.0</strong></td>
+    <td><strong>Modifiche e integrazione</strong></td>
+    <td>
+      ✅ Donor mode sbloccato<br>
+      ✅ Slime chunk cracking (256 punti/chunk)<br>
+      ✅ SlimeEntityMixin (rilevamento automatico)<br>
+      ✅ Anti-detection patching (JarPatcher)<br>
+      ✅ Embedded seed cracker<br>
+      ✅ UI checkbox SeedCrackerX + Anti-detection
+    </td>
+  </tr>
+</table>
+
+<hr>
+
+<div class="footer">
+  <p>
+    <strong>AristoSeedCrack v1.1.0</strong> — Luglio 2026<br>
+    Licenza MIT — <a href="https://github.com/fabiomacchiavelli77-rgb/AristoSeedCrack">github.com/fabiomacchiavelli77-rgb/AristoSeedCrack</a>
+  </p>
+  <p style="margin-top:10px; font-size:0.8em;">
+    This software is provided "AS IS", without warranty of any kind.<br>
+    Minecraft is a trademark of Mojang AB. Not affiliated with Mojang or Aristois.
+  </p>
+</div>
+
+</body>
+</html>
