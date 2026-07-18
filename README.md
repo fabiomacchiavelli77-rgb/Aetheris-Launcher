@@ -33,9 +33,11 @@ L'installer originale Aristois limitava alcune funzionalità solo agli utenti "d
 ## Download & Installazione Rapida
 
 1. Scarica `Aristois-Donor.jar` dalla [pagina Releases](https://github.com/fabiomacchiavelli77-rgb/AristoSeedCrack/releases/latest)
-2. **Windows:** Doppio click su `AristoSeedCrack.bat` oppure `java -jar Aristois-Donor.jar`
-3. **Linux/macOS:** `./AristoSeedCrack.sh` oppure `java -jar Aristois-Donor.jar`
-4. Seleziona versione Minecraft, launcher, opzioni → clicca **Install**
+2. Scarica anche `AristoSeedCrack.bat` (Windows) o `AristoSeedCrack.sh` (Linux/macOS) — sono i launcher
+3. **Windows:** Doppio click su `AristoSeedCrack.bat`
+4. **Linux/macOS:** `chmod +x AristoSeedCrack.sh && ./AristoSeedCrack.sh`
+5. In alternativa: `java -jar Aristois-Donor.jar`
+6. Seleziona versione Minecraft, launcher, opzioni → clicca **Install**
 
 > 📖 **Manuale completo:** [docs/MANUAL.html](docs/MANUAL.html) — aprilo nel browser, usa Stampa → Salva come PDF
 
