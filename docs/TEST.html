@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>AristoSeedCrack v1.1.0 — Test Plan</title>
+<style>
+  :root {
+    --bg: #fff;
+    --text: #1a1a1a;
+    --muted: #555;
+    --accent: #7c3aed;
+    --accent2: #4f46e5;
+    --border: #e5e7eb;
+    --code-bg: #f3f4f6;
+    --table-stripe: #f9fafb;
+    --warning-bg: #fef3c7;
+    --warning-border: #f59e0b;
+    --info-bg: #dbeafe;
+    --info-border: #3b82f6;
+    --success-bg: #d1fae5;
+    --success-border: #10b981;
+    --danger-bg: #fee2e2;
+    --danger-border: #ef4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.7;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 30px;
+  }
+
+  .header {
+    text-align: center;
+    padding: 40px 0 20px;
+    border-bottom: 3px solid var(--accent);
+    margin-bottom: 40px;
+  }
+  .header h1 {
+    font-size: 2.2em;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .header .subtitle { font-size: 1.1em; color: var(--muted); margin-bottom: 20px; }
+  .header .version {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    padding: 4px 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9em;
+  }
+
+  h2 {
+    font-size: 1.5em;
+    margin: 35px 0 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    color: var(--accent2);
+  }
+  h3 { font-size: 1.2em; margin: 25px 0 10px; color: var(--text); }
+  p { margin: 10px 0; }
+  
+  /* Interactive checkbox list */
+  .todo-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+  }
+  .todo-list li {
+    display: flex;
+    align-items: flex-start;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+  .todo-list li:hover {
+    background: var(--code-bg);
+  }
+  .todo-list input[type="checkbox"] {
+    margin-top: 6px;
+    margin-right: 12px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--accent);
+  }
+  .todo-list label {
+    cursor: pointer;
+    flex: 1;
+  }
+
+  /* Callout boxes */
+  .callout {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid;
+  }
+  .callout.info    { background: var(--info-bg);    border-color: var(--info-border); }
+  .callout.warning { background: var(--warning-bg); border-color: var(--warning-border); }
+  .callout.success { background: var(--success-bg); border-color: var(--success-border); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  tr:nth-child(even) td { background: var(--table-stripe); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+  }
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 18px 22px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.88em;
+    line-height: 1.6;
+    margin: 15px 0;
+  }
+
+  .footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85em;
+  }
+
+  @media print {
+    body { padding: 0; max-width: none; font-size: 11pt; }
+    .header { padding: 20px 0 10px; }
+    pre { white-space: pre-wrap; word-wrap: break-word; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AristoSeedCrack v1.1.0</h1>
+  <div class="subtitle">Test Plan Interattivo per Installer & SeedCrackerX</div>
+  <div class="version">Test Plan HTML</div>
+</div>
+
+<h2>Versioni Minecraft Supportate</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Versione Minecraft</th>
+      <th>Aristois Installer</th>
+      <th>SeedCrackerX</th>
+      <th>Slime Chunk</th>
+      <th>Anti-Detection</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1.21.x</strong> (latest)</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+    </tr>
+    <tr>
+      <td><strong>1.20.x</strong></td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+    </tr>
+    <tr>
+      <td><strong>1.19.x</strong></td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+    </tr>
+    <tr>
+      <td><strong>1.18.x</strong></td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+    </tr>
+    <tr>
+      <td><strong>1.17.x</strong></td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+    </tr>
+    <tr>
+      <td><strong>1.16.x</strong></td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+    </tr>
+    <tr>
+      <td><strong>1.15.x</strong></td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+    </tr>
+    <tr>
+      <td><strong>1.14.x</strong></td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+      <td>✅ Supportato</td>
+    </tr>
+    <tr>
+      <td><strong>1.13.x</strong></td>
+      <td>✅ Supportato</td>
+      <td>❌ Non sup. (No Fabric)</td>
+      <td>❌ Non sup.</td>
+      <td>✅ Supportato</td>
+    </tr>
+    <tr>
+      <td><strong>1.8 - 1.12</strong></td>
+      <td>✅ Supportato</td>
+      <td>❌ Non sup.</td>
+      <td>❌ Non sup.</td>
+      <td>✅ Supportato</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout info">
+  <strong>Nota:</strong> SeedCrackerX richiede Fabric (Minecraft 1.14+). Slime Chunk Cracking usa meccaniche stabili a partire da Minecraft 1.14. L'Anti-Detection patcha i metadati e funziona su tutte le versioni.
+</div>
+
+<h3>Target prioritari di test</h3>
+<ul class="todo-list">
+  <li>
+    <input type="checkbox" id="target-121">
+    <label for="target-121"><strong>Minecraft 1.21.4</strong> — Ultima versione stabile rilasciata (Test principale completo)</label>
+  </li>
+  <li>
+    <input type="checkbox" id="target-120">
+    <label for="target-120"><strong>Minecraft 1.20.6</strong> — Versione intermedia precedente molto diffusa</label>
+  </li>
+  <li>
+    <input type="checkbox" id="target-116">
+    <label for="target-116"><strong>Minecraft 1.16.5</strong> — Storica versione moddata (Test con Forge)</label>
+  </li>
+  <li>
+    <input type="checkbox" id="target-114">
+    <label for="target-114"><strong>Minecraft 1.14.4</strong> — Limite inferiore del supporto a SeedCrackerX</label>
+  </li>
+</ul>
+
+<h2>Fase di Setup</h2>
+<ul class="todo-list">
+  <li>
+    <input type="checkbox" id="setup-clean">
+    <label for="setup-clean"><strong>Ambiente pulito:</strong> Rimuovere la cartella <code>.minecraft/versions/*-Aristois</code> e <code>.minecraft/mods/Aristois*</code> prima di iniziare.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="setup-java">
+    <label for="setup-java"><strong>Verifica Java:</strong> Eseguire <code>java -version</code> nel terminale e verificare la presenza di Java 8 o superiore.</label>
+  </li>
+</ul>
+
+<h2>1. Installer — Avvio ed Esecuzione</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Azione / Test Case</th>
+      <th>Risultato Atteso</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1.1</td>
+      <td>Doppio clic su <code>AristoSeedCrack.bat</code> (Windows) o <code>./AristoSeedCrack.sh</code> (Linux/Mac)</td>
+      <td>La finestra dell'installer si avvia correttamente, mostrando il logo.</td>
+    </tr>
+    <tr>
+      <td>1.2</td>
+      <td>Eseguire manualmente da riga di comando <code>java -jar Aristois-Donor.jar</code></td>
+      <td>Stesso risultato del punto 1.1.</td>
+    </tr>
+    <tr>
+      <td>1.3</td>
+      <td>Avviare lo script su un sistema privo di Java installato nel PATH</td>
+      <td>Viene mostrato un messaggio di errore chiaro e descrittivo. Nessun crash silenzioso.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. Interfaccia Grafica (UI SetupScene)</h2>
+<ul class="todo-list">
+  <li>
+    <input type="checkbox" id="ui-version-dropdown">
+    <label for="ui-version-dropdown"><strong>2.1:</strong> All'avvio dell'installer il dropdown per la versione di Minecraft è popolato con l'elenco corretto fornito da Mojang PistonMeta.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="ui-clean-checkbox">
+    <label for="ui-clean-checkbox"><strong>2.2:</strong> La checkbox <code>Clean install</code> è presente e può essere spuntata o deselezionata liberamente.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="ui-seedcracker-visibility">
+    <label for="ui-seedcracker-visibility"><strong>2.3:</strong> Se <code>Forge</code> è deselezionato, la checkbox <code>Install SeedCrackerX</code> è visibile e cliccabile.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="ui-forge-exclusivity">
+    <label for="ui-forge-exclusivity"><strong>2.4:</strong> Se si spunta la casella <code>Forge</code>, la checkbox <code>Install SeedCrackerX</code> scompare o viene disabilitata automaticamente (poiché SeedCrackerX richiede Fabric).</label>
+  </li>
+  <li>
+    <input type="checkbox" id="ui-forge-restore">
+    <label for="ui-forge-restore"><strong>2.5:</strong> Deselezionando <code>Forge</code>, la casella <code>Install SeedCrackerX</code> torna visibile e cliccabile.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="ui-antidetect-state">
+    <label for="ui-antidetect-state"><strong>2.6:</strong> La checkbox <code>Anti-detection patch</code> è visibile e indipendente dallo stato di Forge/Fabric.</label>
+  </li>
+</ul>
+
+<h2>3. Installazione Vanilla + SeedCrackerX</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Azione / Test Case</th>
+      <th>Risultato Atteso</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>3.1</td>
+      <td>Selezionare una versione vanilla, spuntare <code>Install SeedCrackerX</code> e premere <strong>Install</strong></td>
+      <td>L'installazione si completa e nella cartella <code>.minecraft/mods/</code> compare il file <code>Aristois-Seed-Cracker.jar</code>.</td>
+    </tr>
+    <tr>
+      <td>3.2</td>
+      <td>Avviare il gioco con il nuovo profilo Aristois dal Minecraft Launcher</td>
+      <td>Il gioco si avvia correttamente senza crash e con la mod Aristois caricata.</td>
+    </tr>
+    <tr>
+      <td>3.3</td>
+      <td>Digitare in chat: <code>/seedcracker gui</code></td>
+      <td>Si apre l'interfaccia grafica della mod, divisa in schede di configurazione.</td>
+    </tr>
+    <tr>
+      <td>3.4</td>
+      <td>Verificare la presenza del modulo "Slime Chunks"</td>
+      <td>La scheda "Slime Chunks" è visibile e contiene le nuove opzioni di cracking degli slime.</td>
+    </tr>
+    <tr>
+      <td>3.5</td>
+      <td>Digitare in chat: <code>/seedcracker data</code> e <code>/seedcracker render</code></td>
+      <td>I comandi vengono riconosciuti, visualizzando lo stato dei dati e attivando/disattivando il rendering dei cuboid.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>4. Funzionalità Slime Chunk Cracking (Nuova Feature)</h2>
+<ul class="todo-list">
+  <li>
+    <input type="checkbox" id="sc-marsh-test">
+    <label for="sc-marsh-test"><strong>4.1:</strong> Entrare in un mondo e spostarsi in un bioma palude di notte, o scendere in una caverna sotto la coordinata Y &lt; 40.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="sc-spawn-detect">
+    <label for="sc-spawn-detect"><strong>4.2:</strong> Attendere lo spawn naturale di uno slime: sul chunk corrispondente deve comparire un cuboid <strong>blu</strong> che evidenzia il chunk confermato.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="sc-counter-check">
+    <label for="sc-counter-check"><strong>4.3:</strong> Verificare che in <code>/seedcracker gui</code>, nella sezione Slime Chunks, il contatore sia aumentato.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="sc-auto-reversal">
+    <label for="sc-auto-reversal"><strong>4.4:</strong> Trovare/osservare lo spawn in 15-18 slime chunk diversi. Il cracking del seed deve partire automaticamente a fine raccolta.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="sc-seed-found">
+    <label for="sc-seed-found"><strong>4.5:</strong> Digitare <code>/seedcracker data</code> per verificare che il seed del mondo sia stato recuperato con successo ed esposto.</label>
+  </li>
+</ul>
+
+<h2>5. Anti-Detection Patching</h2>
+<ul class="todo-list">
+  <li>
+    <input type="checkbox" id="ad-install-test">
+    <label for="ad-install-test"><strong>5.1:</strong> Avviare l'installazione spuntando <code>Anti-detection patch</code>.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="ad-jar-unzip">
+    <label for="ad-jar-unzip"><strong>5.2:</strong> Aprire il file JAR installato (es. <code>.minecraft/versions/1.21.4-Aristois/1.21.4-Aristois.jar</code>) con un gestore archivi.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="ad-json-patch">
+    <label for="ad-json-patch"><strong>5.3:</strong> Ispezionare <code>fabric.mod.json</code>: l'ID mod deve avere un suffisso casuale (es. <code>aristois_7fd9s2</code> anziché <code>aristois</code>).</label>
+  </li>
+  <li>
+    <input type="checkbox" id="ad-json-name">
+    <label for="ad-json-name"><strong>5.4:</strong> Nel file <code>fabric.mod.json</code>, il nome deve riportare la dicitura "(Optimization)".</label>
+  </li>
+  <li>
+    <input type="checkbox" id="ad-game-loading">
+    <label for="ad-game-loading"><strong>5.5:</strong> Avviare il gioco e verificare che Minecraft carichi la mod senza errori di incompatibilità o di firma.</label>
+  </li>
+</ul>
+
+<h2>6. Donor Mode Sbloccato</h2>
+<ul class="todo-list">
+  <li>
+    <input type="checkbox" id="donor-no-login">
+    <label for="donor-no-login"><strong>6.1:</strong> All'avvio del gioco, non viene richiesta alcuna credenziale premium Aristois o codice licenza.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="donor-menu-access">
+    <label for="donor-menu-access"><strong>6.2:</strong> Premendo <code>Shift Destro</code>, il pannello delle mod si apre mostrando tutte le caratteristiche sbloccate.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="donor-modules-test">
+    <label for="donor-modules-test"><strong>6.3:</strong> Attivare ed usare XRay, ESP, Tracers e AutoTool per accertarsi che funzionino liberamente e senza limitazioni di tempo o paywall.</label>
+  </li>
+</ul>
+
+<div class="footer">
+  AristoSeedCrack v1.1.0 &middot; Test Plan Generato in HTML &middot; Uso Personale
+</div>
+
+</body>
+</html>

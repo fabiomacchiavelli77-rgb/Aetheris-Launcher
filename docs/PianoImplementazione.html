@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Piano di Implementazione — Seed Cracker + Anti-Detection</title>
+<style>
+  :root {
+    --bg: #fff;
+    --text: #1a1a1a;
+    --muted: #555;
+    --accent: #7c3aed;
+    --accent2: #4f46e5;
+    --border: #e5e7eb;
+    --code-bg: #f3f4f6;
+    --table-stripe: #f9fafb;
+    --info-bg: #dbeafe;
+    --info-border: #3b82f6;
+    --warning-bg: #fef3c7;
+    --warning-border: #f59e0b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.7;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 30px;
+  }
+
+  .header {
+    text-align: center;
+    padding: 40px 0 20px;
+    border-bottom: 3px solid var(--accent);
+    margin-bottom: 40px;
+  }
+  .header h1 {
+    font-size: 2.2em;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .header .subtitle { font-size: 1.1em; color: var(--muted); margin-bottom: 20px; }
+  .header .version {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    padding: 4px 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9em;
+  }
+
+  h2 {
+    font-size: 1.5em;
+    margin: 35px 0 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    color: var(--accent2);
+  }
+  h3 { font-size: 1.2em; margin: 25px 0 10px; color: var(--text); }
+  h4 { font-size: 1.05em; margin: 18px 0 8px; color: var(--muted); }
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 24px; margin: 10px 0; }
+  li { margin: 5px 0; }
+
+  /* Callout boxes */
+  .callout {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid;
+  }
+  .callout.info    { background: var(--info-bg);    border-color: var(--info-border); }
+  .callout.warning { background: var(--warning-bg); border-color: var(--warning-border); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  tr:nth-child(even) td { background: var(--table-stripe); }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+  }
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 18px 22px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.88em;
+    line-height: 1.6;
+    margin: 15px 0;
+  }
+
+  .footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85em;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Piano di Implementazione Tecnico</h1>
+  <div class="subtitle">Seed Cracker + Anti-Detection Integration</div>
+  <div class="version">Design Document HTML</div>
+</div>
+
+<h2>Contesto</h2>
+<p>L'installer Aristois (questo progetto) è un tool desktop che scarica e installa il mod Aristois per Minecraft. Non ha accesso diretto al codice sorgente protetto del mod principale — scarica JAR pre-compilati da <code>maven.aristois.net</code> e da <code>gitlab.com/EMC-Framework/maven</code>.</p>
+
+<p><strong>Obiettivi dell'implementazione:</strong></p>
+<ol>
+  <li><strong>Seed Cracker:</strong> Integrare SeedCrackerX insieme ad Aristois (in modalità Fabric).</li>
+  <li><strong>Anti-Detection:</strong> Rendere i JAR installati più resistenti ai sistemi anti-cheat (es. Grim, Spartan) offuscandone i metadati identificativi.</li>
+</ol>
+
+<h2>Riepilogo Modifiche Effettuate</h2>
+<table>
+  <thead>
+    <tr>
+      <th>File Modificato</th>
+      <th>Tipo Modifica</th>
+      <th>Descrizione</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>model/Configuration.java</code></td>
+      <td>Modifica</td>
+      <td>Aggiunta dei campi booleani <code>seedCracker</code> e <code>antiDetection</code>.</td>
+    </tr>
+    <tr>
+      <td><code>view/components/CheckBox.java</code></td>
+      <td>Modifica</td>
+      <td>Aggiunta del callback <code>onChange</code> per gestire dinamicamente lo stato della UI.</td>
+    </tr>
+    <tr>
+      <td><code>view/scenes/SetupScene.java</code></td>
+      <td>Modifica</td>
+      <td>Aggiunta delle checkbox grafiche e della logica di interazione Forge/Fabric.</td>
+    </tr>
+    <tr>
+      <td><code>view/scenes/WelcomeScene.java</code></td>
+      <td>Modifica</td>
+      <td>Aggiunta di verifiche preliminari per SeedCrackerX (non bloccanti).</td>
+    </tr>
+    <tr>
+      <td><code>view/scenes/InstallingScene.java</code></td>
+      <td>Modifica</td>
+      <td>Integrazione delle chiamate per installare il Seed Cracker e avviare il patching JAR.</td>
+    </tr>
+    <tr>
+      <td><code>model/provider/Provider.java</code></td>
+      <td>Modifica</td>
+      <td>Aggiunta del metodo di default <code>installSeedCracker()</code> per estrarre la risorsa JAR embedded.</td>
+    </tr>
+    <tr>
+      <td><code>model/JarPatcher.java</code></td>
+      <td>Nuovo File</td>
+      <td>Utility stateless per manipolare ed offuscare i metadati <code>fabric.mod.json</code> e <code>mcmod.info</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout info">
+  <strong>Nessuna nuova dipendenza aggiunta:</strong> Si usano esclusivamente le librerie standard <code>java.util.zip</code> e la libreria <code>com.google.gson</code> già presente nel progetto originale.
+</div>
+
+<h2>Dettaglio Tecnico</h2>
+
+<h3>1. Logica di Patching (JarPatcher.java)</h3>
+<p>La classe <code>JarPatcher</code> apre il file JAR come un archivio ZIP in memoria ed esegue le seguenti operazioni:</p>
+<ul>
+  <li>Cerca la presenza dei metadati Fabric (<code>fabric.mod.json</code>) o Forge (<code>mcmod.info</code>).</li>
+  <li>Genera un UUID randomizzato a 6 caratteri e lo appende come suffisso all'ID originale della mod (es. <code>aristois_6c9f2b</code>).</li>
+  <li>Modifica la proprietà "name" della mod includendo un suffisso per mimetizzarla (es. <code>Aristois (Optimization)</code>).</li>
+  <li>Scrive i metadati modificati in un file JAR temporaneo ed esegue una sostituzione atomica del file originale per evitare corruzioni in caso di crash.</li>
+</ul>
+
+<h3>2. Integrazione UI e Interdipendenze</h3>
+<p>Nel file <code>SetupScene.java</code>, le opzioni di installazione sono gestite in modo da prevenire conflitti:</p>
+<pre>
+// Disabilita SeedCrackerX se l'utente spunta Forge
+forgeInstall.withOnChange(() -> {
+    if (forgeInstall.isChecked()) {
+        seedCracker.setChecked(false);
+        seedCracker.setVisible(false);
+    } else {
+        seedCracker.setVisible(true);
+    }
+});
+</pre>
+
+<h3>3. Meccanismo Offline / Embedded</h3>
+<p>Per garantire affidabilità e superare i rate limit delle API di GitHub, si è preferito inserire la mod SeedCrackerX direttamente nelle risorse dell'installer (<code>src/main/resources/aristois-seed-cracker.jar</code>). In questo modo l'installazione è garantita in qualsiasi momento, anche offline.</p>
+
+<div class="footer">
+  Piano di Implementazione &middot; AristoSeedCrack v1.1.0 &middot; HTML Design Document
+</div>
+
+</body>
+</html>

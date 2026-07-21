@@ -102,7 +102,7 @@ public class InstallingScene extends Scene {
             logText.accept("Installing SeedCrackerX");
             try {
                 provider.installSeedCracker(root, launcher, profile,
-                        provider.getVersion(), logText);
+                        provider.getVersion(), configuration.isForge(), logText);
             } catch (Exception ex) {
                 log.append("SeedCrackerX install failed: " + ex.getMessage());
                 ex.printStackTrace();
@@ -134,6 +134,34 @@ public class InstallingScene extends Scene {
             } catch (Exception ex) {
                 log.append("Anti-detection patch error: " + ex.getMessage());
             }
+        }
+
+        // Pre-configure Aristois to skip the welcome/update screens and remove wait times
+        logText.accept("Pre-configuring Aristois settings...");
+        try {
+            Path emcConfigs = launcher.getEMCDirectory(root, profile)
+                    .resolve(provider.getVersion())
+                    .resolve("configs");
+            if (!Files.exists(emcConfigs)) {
+                Files.createDirectories(emcConfigs);
+            }
+            Path aristoisConfig = emcConfigs.resolve("Aristois_config.json");
+            com.google.gson.JsonObject configJson = new com.google.gson.JsonObject();
+            if (Files.exists(aristoisConfig)) {
+                try (java.io.Reader reader = Files.newBufferedReader(aristoisConfig)) {
+                    configJson = Utils.GSON.fromJson(reader, com.google.gson.JsonObject.class);
+                }
+            }
+            configJson.addProperty("the_new_welcome_screen", false);
+            configJson.addProperty("_social-splash-screen", false);
+            configJson.addProperty("aristois__version", 9999);
+            configJson.addProperty("shown_gui_usage", true);
+            try (java.io.Writer writer = Files.newBufferedWriter(aristoisConfig)) {
+                Utils.GSON.toJson(configJson, writer);
+            }
+            log.append("Bypassed welcome & update screens (0s wait time)");
+        } catch (Exception ex) {
+            log.append("Pre-config failed: " + ex.getMessage());
         }
 
         logText.accept("Done");

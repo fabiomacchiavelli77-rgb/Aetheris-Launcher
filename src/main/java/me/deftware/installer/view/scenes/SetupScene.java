@@ -43,12 +43,12 @@ public class SetupScene extends Scene {
         seedCracker.setLabel("Install SeedCrackerX");
 
         CheckBox antiDetection = new CheckBox()
-                .withPosition(launcherBox.getX() + 200, 380)
+                .withPosition(launcherBox.getX() + 320, 380)
                 .add(this);
         antiDetection.setLabel("Anti-detection patch");
 
         forgeInstall
-                .withPosition(launcherBox.getX() + 150, 330)
+                .withPosition(launcherBox.getX() + 180, 330)
                 .withOnChange(() -> {
                     if (forgeInstall.isChecked()) {
                         seedCracker.setChecked(false);

@@ -18,8 +18,25 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
+:: Determina il percorso corretto del JAR (stessa cartella, ../packager, o packager/)
+set "JAR_PATH="
+if exist "%~dp0Aristois-Donor.jar" (
+    set "JAR_PATH=%~dp0Aristois-Donor.jar"
+) else if exist "%~dp0..\packager\Aristois-Donor.jar" (
+    set "JAR_PATH=%~dp0..\packager\Aristois-Donor.jar"
+) else if exist "%~dp0packager\Aristois-Donor.jar" (
+    set "JAR_PATH=%~dp0packager\Aristois-Donor.jar"
+)
+
+if "%JAR_PATH%"=="" (
+    echo [ERRORE] Aristois-Donor.jar non trovato.
+    echo Assicurati che il file JAR sia nella stessa cartella di questo script o nella cartella packager.
+    pause
+    exit /b 1
+)
+
 :: Avvia l'installer
-"%JAVA%" -jar "%~dp0packager\Aristois-Donor.jar" %*
+"%JAVA%" -jar "%JAR_PATH%" %*
 
 if %ERRORLEVEL% NEQ 0 (
     echo.

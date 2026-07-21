@@ -16,4 +16,20 @@ fi
 
 # Avvia l'installer
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-java -jar "$SCRIPT_DIR/packager/Aristois-Donor.jar" "$@"
+
+JAR_PATH=""
+if [ -f "$SCRIPT_DIR/Aristois-Donor.jar" ]; then
+    JAR_PATH="$SCRIPT_DIR/Aristois-Donor.jar"
+elif [ -f "$SCRIPT_DIR/../packager/Aristois-Donor.jar" ]; then
+    JAR_PATH="$SCRIPT_DIR/../packager/Aristois-Donor.jar"
+elif [ -f "$SCRIPT_DIR/packager/Aristois-Donor.jar" ]; then
+    JAR_PATH="$SCRIPT_DIR/packager/Aristois-Donor.jar"
+fi
+
+if [ -z "$JAR_PATH" ]; then
+    echo "[ERRORE] Aristois-Donor.jar non trovato."
+    echo "Assicurati che il file JAR sia nella stessa cartella di questo script o nella cartella packager."
+    exit 1
+fi
+
+java -jar "$JAR_PATH" "$@"

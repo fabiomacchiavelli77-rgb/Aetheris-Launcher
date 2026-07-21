@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>AristoSeedCrack v1.1.0 — Sviluppo Roadmap</title>
+<style>
+  :root {
+    --bg: #fff;
+    --text: #1a1a1a;
+    --muted: #555;
+    --accent: #7c3aed;
+    --accent2: #4f46e5;
+    --border: #e5e7eb;
+    --code-bg: #f3f4f6;
+    --table-stripe: #f9fafb;
+    --success-bg: #d1fae5;
+    --success-border: #10b981;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.7;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 30px;
+  }
+
+  .header {
+    text-align: center;
+    padding: 40px 0 20px;
+    border-bottom: 3px solid var(--accent);
+    margin-bottom: 40px;
+  }
+  .header h1 {
+    font-size: 2.2em;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .header .subtitle { font-size: 1.1em; color: var(--muted); margin-bottom: 20px; }
+  .header .version {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    padding: 4px 18px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9em;
+  }
+
+  h2 {
+    font-size: 1.4em;
+    margin: 30px 0 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    color: var(--accent2);
+  }
+
+  .todo-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+  }
+  .todo-list li {
+    display: flex;
+    align-items: flex-start;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+  .todo-list li:hover {
+    background: var(--code-bg);
+  }
+  .todo-list input[type="checkbox"] {
+    margin-top: 6px;
+    margin-right: 12px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--accent);
+  }
+  .todo-list label {
+    cursor: pointer;
+    flex: 1;
+  }
+  .todo-list code {
+    background: var(--code-bg);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+  }
+
+  .footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85em;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Roadmap & Sviluppo Checklist</h1>
+  <div class="subtitle">AristoSeedCrack v1.1.0</div>
+  <div class="version">Roadmap HTML</div>
+</div>
+
+<h2>Fase 1: Fondamenta (file indipendenti, nessun impatto UI)</h2>
+<ul class="todo-list">
+  <li>
+    <input type="checkbox" id="f1-1" checked>
+    <label for="f1-1"><strong>Configuration.java</strong> — Aggiungere campi <code>seedCracker</code>, <code>antiDetection</code> con builder methods relativi.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="f1-2" checked>
+    <label for="f1-2"><strong>CheckBox.java</strong> — Aggiungere callback <code>onChange</code> con setter <code>withOnChange(Runnable)</code>.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="f1-3" checked>
+    <label for="f1-3"><strong>JarPatcher.java</strong> — Creare utility per patchare metadata JAR (fabric.mod.json, mcmod.info).</label>
+  </li>
+  <li>
+    <input type="checkbox" id="f1-4" checked>
+    <label for="f1-4"><strong>SeedCrackerManager.java</strong> — Creare singleton per gestione e download (deprecato a favore della versione embedded in resources per compatibilità offline).</label>
+  </li>
+</ul>
+
+<h2>Fase 2: Provider Interface</h2>
+<ul class="todo-list">
+  <li>
+    <input type="checkbox" id="f2-1" checked>
+    <label for="f2-1"><strong>Provider.java</strong> — Aggiungere il metodo di default <code>installSeedCracker()</code>.</label>
+  </li>
+</ul>
+
+<h2>Fase 3: UI e Collegamento (Wiring)</h2>
+<ul class="todo-list">
+  <li>
+    <input type="checkbox" id="f3-1" checked>
+    <label for="f3-1"><strong>SetupScene.java</strong> — Aggiungere checkbox "Install SeedCrackerX" e "Anti-detection patch" con gestione interdipendenza da Forge.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="f3-2" checked>
+    <label for="f3-2"><strong>WelcomeScene.java</strong> — Inserire bootstrap di pre-fetch (reso non bloccante).</label>
+  </li>
+  <li>
+    <input type="checkbox" id="f3-3" checked>
+    <label for="f3-3"><strong>InstallingScene.java</strong> — Aggiungere chiamata a <code>installSeedCracker()</code> e il ciclo di patching dell'anti-detection all'interno del metodo <code>run()</code>.</label>
+  </li>
+</ul>
+
+<h2>Fase 4: Build e Verifica</h2>
+<ul class="todo-list">
+  <li>
+    <input type="checkbox" id="f4-1" checked>
+    <label for="f4-1"><code>./gradlew compileJava</code> — Compilazione pulita completata.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="f4-2" checked>
+    <label for="f4-2"><code>./gradlew shadowJar</code> — Compilazione del file JAR distribuibile completata.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="f4-3">
+    <label for="f4-3">Test manuale Seed Cracker: installare con checkbox, verificare la presenza di <code>SeedCrackerX.jar</code> nella cartella mods.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="f4-4">
+    <label for="f4-4">Test manuale Anti-Detection: installare spuntando la casella, aprire il JAR e controllare che <code>fabric.mod.json</code> sia patchato.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="f4-5">
+    <label for="f4-5">Test manuale Forge: verificare che la modalità Forge escluda correttamente l'installazione di SeedCrackerX mostrando un avviso.</label>
+  </li>
+  <li>
+    <input type="checkbox" id="f4-6">
+    <label for="f4-6">Test manuale offline: verificare che l'assenza di connessione internet non impedisca l'avvio e il completamento dell'installazione di base.</label>
+  </li>
+</ul>
+
+<div class="footer">
+  AristoSeedCrack v1.1.0 &middot; Roadmap HTML &middot; Uso Personale
+</div>
+
+</body>
+</html>

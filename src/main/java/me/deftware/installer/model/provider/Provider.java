@@ -68,15 +68,27 @@ public interface Provider {
     }
 
     default void installSeedCracker(Path root, Launcher launcher,
-            String profile, String mcVersion, Consumer<String> logger) throws IOException {
-        Path mods = launcher.getModsDirectory(root, profile);
-        if (getProtocol() <= 573) {
-            mods = mods.resolve(mcVersion);
+            String profile, String mcVersion, boolean isForge, Consumer<String> logger) throws IOException {
+        Path mods;
+        if (isForge) {
+            mods = launcher.getModsDirectory(root, profile);
+            if (getProtocol() <= 573) {
+                mods = mods.resolve(mcVersion);
+            }
+        } else {
+            // For Vanilla (Fabric/EMC), Aristois loads mods from libraries/me/deftware/EMC-F-v2/latest-{mcVersion}/
+            mods = launcher.getMinecraftDirectory(root, profile)
+                    .resolve("libraries")
+                    .resolve("me")
+                    .resolve("deftware")
+                    .resolve("EMC-F-v2")
+                    .resolve("latest-" + mcVersion);
         }
+
         if (!Files.exists(mods)) {
             Files.createDirectories(mods);
         }
-        logger.accept("Installing Aristois Seed Cracker");
+        logger.accept("Installing Aristois Seed Cracker to " + mods.getFileName());
         try (InputStream stream = Main.class.getResourceAsStream("/aristois-seed-cracker.jar")) {
             if (stream == null) {
                 logger.accept("Warning: Seed cracker JAR not found in resources");
