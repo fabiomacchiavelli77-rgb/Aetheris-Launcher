@@ -149,7 +149,12 @@ public class InstallingScene extends Scene {
             com.google.gson.JsonObject configJson = new com.google.gson.JsonObject();
             if (Files.exists(aristoisConfig)) {
                 try (java.io.Reader reader = Files.newBufferedReader(aristoisConfig)) {
-                    configJson = Utils.GSON.fromJson(reader, com.google.gson.JsonObject.class);
+                    com.google.gson.JsonObject parsed = Utils.GSON.fromJson(reader, com.google.gson.JsonObject.class);
+                    if (parsed != null) {
+                        configJson = parsed;
+                    }
+                } catch (Exception ex) {
+                    log.append("Warning: Could not read existing Aristois_config.json, creating new.");
                 }
             }
             configJson.addProperty("the_new_welcome_screen", false);
@@ -233,6 +238,9 @@ public class InstallingScene extends Scene {
 
         public void append(String line) {
             this.lines.add(line);
+            if (this.lines.size() > 11) {
+                this.lines.remove(0);
+            }
         }
 
     }

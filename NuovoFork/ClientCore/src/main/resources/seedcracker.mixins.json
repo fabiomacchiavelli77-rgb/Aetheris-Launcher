@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "kaptainwutax.seedcrackerX.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [
+    "ClientLevelMixin",
+    "ClientPacketListenerMixin",
+    "LocalPlayerMixin",
+    "SlimeEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

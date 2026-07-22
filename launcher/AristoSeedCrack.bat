@@ -1,4 +1,5 @@
 @echo off
+setlocal enableextensions
 title AristoSeedCrack v1.1.0
 echo ========================================
 echo   AristoSeedCrack v1.1.0
@@ -42,4 +43,7 @@ if %ERRORLEVEL% NEQ 0 (
     echo.
     echo [ERRORE] Installer terminato con errore
     pause
+    exit /b %ERRORLEVEL%
 )
+
+endlocal

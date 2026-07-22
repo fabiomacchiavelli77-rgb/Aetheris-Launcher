@@ -106,6 +106,21 @@ public class HttpProvider implements Provider {
             }
         }
         Files.deleteIfExists(temp);
+        
+        // --- ARISTOISEEDCRACK: PATCH FABRIC LOADER VERSION ---
+        try {
+            logger.accept("Patching Aristois JSON to upgrade Fabric Loader...");
+            Path jsonFile = directory.resolve(getVersion() + "-Aristois").resolve(getVersion() + "-Aristois.json");
+            if (Files.exists(jsonFile)) {
+                String content = new String(Files.readAllBytes(jsonFile), "UTF-8");
+                content = content.replaceAll("fabric-loader:0\\.1[0-9]\\.[0-9]+", "fabric-loader:0.19.3");
+                Files.write(jsonFile, content.getBytes("UTF-8"));
+                logger.accept("Fabric Loader successfully forced to 0.19.3!");
+            }
+        } catch (Exception ex) {
+            logger.accept("Warning: Failed to patch fabric loader version: " + ex.getMessage());
+        }
+        // -----------------------------------------------------
     }
 
     private String encode(String text) {

@@ -34,21 +34,21 @@ public class SetupScene extends Scene {
                 .add(this);
 
         CheckBox cleanInstall = new CheckBox()
-                .withPosition(launcherBox.getX(), 330)
+                .withPosition(launcherBox.getX() - 30, 340)
                 .add(this);
 
         CheckBox seedCracker = new CheckBox()
-                .withPosition(launcherBox.getX(), 380)
+                .withPosition(launcherBox.getX() - 30, 380)
                 .add(this);
         seedCracker.setLabel("Install SeedCrackerX");
 
         CheckBox antiDetection = new CheckBox()
-                .withPosition(launcherBox.getX() + 320, 380)
+                .withPosition(launcherBox.getX() + 230, 380)
                 .add(this);
         antiDetection.setLabel("Anti-detection patch");
 
         forgeInstall
-                .withPosition(launcherBox.getX() + 180, 330)
+                .withPosition(launcherBox.getX() + 230, 340)
                 .withOnChange(() -> {
                     if (forgeInstall.isChecked()) {
                         seedCracker.setChecked(false);
@@ -70,7 +70,7 @@ public class SetupScene extends Scene {
                 sceneManager.setScene(new LocationSetupScene(configuration, versionBox.getSelectedItem(), launcherBox.getSelectedItem().getLauncher()));
                 return true;
             }
-        }.withCenteredPosition(400).add(this);
+        }.withCenteredPosition(430).add(this);
         cleanInstall.setLabel("Clean install");
         Collections.reverse(components);
         setTitle("Setup");

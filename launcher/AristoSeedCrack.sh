@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 echo "========================================"
 echo "  AristoSeedCrack v1.1.0"
@@ -32,4 +32,9 @@ if [ -z "$JAR_PATH" ]; then
     exit 1
 fi
 
-java -jar "$JAR_PATH" "$@"
+java -jar "$JAR_PATH" "$@" || {
+    EXIT_CODE=$?
+    echo
+    echo "[ERRORE] Installer terminato con errore (codice: $EXIT_CODE)" >&2
+    exit $EXIT_CODE
+}

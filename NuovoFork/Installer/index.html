@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Aetheris Installer</title>
+  </head>
+  <body>
+    <div id="app">
+      <div class="glass-container">
+        <header>
+          <img src="/icon.jpg" class="logo-img" alt="Aetheris Logo">
+          <h1>Aetheris</h1>
+          <p class="subtitle">The Next Generation Minecraft Client</p>
+        </header>
+
+        <main>
+          <div class="installer-card">
+            <div class="version-selector">
+              <label for="mc-version">Minecraft Version</label>
+              <select id="mc-version">
+                <option value="1.21.4">1.21.4 (Latest)</option>
+                <option value="1.21">1.21</option>
+              </select>
+            </div>
+
+            <div class="features-list">
+              <div class="feature-item">
+                <span class="icon">🚀</span>
+                <span>Fabric Loader 0.19.3</span>
+              </div>
+              <div class="feature-item">
+                <span class="icon">🧩</span>
+                <span>Native SeedCrackerX Support</span>
+              </div>
+              <div class="feature-item">
+                <span class="icon">✨</span>
+                <span>100% Mod Compatibility</span>
+              </div>
+            </div>
+
+            <div class="progress-container hidden" id="progress-wrapper">
+              <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+              </div>
+              <p class="status-text" id="status-text">Preparing installation...</p>
+            </div>
+
+            <div class="clean-install-toggle">
+              <label class="switch">
+                <input type="checkbox" id="clean-install">
+                <span class="slider round"></span>
+              </label>
+              <span class="toggle-label">Clean Install (Backup old mods)</span>
+            </div>
+
+            <button id="install-btn" class="install-btn">
+              <span class="btn-text">Install Aetheris</span>
+              <div class="btn-glow"></div>
+            </button>
+          </div>
+        </main>
+        
+        <footer>
+          <p>Powered by Aetheris Core &bull; 2026 Edition</p>
+        </footer>
+      </div>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

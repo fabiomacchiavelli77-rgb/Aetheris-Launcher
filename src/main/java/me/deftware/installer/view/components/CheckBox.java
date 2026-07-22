@@ -38,9 +38,14 @@ public class CheckBox extends Component<CheckBox> {
         nvgBeginPath(vg);
         nvgRoundedRect(vg, x, y, width, height, 5);
 
+        nvgStroke(vg);
+
         if (checked) {
-            nvgFill(vg);
-        } else {
+            nvgBeginPath(vg);
+            nvgMoveTo(vg, x + 6, y + 6);
+            nvgLineTo(vg, x + width - 6, y + height - 6);
+            nvgMoveTo(vg, x + width - 6, y + 6);
+            nvgLineTo(vg, x + 6, y + height - 6);
             nvgStroke(vg);
         }
 

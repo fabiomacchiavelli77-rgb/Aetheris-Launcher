@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "aetheris-core",
+  "version": "${version}",
+  "name": "Aetheris Client",
+  "description": "Aetheris Client — Minecraft 1.21.4 hacked client with SeedCrackerX integrated. Fork of Aristois.",
+  "authors": [
+    "Aetheris Team"
+  ],
+  "contact": {
+    "homepage": "https://aetheris.dev"
+  },
+  "license": "MIT",
+  "icon": "assets/aetheris/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.aetheris.client.AetherisClient"
+    ],
+    "main": [
+      "kaptainwutax.seedcrackerX.SeedCracker"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "1.21.4",
+    "java": ">=21",
+    "fabric-api-base": "*",
+    "fabric-transitive-access-wideners-v1": "*",
+    "fabric-command-api-v2": "*",
+    "fabric-rendering-v1": "*",
+    "fabric-resource-loader-v0": "*",
+    "fabric-resource-loader-v1": "*",
+    "cloth-config": "*"
+  },
+  "mixins": [
+    "aetheris.mixins.json",
+    "seedcracker.mixins.json"
+  ],
+  "accessWidener": "aetheris.accesswidener"
+}

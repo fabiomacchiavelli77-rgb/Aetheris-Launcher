@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "net.aetheris.client.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "LivingEntityMixin",
+    "PlayerEntityMixin"
+  ],
+  "client": [
+    "TitleScreenMixin",
+    "KeyboardMixin",
+    "MinecraftClientMixin",
+    "ClientPlayerEntityMixin",
+    "ClientPlayerInteractionManagerMixin",
+    "GameRendererMixin",
+    "WorldRendererMixin",
+    "BlockRenderManagerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
