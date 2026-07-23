@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import net.aetheris.client.config.ProfileManager;
 import net.aetheris.client.modules.impl.combat.*;
 import net.aetheris.client.modules.impl.movement.*;
 import net.aetheris.client.modules.impl.render.*;
@@ -63,6 +64,10 @@ public class ModuleManager {
 
     public static List<Module> getModules() {
         return modules;
+    }
+
+    public static List<Module> getModules(Category category) {
+        return modules.stream().filter(m -> m.getCategory() == category).toList();
     }
 
     public static Optional<Module> getModule(String name) {
