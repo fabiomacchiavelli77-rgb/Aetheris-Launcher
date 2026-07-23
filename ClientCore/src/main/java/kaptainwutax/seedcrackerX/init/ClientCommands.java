@@ -1,6 +1,7 @@
 package kaptainwutax.seedcrackerX.init;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import kaptainwutax.seedcrackerX.command.ClientCommand;
 import kaptainwutax.seedcrackerX.command.CrackerCommand;
 import kaptainwutax.seedcrackerX.command.DataCommand;
@@ -38,7 +39,21 @@ public class ClientCommands {
     }
 
     public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher) {
-        COMMANDS.forEach(clientCommand -> clientCommand.register(dispatcher));
+        LiteralArgumentBuilder<FabricClientCommandSource> root = net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal(PREFIX)
+            .executes(context -> {
+                if (DATA != null) {
+                    return DATA.printBits(context);
+                }
+                return 0;
+            });
+
+        for (ClientCommand cmd : COMMANDS) {
+            LiteralArgumentBuilder<FabricClientCommandSource> builder = net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal(cmd.getName());
+            cmd.build(builder);
+            root.then(builder);
+        }
+
+        dispatcher.register(root);
     }
 
 }

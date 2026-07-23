@@ -83,8 +83,8 @@ public class DataStorage {
     public void tick() {
         if (openGui) {
             ConfigScreen configscreen = new ConfigScreen();
-            Screen screen = configscreen.getConfigScreenByCloth(Minecraft.getInstance().gui.screen());
-            Minecraft.getInstance().gui.setScreen(screen);
+            Screen screen = configscreen.getConfigScreenByCloth(Minecraft.getInstance().screen);
+            Minecraft.getInstance().setScreen(screen);
             openGui = false;
         }
         if (!this.timeMachine.isRunning) {
@@ -271,3 +271,4 @@ public class DataStorage {
     }
 
 }
+

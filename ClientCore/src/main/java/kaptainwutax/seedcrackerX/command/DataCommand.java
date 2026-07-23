@@ -12,7 +12,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.locale.Language;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 
 public class DataCommand extends ClientCommand {
 
@@ -23,6 +23,8 @@ public class DataCommand extends ClientCommand {
 
     @Override
     public void build(LiteralArgumentBuilder<FabricClientCommandSource> builder) {
+        builder.executes(this::printBits);
+
         builder.then(literal("clear")
                 .executes(this::clear)
         );
@@ -43,12 +45,21 @@ public class DataCommand extends ClientCommand {
         return 0;
     }
 
-    private int printBits(CommandContext<FabricClientCommandSource> context) {
+    public int printBits(CommandContext<FabricClientCommandSource> context) {
         DataStorage s = SeedCracker.get().getDataStorage();
-        String message = Language.getInstance().getOrDefault("data.collectedBits").formatted((int) s.getBaseBits(), (int) s.getWantedBits());
-        String message2 = Language.getInstance().getOrDefault("data.collectedLiftingBits").formatted((int) s.getLiftingBits(), 40);
-        sendFeedback(message, ChatFormatting.GREEN);
-        sendFeedback(message2, ChatFormatting.GREEN);
+        int baseBits = (int) s.getBaseBits();
+        int wantedBits = (int) s.getWantedBits();
+        int liftingBits = (int) s.getLiftingBits();
+
+        sendFeedback("§e[SeedCrackerX] Data Progress:", ChatFormatting.YELLOW);
+        sendFeedback("  - Base Bits: §a" + baseBits + " / " + wantedBits + " §7(Structures/Decorators)", ChatFormatting.GRAY);
+        sendFeedback("  - Lifting Bits: §b" + liftingBits + " / 40 §7(World Seed calculation)", ChatFormatting.GRAY);
+
+        if (baseBits >= wantedBits && liftingBits >= 40) {
+            sendFeedback("§a[+] Ready to crack world seed! Run /seedcracker cracker data", ChatFormatting.GREEN);
+        } else {
+            sendFeedback("§c[-] Need more structures/pillars to calculate world seed.", ChatFormatting.RED);
+        }
         return 0;
     }
 

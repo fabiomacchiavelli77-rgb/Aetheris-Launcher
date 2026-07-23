@@ -21,7 +21,7 @@ public class Scaffold extends Module {
     public void onTick() {
         if (mc.player == null || mc.level == null) return;
         if (placeCooldown > 0) { placeCooldown--; return; }
-        if (mc.player.input.forward() == 0 && mc.player.input.left() == 0) return;
+        if (mc.player.input.forwardImpulse == 0 && mc.player.input.leftImpulse == 0) return;
 
         BlockPos below = mc.player.blockPosition().below();
         if (!mc.level.getBlockState(below).isAir() && !mc.level.getBlockState(below).canBeReplaced()) return;

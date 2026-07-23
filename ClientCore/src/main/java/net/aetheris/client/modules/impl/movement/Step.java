@@ -15,21 +15,21 @@ public class Step extends Module {
     public void onEnable() {
         if (mc.player != null) {
             oldStepHeight = mc.player.maxUpStep();
-            mc.player.setMaxUpStep(STEP_HEIGHT);
+            mc.player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(STEP_HEIGHT);
         }
     }
 
     @Override
     public void onDisable() {
         if (mc.player != null) {
-            mc.player.setMaxUpStep(oldStepHeight);
+            mc.player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(oldStepHeight);
         }
     }
 
     @Override
     public void onTick() {
         if (mc.player != null && mc.player.maxUpStep() != STEP_HEIGHT) {
-            mc.player.setMaxUpStep(STEP_HEIGHT);
+            mc.player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(STEP_HEIGHT);
         }
     }
 }

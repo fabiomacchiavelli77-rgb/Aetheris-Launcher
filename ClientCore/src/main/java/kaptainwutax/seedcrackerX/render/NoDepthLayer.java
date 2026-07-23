@@ -1,30 +1,31 @@
 package kaptainwutax.seedcrackerX.render;
 
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.CompareOp;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.rendertype.LayeringTransform;
-import net.minecraft.client.renderer.rendertype.OutputTarget;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.resources.Identifier;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
+import java.util.OptionalDouble;
 
-public final class NoDepthLayer {
-    private NoDepthLayer() {
+public abstract class NoDepthLayer extends RenderType {
+    public NoDepthLayer(String string, VertexFormat vertexFormat, VertexFormat.Mode mode, int i, boolean bl, boolean bl2, Runnable runnable, Runnable runnable2) {
+        super(string, vertexFormat, mode, i, bl, bl2, runnable, runnable2);
     }
 
-    private static final RenderPipeline LINES_NO_DEPTH_PIPELINE = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
-            .withLocation(Identifier.fromNamespaceAndPath("seedcrackerx", "pipeline/lines_no_depth"))
-            .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false, 0, 0))
-            .build()
-    );
-
     public static final RenderType LINES_NO_DEPTH_LAYER = RenderType.create("seedcrackerx_no_depth",
-        RenderSetup.builder(LINES_NO_DEPTH_PIPELINE)
-            .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-            .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
-            .createRenderSetup()
+        DefaultVertexFormat.POSITION_COLOR_NORMAL,
+        VertexFormat.Mode.LINES,
+        256,
+        false,
+        false,
+        RenderType.CompositeState.builder()
+            .setShaderState(RENDERTYPE_LINES_SHADER)
+            .setLineState(new RenderStateShard.LineStateShard(OptionalDouble.empty()))
+            .setLayeringState(VIEW_OFFSET_Z_LAYERING)
+            .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+            .setOutputState(ITEM_ENTITY_TARGET)
+            .setWriteMaskState(COLOR_DEPTH_WRITE)
+            .setCullState(NO_CULL)
+            .setDepthTestState(NO_DEPTH_TEST)
+            .createCompositeState(false)
     );
 }

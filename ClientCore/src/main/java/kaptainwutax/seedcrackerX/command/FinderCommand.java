@@ -8,7 +8,7 @@ import kaptainwutax.seedcrackerX.util.Log;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.*;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 
 public class FinderCommand extends ClientCommand {
     ReloadFinders reloadFinders = new ReloadFinders();

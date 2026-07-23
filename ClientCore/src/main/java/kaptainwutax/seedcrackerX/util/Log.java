@@ -38,7 +38,7 @@ public class Log {
         String message = translate(translateKey);
         String[] data = message.split(Pattern.quote("${SEED}"));
         String seed = String.valueOf(seedValue);
-        Component text = ComponentUtils.wrapInSquareBrackets((Component.literal(seed)).withStyle(style -> style.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent.CopyToClipboard(seed)).withHoverEvent(new HoverEvent.ShowText(Component.translatable("chat.copy.click"))).withInsertion(seed)));
+        Component text = ComponentUtils.wrapInSquareBrackets((Component.literal(seed)).withStyle(style -> style.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, seed)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click"))).withInsertion(seed)));
 
 
         MutableComponent text1 = Component.literal(data[0]).append(text);
@@ -49,7 +49,7 @@ public class Log {
     }
 
     public static void printDungeonInfo(String message) {
-        Component text = ComponentUtils.wrapInSquareBrackets((Component.literal(message)).withStyle(style -> style.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent.CopyToClipboard(message)).withHoverEvent(new HoverEvent.ShowText( Component.translatable("chat.copy.click"))).withInsertion(message)));
+        Component text = ComponentUtils.wrapInSquareBrackets((Component.literal(message)).withStyle(style -> style.withColor(ChatFormatting.GREEN).withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, message)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("chat.copy.click"))).withInsertion(message)));
 
         sendMessage(text);
     }
@@ -63,7 +63,7 @@ public class Log {
     }
 
     private static void sendMessage(Component component) {
-        schedule(() -> Minecraft.getInstance().gui.chatListener().handleSystemMessage(component, false));
+        schedule(() -> Minecraft.getInstance().gui.getChat().addMessage(component));
     }
 
 }

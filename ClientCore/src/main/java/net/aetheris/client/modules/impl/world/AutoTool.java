@@ -5,6 +5,10 @@ import net.aetheris.client.modules.Module;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+
 public class AutoTool extends Module {
     private int lastSlot = -1;
 
@@ -14,11 +18,11 @@ public class AutoTool extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null || mc.hitResult == null) return;
+        if (mc.player == null || mc.hitResult == null || mc.hitResult.getType() != HitResult.Type.BLOCK) return;
         if (!mc.options.keyAttack.isDown()) return;
         if (mc.gameMode == null || !mc.gameMode.isDestroying()) return;
 
-        BlockPos pos = mc.hitResult.getBlockPos();
+        BlockPos pos = ((BlockHitResult) mc.hitResult).getBlockPos();
         if (pos == null) return;
 
         BlockState state = mc.level.getBlockState(pos);

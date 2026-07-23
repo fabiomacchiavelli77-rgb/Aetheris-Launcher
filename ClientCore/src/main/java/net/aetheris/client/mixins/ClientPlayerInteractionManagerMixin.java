@@ -22,17 +22,7 @@ public class ClientPlayerInteractionManagerMixin {
     @Shadow
     private float destroyProgress;
 
-    /**
-     * Reach — estende la distanza di interazione.
-     */
-    @Inject(method = "getPickRange", at = @At("RETURN"), cancellable = true)
-    private void onGetPickRange(CallbackInfoReturnable<Float> cir) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof Reach r && r.isEnabled()) {
-                cir.setReturnValue(r.getReachDistance());
-            }
-        }
-    }
+
 
     /**
      * FastBreak — accelera il progresso di rottura blocchi.

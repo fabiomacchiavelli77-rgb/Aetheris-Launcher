@@ -15,7 +15,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class ConfigScreen {
         ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
                 .setTitle(Component.translatable("title"))
-                .setDefaultBackgroundTexture(Identifier.parse("minecraft:textures/block/blackstone.png"))
+                .setDefaultBackgroundTexture(ResourceLocation.parse("minecraft:textures/block/blackstone.png"))
                 .setTransparentBackground(true);
         ConfigEntryBuilder eb = builder.entryBuilder();
 
@@ -58,8 +58,8 @@ public class ConfigScreen {
                 .setSaveConsumer(val -> config.databaseSubmits = val).build());
         settings.addEntry(eb.startBooleanToggle(Component.translatable("settings.hideNameDatabase"), config.anonymusSubmits).setSaveConsumer(val -> config.anonymusSubmits = val).build());
         settings.addEntry(eb.startTextDescription(Component.translatable("settings.openDatabase").withStyle(s -> s
-                .withClickEvent(new ClickEvent.OpenUrl(DatabaseCommand.DATABASE_URL))
-                .withHoverEvent(new HoverEvent.ShowText(Component.literal("google sheet")))
+                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, DatabaseCommand.DATABASE_URL.toString()))
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("google sheet")))
                 .withColor(ChatFormatting.BLUE)
                 .withUnderlined(true)
                 .withItalic(true)))

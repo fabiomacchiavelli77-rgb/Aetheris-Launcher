@@ -3,11 +3,10 @@ package kaptainwutax.seedcrackerX.finder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import kaptainwutax.seedcrackerX.config.Config;
 import kaptainwutax.seedcrackerX.render.Cuboid;
-import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.state.level.LevelRenderState;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ public class FinderQueue {
     private static final Logger log = LoggerFactory.getLogger(FinderQueue.class);
     public static ExecutorService SERVICE = Executors.newFixedThreadPool(5);
 
-    private static final RenderStateDataKey<Set<Cuboid>> CUBOID_SET_KEY = RenderStateDataKey.create(() -> "SeedCrackerX cuboid set");
 
     public FinderControl finderControl = new FinderControl();
 
@@ -37,8 +35,10 @@ public class FinderQueue {
     }
 
     public static void registerEvents() {
-        LevelRenderEvents.END_EXTRACTION.register(levelExtractionContext -> FinderQueue.get().extractCuboids(levelExtractionContext.levelState(), levelExtractionContext.camera()));
-        LevelRenderEvents.END_MAIN.register(levelRenderContext -> FinderQueue.get().renderCuboids(levelRenderContext.submitNodeCollector(), levelRenderContext.poseStack(), levelRenderContext.levelState()));
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> {
+            FinderQueue.get().extractCuboids(context.camera());
+            FinderQueue.get().renderCuboids(context.consumers(), context.matrixStack());
+        });
     }
 
     public static FinderQueue get() {
@@ -66,9 +66,9 @@ public class FinderQueue {
         });
     }
 
-    private void extractCuboids(LevelRenderState state, Camera camera) {
+    private void extractCuboids(Camera camera) {
         if (Config.get().render == Config.RenderType.OFF) {
-            state.setData(CUBOID_SET_KEY, Collections.emptySet());
+            // Note: RenderStateDataKey is usually tied to a state, but since we don't have it, we just store it locally. Wait!
             return;
         }
         Set<Cuboid> cuboids = new HashSet<>();
@@ -77,11 +77,14 @@ public class FinderQueue {
                 finder.cuboids.forEach(cuboid -> cuboids.add(cuboid.offset(camera)));
             }
         });
-        state.setData(CUBOID_SET_KEY, cuboids);
+        // We will store it in a local variable or directly pass it to renderCuboids since we run them in the same event now!
+        this.currentCuboids = cuboids;
     }
 
-    public void renderCuboids(SubmitNodeCollector submitter, PoseStack poseStack, LevelRenderState state) {
-        Set<Cuboid> cuboids = state.getData(CUBOID_SET_KEY);
+    private Set<Cuboid> currentCuboids = Collections.emptySet();
+
+    public void renderCuboids(MultiBufferSource submitter, PoseStack poseStack) {
+        Set<Cuboid> cuboids = this.currentCuboids;
         if (cuboids == null) {
             return;
         }

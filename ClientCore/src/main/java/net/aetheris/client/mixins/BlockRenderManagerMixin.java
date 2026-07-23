@@ -14,7 +14,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BlockRenderDispatcher.class)
 public class BlockRenderManagerMixin {
@@ -22,11 +22,11 @@ public class BlockRenderManagerMixin {
     @Inject(method = "renderBatched", at = @At("HEAD"), cancellable = true)
     private void onRenderBatched(BlockState state, BlockPos pos, BlockAndTintGetter level,
                                   PoseStack poseStack, VertexConsumer consumer,
-                                  boolean checkSides, RandomSource random, CallbackInfoReturnable<Boolean> cir) {
+                                  boolean checkSides, RandomSource random, CallbackInfo ci) {
         for (var mod : ModuleManager.getModules()) {
             if (mod instanceof Xray && mod.isEnabled()) {
                 if (!Xray.isXrayBlock(state.getBlock())) {
-                    cir.setReturnValue(false);
+                    ci.cancel();
                     return;
                 }
             }

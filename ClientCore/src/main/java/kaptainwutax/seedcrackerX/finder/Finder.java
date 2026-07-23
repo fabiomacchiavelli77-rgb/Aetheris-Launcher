@@ -97,23 +97,22 @@ public abstract class Finder {
     public abstract boolean isValidDimension(DimensionType dimension);
 
     public boolean isOverworld(DimensionType dimension) {
-        return dimension.skybox() == DimensionType.Skybox.OVERWORLD;
+        return dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.OVERWORLD_EFFECTS);
     }
 
     public boolean isNether(DimensionType dimension) {
-        return dimension.skybox() == DimensionType.Skybox.NONE;
+        return dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.NETHER_EFFECTS);
     }
 
     public boolean isEnd(DimensionType dimension) {
-        return dimension.skybox() == DimensionType.Skybox.END;
+        return dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.END_EFFECTS);
     }
 
     public static String inferDimension(DimensionType dimension) {
-        return switch (dimension.skybox()) {
-            case OVERWORLD -> "overworld";
-            case NONE -> "the_nether";
-            case END -> "the_end";
-        };
+        if (dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.OVERWORLD_EFFECTS)) return "overworld";
+        if (dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.NETHER_EFFECTS)) return "the_nether";
+        if (dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.END_EFFECTS)) return "the_end";
+        return "unknown";
     }
 
     public enum Category {
@@ -161,3 +160,4 @@ public abstract class Finder {
         }
     }
 }
+

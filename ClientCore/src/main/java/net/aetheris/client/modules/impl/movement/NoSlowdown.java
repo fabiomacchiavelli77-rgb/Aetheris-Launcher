@@ -15,8 +15,8 @@ public class NoSlowdown extends Module {
         // Il mixin nel LocalPlayer impedisce il flag isUsingItem che rallenta
         // Il modulo forza l'input a non essere influenzato dall'uso oggetti
         if (mc.player.isUsingItem()) {
-            mc.player.input.leftImpulse = mc.player.input.left() * 0.2f;
-            mc.player.input.forwardImpulse = mc.player.input.forward() * 0.2f;
+            mc.player.input.leftImpulse = mc.player.input.leftImpulse * 0.2f;
+            mc.player.input.forwardImpulse = mc.player.input.forwardImpulse * 0.2f;
         }
     }
 }

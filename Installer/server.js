@@ -64,7 +64,7 @@ app.post('/install', async (req, res) => {
         }
 
         // 3. Copy Aetheris Core
-        const sourceJar = 'c:\\Progetti AI\\Aristois\\NuovoFork\\ClientCore\\build\\libs\\aetheris-core-1.0.0.jar';
+        const sourceJar = path.resolve(__dirname, '../ClientCore/build/libs/aetheris-core-1.0.0.jar');
         if (fs.existsSync(sourceJar)) {
             fs.copyFileSync(sourceJar, path.join(modsDir, 'aetheris-core-1.0.0.jar'));
         } else {

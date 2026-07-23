@@ -73,16 +73,16 @@ public class TrialChambersFinder extends Finder {
                 .setValue(VaultBlock.STATE, VaultState.INACTIVE);
         var tuffBricks = Blocks.TUFF_BRICKS.defaultBlockState();
         var chiseledTuff = Blocks.CHISELED_TUFF.defaultBlockState();
-        var redGlazedTerracotta = Blocks.GLAZED_TERRACOTTA.red().defaultBlockState();
-        var waxedCopperBulbOn = Blocks.COPPER_BULB.waxed().unaffected().defaultBlockState()
+        var redGlazedTerracotta = Blocks.RED_GLAZED_TERRACOTTA.defaultBlockState();
+        var waxedCopperBulbOn = Blocks.WAXED_COPPER_BULB.defaultBlockState()
                 .setValue(CopperBulbBlock.LIT, true);
-        var redCandle3 = Blocks.DYED_CANDLE.red().defaultBlockState()
+        var redCandle3 = Blocks.RED_CANDLE.defaultBlockState()
                 .setValue(CandleBlock.CANDLES, 3)
                 .setValue(CandleBlock.LIT, true);
-        var redCandle4 = Blocks.DYED_CANDLE.red().defaultBlockState()
+        var redCandle4 = Blocks.RED_CANDLE.defaultBlockState()
                 .setValue(CandleBlock.CANDLES, 4)
                 .setValue(CandleBlock.LIT, true);
-        var waxedOxidizedCopperGrate = Blocks.COPPER_GRATE.waxed().oxidized().defaultBlockState();
+        var waxedOxidizedCopperGrate = Blocks.WAXED_OXIDIZED_COPPER_GRATE.defaultBlockState();
 
         finder.fillWithOutline(x, y, z, x + 2, y, z + 1, waxedOxidizedCopperGrate, waxedOxidizedCopperGrate, false);
         finder.addBlock(redCandle3, x, y + 1, z);
@@ -103,10 +103,10 @@ public class TrialChambersFinder extends Finder {
     public static void buildEnd1(JigsawFinder finder) {
         var air = Blocks.AIR.defaultBlockState();
         var tuffBricks = Blocks.TUFF_BRICKS.defaultBlockState();
-        var waxedOxidizedCutCopper = Blocks.CUT_COPPER.waxed().oxidized().defaultBlockState();
-        var waxedCopperBulbOn = Blocks.COPPER_BULB.waxed().unaffected().defaultBlockState()
+        var waxedOxidizedCutCopper = Blocks.WAXED_OXIDIZED_CUT_COPPER.defaultBlockState();
+        var waxedCopperBulbOn = Blocks.WAXED_COPPER_BULB.defaultBlockState()
                 .setValue(CopperBulbBlock.LIT, true);
-        var waxedCopperBlock = Blocks.COPPER_BLOCK.waxed().unaffected().defaultBlockState();
+        var waxedCopperBlock = Blocks.WAXED_COPPER_BLOCK.defaultBlockState();
         var chiseledTuff = Blocks.CHISELED_TUFF.defaultBlockState();
         var chiseledTuffBricks = Blocks.CHISELED_TUFF_BRICKS.defaultBlockState();
         var polishedTuff = Blocks.POLISHED_TUFF.defaultBlockState();
@@ -159,8 +159,8 @@ public class TrialChambersFinder extends Finder {
     public static void buildEnd2(JigsawFinder finder) {
         var water = Blocks.WATER.defaultBlockState();
         var tuffBricks = Blocks.TUFF_BRICKS.defaultBlockState();
-        var waxedOxidizedCopper = Blocks.COPPER_BLOCK.waxed().oxidized().defaultBlockState();
-        var waxedCopperGrate = Blocks.COPPER_GRATE.waxed().unaffected().defaultBlockState();
+        var waxedOxidizedCopper = Blocks.WAXED_OXIDIZED_COPPER.defaultBlockState();
+        var waxedCopperGrate = Blocks.WAXED_COPPER_GRATE.defaultBlockState();
         var diamondChest = Blocks.CHEST.defaultBlockState()
                 .setValue(ChestBlock.FACING, Direction.SOUTH)
                 .setValue(ChestBlock.TYPE, ChestType.SINGLE);
@@ -195,7 +195,7 @@ public class TrialChambersFinder extends Finder {
 
     @Override
     public List<BlockPos> findInChunk() {
-        Biome biome = this.world.getNoiseBiome((this.chunkPos.x() << 2) + 2, 64, (this.chunkPos.z() << 2) + 2).value();
+        Biome biome = this.world.getNoiseBiome((this.chunkPos.x << 2) + 2, 64, (this.chunkPos.z << 2) + 2).value();
         // TODO: replace with following once deep dark is implemented
         // if (!Features.TRIAL_CHAMBERS.isValidBiome(BiomeFixer.swap(biome))) return new ArrayList<>();
         if (Minecraft.getInstance().level.registryAccess().lookup(Registries.BIOME).get().getKey(biome).equals(Biomes.DEEP_DARK)) return new ArrayList<>();
@@ -208,7 +208,7 @@ public class TrialChambersFinder extends Finder {
             combinedResult.addAll(positions);
 
             positions.forEach(pos -> {
-                RegionStructure.Data<?> data = Features.TRIAL_CHAMBERS.at(this.chunkPos.x(), this.chunkPos.z());
+                RegionStructure.Data<?> data = Features.TRIAL_CHAMBERS.at(this.chunkPos.x, this.chunkPos.z);
 
                 if (SeedCracker.get().getDataStorage().addBaseData(data, DataAddedEvent.POKE_STRUCTURES)) {
                     this.cuboids.add(new Cuboid(pos, pieceFinder.getLayout(), ARGB.color(170, 84, 3)));
@@ -236,3 +236,5 @@ public class TrialChambersFinder extends Finder {
     }
 
 }
+
+

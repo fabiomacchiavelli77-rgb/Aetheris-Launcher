@@ -1,20 +1,18 @@
 package net.aetheris.client.gui;
 
+import net.aetheris.client.modules.Category;
 import net.aetheris.client.modules.Module;
 import net.aetheris.client.modules.ModuleManager;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-
-import net.aetheris.client.modules.Category;
 
 import java.util.List;
 
 public class AetherisMenuScreen extends Screen {
     private Category currentCategory = Category.COMBAT;
     private int scrollOffset = 0;
-    private static final int MODULES_PER_PAGE = 10;
     private Module recordingKeybind = null;
 
     public AetherisMenuScreen() {
@@ -23,45 +21,41 @@ public class AetherisMenuScreen extends Screen {
 
     @Override
     protected void init() {
-        this.clearWidgets();
         scrollOffset = 0;
-
-        int btnWidth = 90;
-        Category[] cats = Category.values();
-        int totalWidth = cats.length * (btnWidth + 5) - 5;
-        int startX = (this.width - totalWidth) / 2;
-
-        for (Category cat : cats) {
-            this.addRenderableWidget(Button.builder(
-                Component.literal(cat.getName()),
-                button -> { currentCategory = cat; scrollOffset = 0; rebuildWidgets(); }
-            ).bounds(startX, 30, btnWidth, 20).build());
-            startX += btnWidth + 5;
-        }
         rebuildWidgets();
     }
 
-    private void rebuildWidgets() {
-        this.children().clear();
-        // Ricrea bottoni categoria
-        int btnWidth = 90;
+    @Override
+    protected void rebuildWidgets() {
+        this.clearWidgets();
+
+        // 1. Bottoni categoria in alto (calcolo proporzionale alla larghezza)
         Category[] cats = Category.values();
-        int totalWidth = cats.length * (btnWidth + 5) - 5;
+        int btnWidth = Math.min(90, Math.max(55, (this.width - 20) / cats.length - 4));
+        int totalWidth = cats.length * (btnWidth + 4) - 4;
         int startX = (this.width - totalWidth) / 2;
+
         for (Category cat : cats) {
+            String label = (cat == currentCategory ? "§a> " : "") + cat.getName();
             this.addRenderableWidget(Button.builder(
-                Component.literal(cat.getName()),
+                Component.literal(label),
                 button -> { currentCategory = cat; scrollOffset = 0; rebuildWidgets(); }
             ).bounds(startX, 30, btnWidth, 20).build());
-            startX += btnWidth + 5;
+            startX += btnWidth + 4;
         }
+
+        // 2. Calcolo dinamico dello spazio verticale disponibile
+        int startY = 58;
+        int navY = this.height - 28;
+        int availableHeight = navY - startY - 10;
+        int modulesPerPage = Math.max(1, availableHeight / 25);
 
         List<Module> catModules = ModuleManager.getModules().stream()
             .filter(m -> m.getCategory() == currentCategory).toList();
 
-        int startY = 65;
-        int endIdx = Math.min(scrollOffset + MODULES_PER_PAGE, catModules.size());
+        int endIdx = Math.min(scrollOffset + modulesPerPage, catModules.size());
 
+        // 3. Bottoni moduli
         for (int i = scrollOffset; i < endIdx; i++) {
             Module mod = catModules.get(i);
             int y = startY + ((i - scrollOffset) * 25);
@@ -74,35 +68,51 @@ public class AetherisMenuScreen extends Screen {
                 Component.literal(label),
                 button -> {
                     if (hasShiftDown()) {
-                        // Shift+click = registra keybind
                         recordingKeybind = mod;
                         rebuildWidgets();
                     } else {
                         mod.toggle();
-                        button.setMessage(Component.literal(
-                            mod.getName() + " [" + (mod.getKeybindName() == null ? "None" : mod.getKeybindName()) + "]: "
-                            + (mod.isEnabled() ? "§aON" : "§cOFF")
-                        ));
+                        rebuildWidgets();
                     }
                 }
             ).bounds(this.width / 2 - 120, y, 240, 20).build());
         }
 
-        // Scroll buttons
-        if (catModules.size() > MODULES_PER_PAGE) {
+        // 4. Bottoni di scorrimento (se i moduli superano la capienza della pagina)
+        if (catModules.size() > modulesPerPage) {
             if (scrollOffset > 0)
                 this.addRenderableWidget(Button.builder(Component.literal("▲"),
-                    b -> { scrollOffset--; rebuildWidgets(); }).bounds(this.width / 2 - 125, 55, 20, 12).build());
-            if (scrollOffset + MODULES_PER_PAGE < catModules.size())
+                    b -> { scrollOffset--; rebuildWidgets(); }).bounds(this.width / 2 - 145, startY, 20, 20).build());
+            if (scrollOffset + modulesPerPage < catModules.size())
                 this.addRenderableWidget(Button.builder(Component.literal("▼"),
-                    b -> { scrollOffset++; rebuildWidgets(); }).bounds(this.width / 2 + 105, 55, 20, 12).build());
+                    b -> { scrollOffset++; rebuildWidgets(); }).bounds(this.width / 2 + 125, startY, 20, 20).build());
         }
+
+        // 5. Bottom Navigation Bar ancorata in basso
+        int bWidth = Math.min(100, (this.width - 20) / 4 - 5);
+        int bStartX = (this.width - (4 * (bWidth + 5) - 5)) / 2;
+
+        this.addRenderableWidget(Button.builder(Component.literal("§bKeybinds"), b -> {
+            this.minecraft.setScreen(new KeybindManagerScreen(this));
+        }).bounds(bStartX, navY, bWidth, 20).build());
+
+        this.addRenderableWidget(Button.builder(Component.literal("§6Xray Ores"), b -> {
+            this.minecraft.setScreen(new XrayBlockSelectorScreen(this));
+        }).bounds(bStartX + bWidth + 5, navY, bWidth, 20).build());
+
+        this.addRenderableWidget(Button.builder(Component.literal("§dAlt Manager"), b -> {
+            this.minecraft.setScreen(new AltManagerScreen(this));
+        }).bounds(bStartX + 2 * (bWidth + 5), navY, bWidth, 20).build());
+
+        this.addRenderableWidget(Button.builder(Component.literal("§eSeedCracker"), b -> {
+            this.minecraft.setScreen(new SeedCrackerConfigScreen(this));
+        }).bounds(bStartX + 3 * (bWidth + 5), navY, bWidth, 20).build());
     }
 
     @Override
     public boolean keyPressed(int key, int scancode, int modifiers) {
         if (recordingKeybind != null) {
-            if (key == 256) { // ESC = unbind
+            if (key == 256) {
                 recordingKeybind.setKeybind(-1);
             } else {
                 recordingKeybind.setKeybind(key);
@@ -119,16 +129,16 @@ public class AetherisMenuScreen extends Screen {
         super.render(guiGraphics, mouseX, mouseY, delta);
         guiGraphics.drawCenteredString(this.font,
             "AETHERIS - " + currentCategory.getName().toUpperCase(),
-            this.width / 2, 10, 0xFFaa00aa);
+            this.width / 2, 8, 0xFFaa00aa);
         long count = ModuleManager.getModules().stream()
             .filter(m -> m.getCategory() == currentCategory).count();
         guiGraphics.drawCenteredString(this.font,
             "Moduli: " + count + " | Shift+Click = Keybind | Esc = Unbind",
-            this.width / 2, 22, 0xFF888888);
+            this.width / 2, 19, 0xFF888888);
         if (recordingKeybind != null) {
             guiGraphics.drawCenteredString(this.font,
                 "Premi un tasto per " + recordingKeybind.getName() + " (ESC = unbind)",
-                this.width / 2, this.height - 15, 0xFFFFFF00);
+                this.width / 2, this.height - 42, 0xFFFFFF00);
         }
     }
 

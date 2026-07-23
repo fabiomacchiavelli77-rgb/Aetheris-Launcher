@@ -20,7 +20,7 @@ public class ESP extends Module {
             if (entity == mc.player) continue;
             if (!entity.isAlive()) continue;
             if (entity instanceof Player || entity instanceof LivingEntity) {
-                entity.setGlowing(true);
+                entity.setGlowingTag(true);
             }
         }
     }
@@ -29,7 +29,7 @@ public class ESP extends Module {
     public void onDisable() {
         if (mc.level != null) {
             for (Entity entity : mc.level.entitiesForRendering()) {
-                if (entity.isCurrentlyGlowing()) entity.setGlowing(false);
+                if (entity.isCurrentlyGlowing()) entity.setGlowingTag(false);
             }
         }
     }

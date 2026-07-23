@@ -20,8 +20,8 @@ public class Speed extends Module {
         Vec3 delta = mc.player.getDeltaMovement();
         double yaw = Math.toRadians(mc.player.getYRot());
 
-        float forward = mc.player.input.forward();
-        float sideways = mc.player.input.left();
+        float forward = mc.player.input.forwardImpulse;
+        float sideways = mc.player.input.leftImpulse;
 
         double x = -Math.sin(yaw) * forward - Math.cos(yaw) * sideways;
         double z = Math.cos(yaw) * forward - Math.sin(yaw) * sideways;
@@ -37,6 +37,6 @@ public class Speed extends Module {
 
     private boolean isMoving() {
         return mc.player != null &&
-               (mc.player.input.forward() != 0 || mc.player.input.left() != 0);
+               (mc.player.input.forwardImpulse != 0 || mc.player.input.leftImpulse != 0);
     }
 }

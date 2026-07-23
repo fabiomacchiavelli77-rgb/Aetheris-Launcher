@@ -25,7 +25,7 @@ public class AutoTotem extends Module {
                 if (mc.player.getInventory().getItem(i).getItem() == Items.TOTEM_OF_UNDYING) {
                     // Sposta il totem nella mano secondaria
                     mc.player.getInventory().selected = i < 9 ? i : mc.player.getInventory().selected;
-                    mc.player.getInventory().swapOffhand();
+                    mc.getConnection().send(new net.minecraft.network.protocol.game.ServerboundPlayerActionPacket(net.minecraft.network.protocol.game.ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, net.minecraft.core.BlockPos.ZERO, net.minecraft.core.Direction.DOWN));
                     checkDelay = 20;
                     return;
                 }

@@ -27,7 +27,7 @@ public abstract class ClientLevelMixin extends Level {
     }
 
     @Inject(method = "disconnect", at = @At("HEAD"))
-    private void disconnect(Component reason, CallbackInfo ci) {
+    private void disconnect(CallbackInfo ci) {
         StructureSave.saveStructures(SeedCracker.get().getDataStorage().baseSeedData);
         SeedCracker.get().reset();
     }
