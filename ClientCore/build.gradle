@@ -16,6 +16,8 @@ repositories {
 }
 
 dependencies {
+	testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.officialMojangMappings()
 
@@ -70,4 +72,8 @@ java {
 	withSourcesJar()
 	sourceCompatibility = JavaVersion.VERSION_21
 	targetCompatibility = JavaVersion.VERSION_21
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
 }
