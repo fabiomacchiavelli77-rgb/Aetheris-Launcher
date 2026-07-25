@@ -183,7 +183,10 @@ public class XrayBlockSelectorScreen extends Screen {
             String englishId = BuiltInRegistries.BLOCK.getKey(block).getPath();
             String label = italianName + " §7(" + englishId + ")";
 
-            if (label.length() > 38) label = label.substring(0, 36) + "..";
+            int maxTextWidth = tableWidth - 115;
+            if (this.font.width(label) > maxTextWidth) {
+                label = this.font.plainSubstrByWidth(label, maxTextWidth - this.font.width("...")) + "...";
+            }
 
             g.drawString(this.font, label, tableX + 24, y + 5, 0xFFFFFFFF);
         }
