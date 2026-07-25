@@ -1,7 +1,7 @@
 package net.aetheris.client.mixins;
 
 import kaptainwutax.seedcrackerX.config.ConfigScreen;
-import net.aetheris.client.gui.AetherisMenuScreen;
+import net.aetheris.client.gui.ClickGUI;
 import net.aetheris.client.gui.AltManagerScreen;
 import net.aetheris.client.gui.KeybindManagerScreen;
 import net.aetheris.client.gui.XrayBlockSelectorScreen;
@@ -30,7 +30,7 @@ public abstract class PauseScreenMixin extends Screen {
 
         // Aetheris Menu button
         this.addRenderableWidget(Button.builder(Component.literal("§d§lAetheris Menu"), b -> {
-            Minecraft.getInstance().setScreen(new AetherisMenuScreen());
+            Minecraft.getInstance().setScreen(new ClickGUI());
         }).bounds(10, startY, btnWidth, btnHeight).build());
 
         // SeedCracker Config button

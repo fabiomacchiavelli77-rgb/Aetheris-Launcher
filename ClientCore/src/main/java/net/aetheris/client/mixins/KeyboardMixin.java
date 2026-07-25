@@ -1,7 +1,6 @@
 package net.aetheris.client.mixins;
 
 import net.aetheris.client.config.ProfileManager;
-import net.aetheris.client.gui.AetherisMenuScreen;
 import net.aetheris.client.gui.ClickGUI;
 import net.aetheris.client.modules.Module;
 import net.aetheris.client.modules.ModuleManager;
@@ -23,14 +22,8 @@ public class KeyboardMixin {
         Minecraft mc = Minecraft.getInstance();
         if (mc.screen != null) return; // Non processare keybind se un menu è aperto
 
-        // Right Shift = apre menu Aetheris
-        if (key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
-            mc.setScreen(new AetherisMenuScreen());
-            return;
-        }
-
-        // Left Shift = apre ClickGUI
-        if (key == GLFW.GLFW_KEY_LEFT_SHIFT) {
+        // Either Shift toggles the canonical Aetheris control surface.
+        if (key == GLFW.GLFW_KEY_LEFT_SHIFT || key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
             mc.setScreen(new ClickGUI());
             return;
         }
