@@ -459,9 +459,7 @@ public class ClickGUI extends Screen {
             return true;
         }
 
-        if (key == GLFW.GLFW_KEY_ESCAPE
-                || key == GLFW.GLFW_KEY_LEFT_SHIFT
-                || key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
+        if (key == GLFW.GLFW_KEY_ESCAPE || key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
             onClose();
             return true;
         }

@@ -121,6 +121,10 @@ public class AetherisMenuScreen extends Screen {
             rebuildWidgets();
             return true;
         }
+        if (key == org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_SHIFT) {
+            this.onClose();
+            return true;
+        }
         return super.keyPressed(key, scancode, modifiers);
     }
 

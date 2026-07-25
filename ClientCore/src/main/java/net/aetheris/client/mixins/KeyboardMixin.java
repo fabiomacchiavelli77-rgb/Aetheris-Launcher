@@ -23,15 +23,15 @@ public class KeyboardMixin {
         Minecraft mc = Minecraft.getInstance();
         if (mc.screen != null) return; // Non processare keybind se un menu è aperto
 
-        // Right Shift = apre menu Aetheris
+        // Right Shift = apre ClickGUI (nuovo menu)
+        // Right Ctrl + Right Shift = apre AetherisMenuScreen (vecchio menu)
         if (key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
-            mc.setScreen(new AetherisMenuScreen());
-            return;
-        }
-
-        // Left Shift = apre ClickGUI
-        if (key == GLFW.GLFW_KEY_LEFT_SHIFT) {
-            mc.setScreen(new ClickGUI());
+            boolean isRightCtrlDown = GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT_CONTROL) == GLFW.GLFW_PRESS;
+            if (isRightCtrlDown) {
+                mc.setScreen(new AetherisMenuScreen());
+            } else {
+                mc.setScreen(new ClickGUI());
+            }
             return;
         }
 
