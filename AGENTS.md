@@ -53,7 +53,7 @@ All hacks extend `modules.Module` (abstract: `onEnable()`, `onDisable()`, `onTic
 
 **Mixin architecture** — Active Aetheris mixins in `net.aetheris.client.mixins`:
 - `MinecraftClientMixin` — module tick loop + Timer speed control
-- `KeyboardMixin` — Right Shift toggles `AetherisMenuScreen`, Left Shift toggles `ClickGUI`
+- `KeyboardMixin` — either Shift toggles `ClickGUI`; module keybinds work only while no screen is open.
 - `TitleScreenMixin` — watermark on title screen + Alt Manager button
 - `PauseScreenMixin` — in-game Pause Menu quick buttons (Aetheris Menu, SeedCracker, Xray Ores, Alt Manager)
 - `EntityMixin` — Velocity (cancel `setDeltaMovement`)
@@ -103,7 +103,7 @@ Each module has a `keybind` field (int, GLFW code). Default `GLFW.GLFW_KEY_UNKNO
 - **Shift+Click** on a module in the menu opens keybind recording. Press key to assign, ESC to clear.
 - Dedicated `KeybindManagerScreen` provides a searchable list to bind/unbind module keys.
 - `KeyboardMixin` intercepts keys: if no screen is open, toggles module.
-- Left Shift opens **ClickGUI**, Right Shift opens Classic Menu.
+- Left Shift, Right Shift, and the Pause Menu's **Aetheris Menu** button open the same **ClickGUI**.
 
 ## Profile System
 
@@ -116,7 +116,7 @@ Each module has a `keybind` field (int, GLFW code). Default `GLFW.GLFW_KEY_UNKNO
 Multiple GUIs available:
 - **PauseScreen Quick Buttons** (Pause Menu) — Quick access to Aetheris Menu, SeedCracker Config, Xray Ores, Alt Manager.
 - **AetherisMenuScreen** (Right Shift) — Simple category list with scrolling, toggle, keybind assignment, and bottom quick navigation bar.
-- **ClickGUI** (Left Shift) — Aristois/Wurst/Meteor-inspired premium GUI. Horizontal category columns side-by-side (Combat, Movement, Render, World, Player, SeedCracker). Each column has a colored accent header bar, plain-text module rows with left accent bar when enabled, hover overlay, right-click inline dropdown (keybind + settings), per-column scrolling, real-time search bar (bottom center), fade-in animation, and module count badges. Colors: Combat=Red, Movement=Green, Render=Cyan, World=Amber, Player=Violet, SeedCracker=Teal.
+- **ClickGUI** (Left/Right Shift and Pause Menu) — Aristois/Wurst/Meteor-inspired premium GUI. It uses responsive horizontal category columns, a compact Keybinds/Xray/Alts/Seed command dock, direct-drawn module rows, per-column scrolling, search, inline keybind/settings drawers, and a fade-in overlay.
 - **AltManagerScreen** — Offline account profile switcher for dynamic username changes.
 - **XrayBlockSelectorScreen** — Full Minecraft block registry selector with 3-column layout (block icon, name EN/IT, checkbox), search/filter, and buttons for Default/Clear All/Select All.
 - **KeybindManagerScreen** — Searchable keybind manager for all 32 modules.
