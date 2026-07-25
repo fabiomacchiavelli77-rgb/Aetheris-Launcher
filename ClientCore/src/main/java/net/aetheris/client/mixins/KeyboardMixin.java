@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(KeyboardHandler.class)
 public class KeyboardMixin {
 
-    @Inject(method = "keyPress", at = @At("HEAD"))
+    @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)
     public void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
         if (action != GLFW.GLFW_PRESS) return;
 
@@ -32,6 +32,7 @@ public class KeyboardMixin {
             } else {
                 mc.setScreen(new ClickGUI());
             }
+            ci.cancel();
             return;
         }
 
