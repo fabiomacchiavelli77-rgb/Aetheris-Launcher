@@ -27,10 +27,8 @@ import java.util.List;
 public class ClickGUI extends Screen {
 
     // ── layout constants ───────────────────────────────────────────────
-    private static final int COL_WIDTH    = 115;   // column width (Wurst-style: 105-115)
-    private static final int COL_GAP     = 6;      // gap between columns
-    private static final int HEADER_H    = 22;     // category header height
-    private static final int ROW_H       = 16;     // module row height
+    private static final int HEADER_H    = ClickGUILayout.HEADER_HEIGHT;
+    private static final int ROW_H       = ClickGUILayout.ROW_HEIGHT;
     private static final int SETTINGS_H  = 20;     // expanded settings drawer height
     private static final int SEARCH_W    = 140;
     private static final int SEARCH_H    = 18;
@@ -54,13 +52,7 @@ public class ClickGUI extends Screen {
     protected void init() {
         super.init();
         openTime = System.currentTimeMillis();
-        // Reset scroll positions
-        int startX = columnsStartX();
-        for (int i = 0; i < columns.size(); i++) {
-            Column col = columns.get(i);
-            col.x = startX + i * (COL_WIDTH + COL_GAP);
-            col.y = 25;
-        }
+        applyLayoutAndClamp();
     }
 
     // ── accent colours (Aristois-faithful palette) ─────────────────────
@@ -85,13 +77,45 @@ public class ClickGUI extends Screen {
     }
 
     // ── layout helpers ─────────────────────────────────────────────────
-    private int columnsStartX() {
-        int total = columns.size() * COL_WIDTH + (columns.size() - 1) * COL_GAP;
-        return (width - total) / 2;
+
+    private ClickGUILayout.Layout layout() {
+        return ClickGUILayout.calculate(width, height, columns.size());
     }
 
-    private int maxVisibleRows() {
-        return (height - 25 - HEADER_H - 40) / ROW_H;   // leave space top + bottom
+    private void applyLayoutAndClamp() {
+        ClickGUILayout.Layout layout = layout();
+        for (int index = 0; index < columns.size(); index++) {
+            Column column = columns.get(index);
+            column.x = layout.columnX(index);
+            column.y = layout.columnTopY();
+            java.util.List<Module> modules = column.filteredModules(searchQuery);
+            column.scrollOffset = layout.clampScrollOffset(column.scrollOffset, modules.size());
+            if (column.expandedModule != null && !modules.contains(column.expandedModule)) {
+                column.expandedModule = null;
+            }
+        }
+    }
+
+
+        private void setSearchQuery(String query) {
+        searchQuery = query;
+        applyLayoutAndClamp();
+    }
+
+    private enum UtilityAction {
+        KEYBINDS("Keybinds"), XRAY("Xray"), ALTS("Alts"), SEED("Seed");
+
+        private final String label;
+        UtilityAction(String label) { this.label = label; }
+    }
+
+    private void openUtility(UtilityAction action) {
+        switch (action) {
+            case KEYBINDS -> Minecraft.getInstance().setScreen(new KeybindManagerScreen(this));
+            case XRAY -> Minecraft.getInstance().setScreen(new XrayBlockSelectorScreen(this));
+            case ALTS -> Minecraft.getInstance().setScreen(new AltManagerScreen(this));
+            case SEED -> Minecraft.getInstance().setScreen(new SeedCrackerConfigScreen(this));
+        }
     }
 
     // ── rendering ──────────────────────────────────────────────────────
@@ -120,6 +144,27 @@ public class ClickGUI extends Screen {
 
         // ── Watermark ──
         g.drawString(font, "§7Aetheris §8v1.0", 4, height - 12, 0xFF505050);
+
+        // ── Aetheris Header and Dock ──
+        int activeCount = 0;
+        for (Module m : ModuleManager.getModules()) if (m.isEnabled()) activeCount++;
+        String headerText = "AETHERIS §8[" + activeCount + "]";
+        g.drawCenteredString(font, headerText, width / 2, 10, 0xFFFFFFFF);
+
+        int dockW = 200;
+        int dockH = 16;
+        int dockX = (width - dockW) / 2;
+        int dockY = height - SEARCH_H - 10 - dockH - 4; // Above search bar
+        
+        int btnW = (dockW - 12) / 4;
+        UtilityAction[] actions = UtilityAction.values();
+        for (int i = 0; i < actions.length; i++) {
+            UtilityAction action = actions[i];
+            int bx = dockX + i * (btnW + 4);
+            boolean hover = mouseX >= bx && mouseX < bx + btnW && mouseY >= dockY && mouseY < dockY + dockH;
+            g.fill(bx, dockY, bx + btnW, dockY + dockH, hover ? 0xFF3A4050 : 0xFF2A3040);
+            g.drawCenteredString(font, action.label, bx + btnW / 2, dockY + 4, 0xFFCCCCCC);
+        }
     }
 
     private void renderColumn(GuiGraphics g, Column col, int mouseX, int mouseY) {
@@ -127,42 +172,47 @@ public class ClickGUI extends Screen {
         int cy = col.y;
         int accent = accentOf(col.category);
         List<Module> mods = col.filteredModules(searchQuery);
-        int maxRows = maxVisibleRows();
+        int maxRows = layout().maxVisibleRows();
         boolean needsScroll = mods.size() > maxRows;
         int visibleCount = needsScroll ? maxRows : mods.size();
-        int totalH = HEADER_H + visibleCount * ROW_H + col.expandedExtra(mods);
+        int startIdx = col.scrollOffset;
+        int endIdx = Math.min(startIdx + maxRows, mods.size());
+        int expandedExtra = 0;
+        if (col.expandedModule != null && mods.contains(col.expandedModule)) {
+            int eIdx = mods.indexOf(col.expandedModule);
+            if (eIdx >= startIdx && eIdx < endIdx) expandedExtra = SETTINGS_H;
+        }
+        int totalH = HEADER_H + visibleCount * ROW_H + expandedExtra;
 
         // ── Column shadow (subtle depth) ──
-        g.fill(cx + 2, cy + 2, cx + COL_WIDTH + 2, cy + totalH + 2, 0x40000000);
+        g.fill(cx + 2, cy + 2, cx + layout().columnWidth() + 2, cy + totalH + 2, 0x40000000);
 
         // ── Column background ──
-        g.fill(cx, cy, cx + COL_WIDTH, cy + totalH, 0xE8141820);
+        g.fill(cx, cy, cx + layout().columnWidth(), cy + totalH, 0xE8141820);
 
         // ── Header bar ──
-        g.fill(cx, cy, cx + COL_WIDTH, cy + HEADER_H, 0xF0181E28);
+        g.fill(cx, cy, cx + layout().columnWidth(), cy + HEADER_H, 0xF0181E28);
         // Top accent line (3px gradient glow)
-        g.fill(cx, cy, cx + COL_WIDTH, cy + 1, accent);
-        g.fill(cx, cy + 1, cx + COL_WIDTH, cy + 2, (accent & 0x00FFFFFF) | 0x80000000);
+        g.fill(cx, cy, cx + layout().columnWidth(), cy + 1, accent);
+        g.fill(cx, cy + 1, cx + layout().columnWidth(), cy + 2, (accent & 0x00FFFFFF) | 0x80000000);
         // Category name centered in header
-        g.drawCenteredString(font, col.category.getName(), cx + COL_WIDTH / 2, cy + 7, 0xFFFFFFFF);
+        g.drawCenteredString(font, col.category.getName(), cx + layout().columnWidth() / 2, cy + 7, 0xFFFFFFFF);
         // Module count badge (right side)
         String countBadge = "§8[" + mods.size() + "]";
-        g.drawString(font, countBadge, cx + COL_WIDTH - font.width(countBadge) - 3, cy + 7, 0xFF606060);
+        g.drawString(font, countBadge, cx + layout().columnWidth() - font.width(countBadge) - 3, cy + 7, 0xFF606060);
 
         // ── Module rows ──
         int ry = cy + HEADER_H;
-        int startIdx = col.scrollOffset;
-        int endIdx = Math.min(startIdx + maxRows, mods.size());
 
         // Scroll up indicator
         if (col.scrollOffset > 0) {
-            g.drawCenteredString(font, "§7▲", cx + COL_WIDTH / 2, ry - 1, 0xFF808080);
+            g.drawCenteredString(font, "§7▲", cx + layout().columnWidth() / 2, ry - 1, 0xFF808080);
         }
 
         for (int i = startIdx; i < endIdx; i++) {
             Module mod = mods.get(i);
             boolean enabled = mod.isEnabled();
-            boolean hover = mouseX >= cx && mouseX <= cx + COL_WIDTH
+            boolean hover = mouseX >= cx && mouseX <= cx + layout().columnWidth()
                          && mouseY >= ry && mouseY < ry + ROW_H;
 
             // Row background — Wurst/Meteor style
@@ -180,7 +230,7 @@ public class ClickGUI extends Screen {
                 // Default: alternate rows for readability
                 bg = (i % 2 == 0) ? 0x08FFFFFF : 0x00000000;
             }
-            g.fill(cx, ry, cx + COL_WIDTH, ry + ROW_H, bg);
+            g.fill(cx, ry, cx + layout().columnWidth(), ry + ROW_H, bg);
 
             // Left accent bar when enabled (LiquidBounce style)
             if (enabled) {
@@ -197,12 +247,12 @@ public class ClickGUI extends Screen {
             if (mod.getKeybind() != GLFW.GLFW_KEY_UNKNOWN) {
                 String kn = keyName(mod.getKeybind());
                 int tw = font.width(kn);
-                g.drawString(font, kn, cx + COL_WIDTH - tw - 5, ry + 4, 0xFF555555);
+                g.drawString(font, kn, cx + layout().columnWidth() - tw - 5, ry + 4, 0xFF555555);
             }
 
             // Small expand arrow if right-clickable
             String arrow = (col.expandedModule == mod) ? "▾" : "▸";
-            g.drawString(font, arrow, cx + COL_WIDTH - 10, ry + 4, 0xFF666666);
+            g.drawString(font, arrow, cx + layout().columnWidth() - 10, ry + 4, 0xFF666666);
 
             ry += ROW_H;
 
@@ -215,19 +265,19 @@ public class ClickGUI extends Screen {
 
         // Scroll down indicator
         if (endIdx < mods.size()) {
-            g.drawCenteredString(font, "§7▼", cx + COL_WIDTH / 2, ry + 1, 0xFF808080);
+            g.drawCenteredString(font, "§7▼", cx + layout().columnWidth() / 2, ry + 1, 0xFF808080);
         }
 
         // Bottom border accent line
-        g.fill(cx, cy + totalH - 1, cx + COL_WIDTH, cy + totalH, (accent & 0x00FFFFFF) | 0x30000000);
+        g.fill(cx, cy + totalH - 1, cx + layout().columnWidth(), cy + totalH, (accent & 0x00FFFFFF) | 0x30000000);
     }
 
     private void renderSettingsDrawer(GuiGraphics g, int cx, int ry, Module mod, int mouseX, int mouseY) {
         // Drawer background — slightly indented, darker
-        g.fill(cx + 3, ry, cx + COL_WIDTH - 3, ry + SETTINGS_H, 0xE8101420);
-        g.fill(cx + 3, ry, cx + COL_WIDTH - 3, ry + 1, 0x40FFFFFF);   // top separator line
+        g.fill(cx + 3, ry, cx + layout().columnWidth() - 3, ry + SETTINGS_H, 0xE8101420);
+        g.fill(cx + 3, ry, cx + layout().columnWidth() - 3, ry + 1, 0x40FFFFFF);   // top separator line
 
-        int halfW = (COL_WIDTH - 6) / 2;
+        int halfW = (layout().columnWidth() - 6) / 2;
         int btnY = ry + 2;
         int btnH = SETTINGS_H - 4;
 
@@ -242,10 +292,10 @@ public class ClickGUI extends Screen {
         g.drawCenteredString(font, bindLabel, cx + 3 + halfW / 2, btnY + 3, 0xFFFFFFFF);
 
         // ── Settings / config button ──
-        boolean hoverCfg = mouseX >= cx + 3 + halfW + 2 && mouseX <= cx + COL_WIDTH - 3
+        boolean hoverCfg = mouseX >= cx + 3 + halfW + 2 && mouseX <= cx + layout().columnWidth() - 3
                         && mouseY >= btnY && mouseY < btnY + btnH;
         int cfgBg = hoverCfg ? 0xFF2A3040 : 0xFF1C2030;
-        g.fill(cx + 3 + halfW + 2, btnY, cx + COL_WIDTH - 3, btnY + btnH, cfgBg);
+        g.fill(cx + 3 + halfW + 2, btnY, cx + layout().columnWidth() - 3, btnY + btnH, cfgBg);
 
         String cfgLabel = settingsLabelFor(mod);
         g.drawCenteredString(font, cfgLabel, cx + 3 + halfW + 2 + (halfW - 2) / 2, btnY + 3, 0xFFDDDDDD);
@@ -288,6 +338,22 @@ public class ClickGUI extends Screen {
             return true;
         }
 
+        // Utility dock
+        int dockW = 200;
+        int dockH = 16;
+        int dockX = (width - dockW) / 2;
+        int dockY = height - SEARCH_H - 10 - dockH - 4;
+        if (my >= dockY && my < dockY + dockH && button == 0) {
+            int btnW = (dockW - 12) / 4;
+            for (int i = 0; i < 4; i++) {
+                int bx = dockX + i * (btnW + 4);
+                if (mx >= bx && mx < bx + btnW) {
+                    openUtility(UtilityAction.values()[i]);
+                    return true;
+                }
+            }
+        }
+
         // Search bar
         int sbx = (width - SEARCH_W) / 2;
         int sby = height - SEARCH_H - 10;
@@ -303,7 +369,7 @@ public class ClickGUI extends Screen {
             int cx = col.x;
             int cy = col.y;
             List<Module> mods = col.filteredModules(searchQuery);
-            int maxRows = maxVisibleRows();
+            int maxRows = layout().maxVisibleRows();
             int startIdx = col.scrollOffset;
             int endIdx = Math.min(startIdx + maxRows, mods.size());
 
@@ -312,7 +378,7 @@ public class ClickGUI extends Screen {
                 Module mod = mods.get(i);
 
                 // Module row click
-                if (mx >= cx && mx <= cx + COL_WIDTH && my >= ry && my < ry + ROW_H) {
+                if (mx >= cx && mx <= cx + layout().columnWidth() && my >= ry && my < ry + ROW_H) {
                     if (button == 0) {
                         mod.toggle();
                         ProfileManager.getInstance().onModuleChanged();
@@ -326,10 +392,10 @@ public class ClickGUI extends Screen {
                 // Settings drawer click
                 if (col.expandedModule == mod) {
                     if (my >= ry && my < ry + SETTINGS_H) {
-                        int halfW = (COL_WIDTH - 6) / 2;
+                        int halfW = (layout().columnWidth() - 6) / 2;
                         if (mx >= cx + 3 && mx <= cx + 3 + halfW) {
                             bindingModule = mod;
-                        } else if (mx >= cx + 3 + halfW + 2 && mx <= cx + COL_WIDTH - 3) {
+                        } else if (mx >= cx + 3 + halfW + 2 && mx <= cx + layout().columnWidth() - 3) {
                             openSettingsFor(mod);
                         }
                         return true;
@@ -345,17 +411,18 @@ public class ClickGUI extends Screen {
     @Override
     public boolean mouseScrolled(double mx, double my, double hScroll, double vScroll) {
         // Find which column the mouse is over
+        ClickGUILayout.Layout l = layout();
         for (Column col : columns) {
             int cx = col.x;
             int cy = col.y;
             List<Module> mods = col.filteredModules(searchQuery);
-            int totalH = HEADER_H + Math.min(maxVisibleRows(), mods.size()) * ROW_H;
+            int totalH = HEADER_H + Math.min(l.maxVisibleRows(), mods.size()) * ROW_H;
 
-            if (mx >= cx && mx <= cx + COL_WIDTH && my >= cy && my <= cy + totalH) {
-                if (vScroll > 0 && col.scrollOffset > 0) {
-                    col.scrollOffset--;
-                } else if (vScroll < 0 && col.scrollOffset < mods.size() - maxVisibleRows()) {
-                    col.scrollOffset++;
+            if (mx >= cx && mx <= cx + l.columnWidth() && my >= cy && my <= cy + totalH) {
+                if (vScroll > 0) {
+                    col.scrollOffset = l.clampScrollOffset(col.scrollOffset - 1, mods.size());
+                } else if (vScroll < 0) {
+                    col.scrollOffset = l.clampScrollOffset(col.scrollOffset + 1, mods.size());
                 }
                 return true;
             }
@@ -381,19 +448,21 @@ public class ClickGUI extends Screen {
         // Search typing
         if (searchFocused) {
             if (key == GLFW.GLFW_KEY_BACKSPACE && !searchQuery.isEmpty()) {
-                searchQuery = searchQuery.substring(0, searchQuery.length() - 1);
+                setSearchQuery(searchQuery.substring(0, searchQuery.length() - 1));
                 return true;
             }
             if (key == GLFW.GLFW_KEY_ESCAPE) {
                 searchFocused = false;
-                searchQuery = "";
+                setSearchQuery("");
                 return true;
             }
             return true;
         }
 
-        if (key == GLFW.GLFW_KEY_ESCAPE || key == GLFW.GLFW_KEY_LEFT_SHIFT) {
-            this.onClose();
+        if (key == GLFW.GLFW_KEY_ESCAPE
+                || key == GLFW.GLFW_KEY_LEFT_SHIFT
+                || key == GLFW.GLFW_KEY_RIGHT_SHIFT) {
+            onClose();
             return true;
         }
         return super.keyPressed(key, scancode, modifiers);
@@ -402,7 +471,7 @@ public class ClickGUI extends Screen {
     @Override
     public boolean charTyped(char ch, int modifiers) {
         if (searchFocused && ch >= 32) {
-            searchQuery += ch;
+            setSearchQuery(searchQuery + ch);
             return true;
         }
         return super.charTyped(ch, modifiers);
