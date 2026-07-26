@@ -143,11 +143,11 @@ Multiple GUIs available:
 | Web Installer backend | `Installer/server.js` |
 | Root installer entry | `src/main/java/me/deftware/installer/Main.java` |
 
-## Module List (32 total)
+## Module List (33 total)
 
 **Combat (8):** KillAura, Velocity, Criticals, Reach, AutoArmor, AutoTotem, TriggerBot, Surround
 **Movement (7):** AutoSprint, Speed, Fly, NoFall, Step, NoSlowdown, NoClip
 **Render (7):** FullBright, ESP, NoHurtCam, Xray, NameTags, Tracers, FreeCam
-**World (4):** FastBreak, Scaffold, Timer, AutoTool
+**World (5):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins
 **Player (6):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner
 

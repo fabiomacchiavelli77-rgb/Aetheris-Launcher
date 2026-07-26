@@ -10,6 +10,11 @@ import net.aetheris.client.modules.impl.movement.*;
 import net.aetheris.client.modules.impl.render.*;
 import net.aetheris.client.modules.impl.world.*;
 import net.aetheris.client.modules.impl.player.*;
+import net.aetheris.client.modules.impl.world.FastBreak;
+import net.aetheris.client.modules.impl.world.Scaffold;
+import net.aetheris.client.modules.impl.world.Timer;
+import net.aetheris.client.modules.impl.world.AutoTool;
+import net.aetheris.client.modules.impl.world.InstalledPlugins;
 
 public class ModuleManager {
     private static final List<Module> modules = new ArrayList<>();
@@ -43,11 +48,12 @@ public class ModuleManager {
         addModule(new Tracers());
         addModule(new FreeCam());
 
-        // === WORLD (4) ===
+        // === WORLD (5) ===
         addModule(new FastBreak());
         addModule(new Scaffold());
         addModule(new Timer());
         addModule(new AutoTool());
+        addModule(new InstalledPlugins());
 
         // === PLAYER (6) ===
         addModule(new AutoRespawn());
