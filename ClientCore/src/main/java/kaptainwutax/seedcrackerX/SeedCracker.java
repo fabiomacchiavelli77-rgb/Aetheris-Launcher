@@ -44,7 +44,10 @@ public class SeedCracker implements ModInitializer {
     }
 
     public void reset() {
-        SeedCracker.get().getDataStorage().clear();
-        FinderQueue.get().finderControl.deleteFinders();
+        if (this.dataStorage.getTimeMachine() != null) {
+            this.dataStorage.getTimeMachine().shouldTerminate = true;
+        }
+        this.dataStorage.clear();
+        FinderQueue.get().clear();
     }
 }
