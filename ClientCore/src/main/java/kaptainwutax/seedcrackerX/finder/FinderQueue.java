@@ -67,10 +67,7 @@ public class FinderQueue {
     }
 
     private void extractCuboids(Camera camera) {
-        if (Config.get().render == Config.RenderType.OFF) {
-            return;
-        }
-        if (!Config.get().active) {
+        if (!Config.get().active || Config.get().render == Config.RenderType.OFF) {
             this.currentCuboids = Collections.emptySet();
             return;
         }
@@ -80,15 +77,17 @@ public class FinderQueue {
                 finder.cuboids.forEach(cuboid -> cuboids.add(cuboid.offset(camera)));
             }
         });
-        // We will store it in a local variable or directly pass it to renderCuboids since we run them in the same event now!
         this.currentCuboids = cuboids;
     }
 
     private Set<Cuboid> currentCuboids = Collections.emptySet();
 
     public void renderCuboids(MultiBufferSource submitter, PoseStack poseStack) {
+        if (!Config.get().active || Config.get().render == Config.RenderType.OFF) {
+            return;
+        }
         Set<Cuboid> cuboids = this.currentCuboids;
-        if (cuboids == null) {
+        if (cuboids == null || cuboids.isEmpty()) {
             return;
         }
         cuboids.forEach(cuboid -> cuboid.render(poseStack, submitter));
@@ -102,5 +101,6 @@ public class FinderQueue {
 
     public void clear() {
         this.finderControl = new FinderControl();
+        this.currentCuboids = Collections.emptySet();
     }
 }

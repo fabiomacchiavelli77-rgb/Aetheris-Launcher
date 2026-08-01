@@ -62,6 +62,9 @@ public class ModuleManager {
         addModule(new ChestStealer());
         addModule(new AutoFish());
         addModule(new InventoryCleaner());
+
+        // === SEEDCRACKER (1) ===
+        addModule(new SeedCrackerModule());
     }
 
     public static void addModule(Module module) {

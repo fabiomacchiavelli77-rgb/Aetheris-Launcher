@@ -91,8 +91,11 @@ public class ClickGUI extends Screen {
         ClickGUILayout.Layout layout = layout();
         for (int index = 0; index < columns.size(); index++) {
             Column column = columns.get(index);
-            column.x = layout.columnX(index);
-            column.y = layout.columnTopY();
+            if (!column.positioned) {
+                column.x = layout.columnX(index);
+                column.y = layout.columnTopY();
+                column.positioned = true;
+            }
             java.util.List<Module> modules = column.filteredModules(searchQuery);
             column.scrollOffset = layout.clampScrollOffset(column.scrollOffset, modules.size());
             if (column.expandedModule != null && !modules.contains(column.expandedModule)) {
@@ -457,6 +460,7 @@ public class ClickGUI extends Screen {
         if (draggingColumn != null && button == 0) {
             draggingColumn.x = (int) mx - dragOffsetX;
             draggingColumn.y = (int) my - dragOffsetY;
+            draggingColumn.positioned = true;
             return true;
         }
         return super.mouseDragged(mx, my, button, deltaX, deltaY);
@@ -567,7 +571,8 @@ public class ClickGUI extends Screen {
         final Category category;
         Module expandedModule = null;
         int scrollOffset = 0;
-        int x, y;                   // position (for future dragging support)
+        int x, y;
+        boolean positioned = false;
 
         Column(Category cat) {
             this.category = cat;
