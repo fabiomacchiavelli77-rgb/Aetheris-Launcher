@@ -54,6 +54,16 @@ app.post('/install', async (req, res) => {
             const profilesPath = path.join(mcDir, 'launcher_profiles.json');
             if (fs.existsSync(profilesPath)) {
                 const profilesData = JSON.parse(fs.readFileSync(profilesPath, 'utf-8'));
+                
+                // Remove fabric-loader profiles created by Fabric installer
+                for (const key of Object.keys(profilesData.profiles)) {
+                    const p = profilesData.profiles[key];
+                    if (p.lastVersionId && p.lastVersionId.startsWith('fabric-loader-')) {
+                        delete profilesData.profiles[key];
+                    }
+                }
+                
+                // Add Aetheris profile
                 profilesData.profiles["Aetheris"] = {
                     name: "Aetheris",
                     type: "custom",
