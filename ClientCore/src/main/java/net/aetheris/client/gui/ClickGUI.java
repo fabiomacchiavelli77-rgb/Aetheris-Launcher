@@ -41,6 +41,11 @@ public class ClickGUI extends Screen {
     private boolean searchFocused = false;
     private long openTime = 0;
 
+    // Drag state
+    private Column draggingColumn = null;
+    private int dragOffsetX = 0;
+    private int dragOffsetY = 0;
+
     public ClickGUI() {
         super(Component.literal("Aetheris ClickGUI"));
         for (Category cat : Category.values()) {
@@ -237,11 +242,15 @@ public class ClickGUI extends Screen {
                 g.fill(cx, ry, cx + 2, ry + ROW_H, accent);
             }
 
-            // Module name
+            // Module name (truncated to fit column width)
             int textCol = enabled ? 0xFFFFFFFF : (hover ? 0xFFDDDDDD : 0xFFAAAAAA);
-            // Fix: cap at 0xFF for each channel
             if (!enabled && !hover) textCol = 0xFFAAAAAA;
-            g.drawString(font, mod.getName(), cx + 6, ry + 4, textCol);
+            String displayName = mod.getName();
+            int maxNameWidth = layout().columnWidth() - 22;
+            if (font.width(displayName) > maxNameWidth) {
+                displayName = font.plainSubstrByWidth(displayName, maxNameWidth - font.width("…")) + "…";
+            }
+            g.drawString(font, displayName, cx + 6, ry + 4, textCol);
 
             // Keybind label (right-aligned, dimmed)
             if (mod.getKeybind() != GLFW.GLFW_KEY_UNKNOWN) {
@@ -332,13 +341,7 @@ public class ClickGUI extends Screen {
     // ── mouse handling ─────────────────────────────────────────────────
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
-        // Dismiss binding on stray click
-        if (bindingModule != null && button == 0) {
-            bindingModule = null;
-            return true;
-        }
-
-        // Utility dock
+        // Utility dock (check BEFORE binding dismiss so dock always works)
         int dockW = 200;
         int dockH = 16;
         int dockX = (width - dockW) / 2;
@@ -354,6 +357,12 @@ public class ClickGUI extends Screen {
             }
         }
 
+        // Dismiss binding on stray click
+        if (bindingModule != null && button == 0) {
+            bindingModule = null;
+            return true;
+        }
+
         // Search bar
         int sbx = (width - SEARCH_W) / 2;
         int sby = height - SEARCH_H - 10;
@@ -362,6 +371,19 @@ public class ClickGUI extends Screen {
             return true;
         } else {
             searchFocused = false;
+        }
+
+        // Column header drag start
+        if (button == 0) {
+            for (Column col : columns) {
+                if (mx >= col.x && mx <= col.x + layout().columnWidth()
+                    && my >= col.y && my <= col.y + HEADER_H) {
+                    draggingColumn = col;
+                    dragOffsetX = (int) mx - col.x;
+                    dragOffsetY = (int) my - col.y;
+                    return true;
+                }
+            }
         }
 
         // Columns
@@ -428,6 +450,25 @@ public class ClickGUI extends Screen {
             }
         }
         return super.mouseScrolled(mx, my, hScroll, vScroll);
+    }
+
+    @Override
+    public boolean mouseDragged(double mx, double my, int button, double deltaX, double deltaY) {
+        if (draggingColumn != null && button == 0) {
+            draggingColumn.x = (int) mx - dragOffsetX;
+            draggingColumn.y = (int) my - dragOffsetY;
+            return true;
+        }
+        return super.mouseDragged(mx, my, button, deltaX, deltaY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mx, double my, int button) {
+        if (draggingColumn != null && button == 0) {
+            draggingColumn = null;
+            return true;
+        }
+        return super.mouseReleased(mx, my, button);
     }
 
     // ── keyboard handling ──────────────────────────────────────────────

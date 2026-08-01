@@ -68,7 +68,10 @@ public class FinderQueue {
 
     private void extractCuboids(Camera camera) {
         if (Config.get().render == Config.RenderType.OFF) {
-            // Note: RenderStateDataKey is usually tied to a state, but since we don't have it, we just store it locally. Wait!
+            return;
+        }
+        if (!Config.get().active) {
+            this.currentCuboids = Collections.emptySet();
             return;
         }
         Set<Cuboid> cuboids = new HashSet<>();

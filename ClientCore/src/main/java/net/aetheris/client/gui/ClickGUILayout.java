@@ -1,9 +1,10 @@
 package net.aetheris.client.gui;
 
 public final class ClickGUILayout {
-    public static final int OUTER_MARGIN = 12;
-    public static final int COLUMN_GAP = 6;
+    public static final int OUTER_MARGIN = 8;
+    public static final int COLUMN_GAP = 4;
     public static final int MAX_COLUMN_WIDTH = 118;
+    public static final int MIN_COLUMN_WIDTH = 60;
     public static final int COLUMN_TOP = 38;
     public static final int HEADER_HEIGHT = 22;
     public static final int ROW_HEIGHT = 16;
@@ -15,7 +16,7 @@ public final class ClickGUILayout {
         int count = Math.max(1, categoryCount);
         int availableWidth = Math.max(count,
             viewportWidth - OUTER_MARGIN * 2 - COLUMN_GAP * (count - 1));
-        int columnWidth = Math.max(1, Math.min(MAX_COLUMN_WIDTH, availableWidth / count));
+        int columnWidth = Math.max(MIN_COLUMN_WIDTH, Math.min(MAX_COLUMN_WIDTH, availableWidth / count));
         int totalWidth = columnWidth * count + COLUMN_GAP * (count - 1);
         int startX = Math.max(0, (viewportWidth - totalWidth) / 2);
         int topY = Math.max(16, Math.min(COLUMN_TOP, viewportHeight / 6));
