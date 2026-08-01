@@ -2,14 +2,18 @@ package net.aetheris.client.modules.impl.combat;
 
 import net.aetheris.client.modules.Category;
 import net.aetheris.client.modules.Module;
+import net.aetheris.client.settings.SliderSetting;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.InteractionHand;
 
 public class AutoTotem extends Module {
+    private final SliderSetting healthTrigger = new SliderSetting("healthTrigger", "Health Trigger", "Soglia Salute", 10.0, 0.5, 20.0, 0.5, "HP");
+
     private int checkDelay = 0;
 
     public AutoTotem() {
         super("AutoTotem", "Tiene automaticamente un Totem della Non-morte nella mano secondaria.", Category.COMBAT);
+        addSetting(healthTrigger);
     }
 
     @Override
@@ -17,6 +21,9 @@ public class AutoTotem extends Module {
         if (mc.player == null) return;
         if (checkDelay > 0) { checkDelay--; return; }
         checkDelay = 10; // Check ogni 10 tick
+        
+        float health = mc.player.getHealth() + mc.player.getAbsorptionAmount();
+        if (health > healthTrigger.getValue()) return;
 
         // Se la mano secondaria è vuota o non ha un totem
         if (mc.player.getOffhandItem().getItem() != Items.TOTEM_OF_UNDYING) {

@@ -2,26 +2,30 @@ package net.aetheris.client.modules.impl.combat;
 
 import net.aetheris.client.modules.Category;
 import net.aetheris.client.modules.Module;
+import net.aetheris.client.settings.SliderSetting;
 
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
 public class Reach extends Module {
-    private float reachDistance = 5.0f;
+    
+    private final SliderSetting combatReach = new SliderSetting("combatReach", "Combat Reach", "Portata Combattimento", 4.0, 3.0, 6.0, 0.1, "blocks");
+    private final SliderSetting blockReach = new SliderSetting("blockReach", "Block Reach", "Portata Blocchi", 5.0, 4.5, 6.0, 0.1, "blocks");
 
     public Reach() {
         super("Reach", "Estende la distanza di attacco e interazione.", Category.COMBAT);
+        addSetting(combatReach);
+        addSetting(blockReach);
     }
 
-    public float getReachDistance() { return reachDistance; }
-    public void setReachDistance(float dist) { this.reachDistance = Math.min(dist, 6.0f); }
+    public float getReachDistance() { return combatReach.getValue().floatValue(); }
 
     @Override
     public void onTick() {
         if (mc.player == null) return;
         var entityRange = mc.player.getAttribute(Attributes.ENTITY_INTERACTION_RANGE);
         var blockRange = mc.player.getAttribute(Attributes.BLOCK_INTERACTION_RANGE);
-        if (entityRange != null) entityRange.setBaseValue(reachDistance);
-        if (blockRange != null) blockRange.setBaseValue(reachDistance);
+        if (entityRange != null) entityRange.setBaseValue(combatReach.getValue());
+        if (blockRange != null) blockRange.setBaseValue(blockReach.getValue());
     }
 
     @Override

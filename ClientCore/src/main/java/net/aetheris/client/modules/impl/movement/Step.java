@@ -2,20 +2,22 @@ package net.aetheris.client.modules.impl.movement;
 
 import net.aetheris.client.modules.Category;
 import net.aetheris.client.modules.Module;
+import net.aetheris.client.settings.SliderSetting;
 
 public class Step extends Module {
-    private static final float STEP_HEIGHT = 2.0f;
+    private final SliderSetting stepHeight = new SliderSetting("stepHeight", "Step Height", "Altezza Step", 1.5, 1.0, 10.0, 0.5, "blocks");
     private float oldStepHeight;
 
     public Step() {
-        super("Step", "Sale automaticamente blocchi fino a 2 blocchi.", Category.MOVEMENT);
+        super("Step", "Sale automaticamente blocchi.", Category.MOVEMENT);
+        addSetting(stepHeight);
     }
 
     @Override
     public void onEnable() {
         if (mc.player != null) {
             oldStepHeight = mc.player.maxUpStep();
-            mc.player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(STEP_HEIGHT);
+            mc.player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(stepHeight.getValue());
         }
     }
 
@@ -28,8 +30,8 @@ public class Step extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player != null && mc.player.maxUpStep() != STEP_HEIGHT) {
-            mc.player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(STEP_HEIGHT);
+        if (mc.player != null && mc.player.maxUpStep() != stepHeight.getValue()) {
+            mc.player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.STEP_HEIGHT).setBaseValue(stepHeight.getValue());
         }
     }
 }

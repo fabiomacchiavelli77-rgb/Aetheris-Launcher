@@ -4,8 +4,13 @@ import net.aetheris.client.modules.Category;
 import net.aetheris.client.modules.Module;
 import net.minecraft.world.item.*;
 import java.util.Set;
+import net.aetheris.client.settings.SliderSetting;
+import net.aetheris.client.settings.BooleanSetting;
 
 public class InventoryCleaner extends Module {
+    private final SliderSetting dropDelay = new SliderSetting("dropDelay", "Drop Delay", "Ritardo Scarto", 2.0, 0.0, 20.0, 1.0, "ticks");
+    private final BooleanSetting keepEquipment = new BooleanSetting("keepEquipment", "Keep Equipment", "Mantieni Equipaggiamento", true);
+    
     private int cleanDelay = 0;
     private static final Set<Class<?>> JUNK = Set.of(
         // Blocchi comuni da buttare
@@ -14,6 +19,8 @@ public class InventoryCleaner extends Module {
 
     public InventoryCleaner() {
         super("InventoryCleaner", "Butta automaticamente gli oggetti inutili.", Category.PLAYER);
+        addSetting(dropDelay);
+        addSetting(keepEquipment);
     }
 
     @Override
@@ -28,7 +35,7 @@ public class InventoryCleaner extends Module {
             Item item = stack.getItem();
 
             // Tieni armi, armature, tool, cibo, minerali
-            if (isValuable(item)) continue;
+            if (keepEquipment.isOn() && isValuable(item)) continue;
 
             // Butta il resto
             mc.gameMode.handleInventoryMouseClick(
@@ -38,7 +45,7 @@ public class InventoryCleaner extends Module {
                 net.minecraft.world.inventory.ClickType.THROW,
                 mc.player
             );
-            cleanDelay = 5;
+            cleanDelay = dropDelay.getValue().intValue();
             return;
         }
         cleanDelay = 20;

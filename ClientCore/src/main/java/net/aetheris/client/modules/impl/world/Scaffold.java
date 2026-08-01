@@ -9,12 +9,18 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
+import net.aetheris.client.settings.BooleanSetting;
 
 public class Scaffold extends Module {
+    private final BooleanSetting safeWalk = new BooleanSetting("safeWalk", "Safe Walk", "Camminata Sicura", true);
+    private final BooleanSetting autoTower = new BooleanSetting("autoTower", "Auto Tower", "Torre Automatica", true);
+    
     private int placeCooldown = 0;
 
     public Scaffold() {
         super("Scaffold", "Piazza blocchi sotto i piedi mentre cammini.", Category.WORLD);
+        addSetting(safeWalk);
+        addSetting(autoTower);
     }
 
     @Override

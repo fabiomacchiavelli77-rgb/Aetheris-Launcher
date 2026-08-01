@@ -11,6 +11,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import org.lwjgl.glfw.GLFW;
 
+import net.aetheris.client.settings.AetherisLang;
+import net.aetheris.client.settings.BooleanSetting;
+import net.aetheris.client.settings.ModeSetting;
+import net.aetheris.client.settings.Setting;
+import net.aetheris.client.settings.SliderSetting;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +36,6 @@ public class ClickGUI extends Screen {
     // ── layout constants ───────────────────────────────────────────────
     private static final int HEADER_H    = ClickGUILayout.HEADER_HEIGHT;
     private static final int ROW_H       = ClickGUILayout.ROW_HEIGHT;
-    private static final int SETTINGS_H  = 20;     // expanded settings drawer height
     private static final int SEARCH_W    = 140;
     private static final int SEARCH_H    = 18;
 
@@ -46,8 +51,14 @@ public class ClickGUI extends Screen {
 
     // Drag state
     private Column draggingColumn = null;
+    private SliderSetting draggingSetting = null;
     private int dragOffsetX = 0;
     private int dragOffsetY = 0;
+
+    private int settingsHeight(Module mod) {
+        if (!mod.hasSettings()) return 20;
+        return 20 + (mod.getSettings().size() * 14);
+    }
 
     public ClickGUI() {
         super(Component.literal("Aetheris ClickGUI"));
@@ -130,7 +141,7 @@ public class ClickGUI extends Screen {
     }
 
     private enum UtilityAction {
-        KEYBINDS("Keybinds"), XRAY("Xray"), ALTS("Alts"), SEED("Seed");
+        KEYBINDS("Keybinds"), XRAY("Xray"), ALTS("Alts"), SEED("Seed"), LANG("Lang");
 
         private final String label;
         UtilityAction(String label) { this.label = label; }
@@ -142,6 +153,10 @@ public class ClickGUI extends Screen {
             case XRAY -> Minecraft.getInstance().setScreen(new XrayBlockSelectorScreen(this));
             case ALTS -> Minecraft.getInstance().setScreen(new AltManagerScreen(this));
             case SEED -> Minecraft.getInstance().setScreen(new SeedCrackerConfigScreen(this));
+            case LANG -> {
+                AetherisLang.toggle();
+                ProfileManager.getInstance().save();
+            }
         }
     }
 
@@ -178,19 +193,20 @@ public class ClickGUI extends Screen {
         String headerText = "AETHERIS §8[" + activeCount + "]";
         g.drawCenteredString(font, headerText, width / 2, 10, 0xFFFFFFFF);
 
-        int dockW = 200;
+        int dockW = 250;
         int dockH = 16;
         int dockX = (width - dockW) / 2;
         int dockY = height - SEARCH_H - 10 - dockH - 4; // Above search bar
         
-        int btnW = (dockW - 12) / 4;
+        int btnW = (dockW - 16) / 5;
         UtilityAction[] actions = UtilityAction.values();
         for (int i = 0; i < actions.length; i++) {
             UtilityAction action = actions[i];
             int bx = dockX + i * (btnW + 4);
             boolean hover = mouseX >= bx && mouseX < bx + btnW && mouseY >= dockY && mouseY < dockY + dockH;
             g.fill(bx, dockY, bx + btnW, dockY + dockH, hover ? 0xFF3A4050 : 0xFF2A3040);
-            g.drawCenteredString(font, action.label, bx + btnW / 2, dockY + 4, 0xFFCCCCCC);
+            String label = action == UtilityAction.LANG ? AetherisLang.getLabel() : action.label;
+            g.drawCenteredString(font, label, bx + btnW / 2, dockY + 4, 0xFFCCCCCC);
         }
 
         // ── Info Modal Overlay ──
@@ -210,7 +226,7 @@ public class ClickGUI extends Screen {
         int expandedExtra = 0;
         if (col.expandedModule != null && mods.contains(col.expandedModule)) {
             int eIdx = mods.indexOf(col.expandedModule);
-            if (eIdx >= startIdx && eIdx < endIdx) expandedExtra = SETTINGS_H;
+            if (eIdx >= startIdx && eIdx < endIdx) expandedExtra = settingsHeight(col.expandedModule);
         }
         int totalH = HEADER_H + visibleCount * ROW_H + expandedExtra;
 
@@ -296,8 +312,9 @@ public class ClickGUI extends Screen {
 
             // ── Expanded settings drawer (inline, Meteor-inspired) ──
             if (col.expandedModule == mod) {
-                renderSettingsDrawer(g, cx, ry, mod, mouseX, mouseY);
-                ry += SETTINGS_H;
+                int sh = settingsHeight(mod);
+                renderSettingsDrawer(g, cx, ry, mod, mouseX, mouseY, sh);
+                ry += sh;
             }
         }
 
@@ -310,14 +327,14 @@ public class ClickGUI extends Screen {
         g.fill(cx, cy + totalH - 1, cx + layout().columnWidth(), cy + totalH, (accent & 0x00FFFFFF) | 0x30000000);
     }
 
-    private void renderSettingsDrawer(GuiGraphics g, int cx, int ry, Module mod, int mouseX, int mouseY) {
+    private void renderSettingsDrawer(GuiGraphics g, int cx, int ry, Module mod, int mouseX, int mouseY, int totalHeight) {
         // Drawer background — slightly indented, darker
-        g.fill(cx + 3, ry, cx + layout().columnWidth() - 3, ry + SETTINGS_H, 0xE8101420);
+        g.fill(cx + 3, ry, cx + layout().columnWidth() - 3, ry + totalHeight, 0xE8101420);
         g.fill(cx + 3, ry, cx + layout().columnWidth() - 3, ry + 1, 0x40FFFFFF);   // top separator line
 
         int halfW = (layout().columnWidth() - 6) / 2;
         int btnY = ry + 2;
-        int btnH = SETTINGS_H - 4;
+        int btnH = 20 - 4; // top bar is always 20px
 
         // ── Keybind button ──
         boolean isBinding = (bindingModule == mod);
@@ -337,6 +354,51 @@ public class ClickGUI extends Screen {
 
         String cfgLabel = settingsLabelFor(mod);
         g.drawCenteredString(font, cfgLabel, cx + 3 + halfW + 2 + (halfW - 2) / 2, btnY + 3, 0xFFDDDDDD);
+
+        // ── Render settings ──
+        if (mod.hasSettings()) {
+            int sy = ry + 20; // Start below the buttons
+            for (Setting<?> setting : mod.getSettings()) {
+                boolean hover = mouseX >= cx + 3 && mouseX <= cx + layout().columnWidth() - 3
+                             && mouseY >= sy && mouseY < sy + 14;
+                if (hover) {
+                    g.fill(cx + 3, sy, cx + layout().columnWidth() - 3, sy + 14, 0x1AFFFFFF);
+                }
+
+                g.drawString(font, setting.getDisplayName(), cx + 8, sy + 3, 0xFFCCCCCC);
+
+                // Right side control
+                if (setting instanceof BooleanSetting bs) {
+                    String toggle = bs.isOn() ? "§a[✔]" : "§c[✖]";
+                    g.drawString(font, toggle, cx + layout().columnWidth() - 8 - font.width(toggle), sy + 3, 0xFFFFFFFF);
+                } else if (setting instanceof ModeSetting<?> ms) {
+                    String modeText = "§7< §f" + ms.getValueDisplay() + " §7>";
+                    g.drawString(font, modeText, cx + layout().columnWidth() - 8 - font.width(modeText), sy + 3, 0xFFFFFFFF);
+                } else if (setting instanceof SliderSetting ss) {
+                    int trackW = 50;
+                    int trackX = cx + layout().columnWidth() - 8 - trackW;
+                    int trackY = sy + 5;
+                    // Background track
+                    g.fill(trackX, trackY, trackX + trackW, trackY + 4, 0xFF111111);
+                    // Filled track
+                    int fillW = (int) (ss.getRatio() * trackW);
+                    int accent = accentOf(mod.getCategory());
+                    g.fill(trackX, trackY, trackX + fillW, trackY + 4, accent);
+                    
+                    // Value text
+                    String valText = ss.getValueDisplay();
+                    g.drawString(font, valText, trackX - 4 - font.width(valText), sy + 3, 0xFFAAAAAA);
+                    
+                    // Handle drag immediate feedback
+                    if (draggingSetting == ss) {
+                        double newRatio = (double) (mouseX - trackX) / trackW;
+                        newRatio = Math.max(0.0, Math.min(1.0, newRatio));
+                        ss.setFromRatio(newRatio);
+                    }
+                }
+                sy += 14;
+            }
+        }
     }
 
     private void renderSearchBar(GuiGraphics g, int mouseX, int mouseY) {
@@ -401,13 +463,13 @@ public class ClickGUI extends Screen {
         }
 
         // Utility dock (check BEFORE binding dismiss so dock always works)
-        int dockW = 200;
+        int dockW = 250;
         int dockH = 16;
         int dockX = (width - dockW) / 2;
         int dockY = height - SEARCH_H - 10 - dockH - 4;
         if (my >= dockY && my < dockY + dockH && button == 0) {
-            int btnW = (dockW - 12) / 4;
-            for (int i = 0; i < 4; i++) {
+            int btnW = (dockW - 16) / 5;
+            for (int i = 0; i < 5; i++) {
                 int bx = dockX + i * (btnW + 4);
                 if (mx >= bx && mx < bx + btnW) {
                     openUtility(UtilityAction.values()[i]);
@@ -475,16 +537,41 @@ public class ClickGUI extends Screen {
 
                 // Settings drawer click
                 if (col.expandedModule == mod) {
-                    if (my >= ry && my < ry + SETTINGS_H) {
-                        int halfW = (layout().columnWidth() - 6) / 2;
-                        if (mx >= cx + 3 && mx <= cx + 3 + halfW) {
-                            bindingModule = mod;
-                        } else if (mx >= cx + 3 + halfW + 2 && mx <= cx + layout().columnWidth() - 3) {
-                            openSettingsFor(mod);
+                    int sh = settingsHeight(mod);
+                    if (my >= ry && my < ry + sh) {
+                        if (my < ry + 20) {
+                            int halfW = (layout().columnWidth() - 6) / 2;
+                            if (mx >= cx + 3 && mx <= cx + 3 + halfW) {
+                                bindingModule = mod;
+                            } else if (mx >= cx + 3 + halfW + 2 && mx <= cx + layout().columnWidth() - 3) {
+                                openSettingsFor(mod);
+                            }
+                        } else if (mod.hasSettings()) {
+                            int sy = ry + 20;
+                            for (Setting<?> setting : mod.getSettings()) {
+                                if (my >= sy && my < sy + 14) {
+                                    if (setting instanceof BooleanSetting bs) {
+                                        bs.toggle();
+                                        ProfileManager.getInstance().save();
+                                    } else if (setting instanceof ModeSetting<?> ms) {
+                                        ms.cycle();
+                                        ProfileManager.getInstance().save();
+                                    } else if (setting instanceof SliderSetting ss) {
+                                        draggingSetting = ss;
+                                        int trackW = 50;
+                                        int trackX = cx + layout().columnWidth() - 8 - trackW;
+                                        double newRatio = (double) (mx - trackX) / trackW;
+                                        newRatio = Math.max(0.0, Math.min(1.0, newRatio));
+                                        ss.setFromRatio(newRatio);
+                                    }
+                                    return true;
+                                }
+                                sy += 14;
+                            }
                         }
                         return true;
                     }
-                    ry += SETTINGS_H;
+                    ry += sh;
                 }
             }
         }
@@ -532,6 +619,11 @@ public class ClickGUI extends Screen {
 
     @Override
     public boolean mouseReleased(double mx, double my, int button) {
+        if (draggingSetting != null && button == 0) {
+            draggingSetting = null;
+            ProfileManager.getInstance().save();
+            return true;
+        }
         if (draggingColumn != null && button == 0) {
             draggingColumn = null;
             return true;
@@ -605,6 +697,7 @@ public class ClickGUI extends Screen {
 
     // ── helpers ────────────────────────────────────────────────────────
     private String settingsLabelFor(Module mod) {
+        if (mod.hasSettings()) return "§fSettings ⚙";
         String n = mod.getName().toLowerCase();
         if (n.equals("xray")) return "§fSettings ⚙";
         if (n.equals("seedcracker")) return "§fConfig ⚙";
@@ -829,7 +922,10 @@ public class ClickGUI extends Screen {
         }
 
         int expandedExtra(List<Module> mods) {
-            if (expandedModule != null && mods != null && mods.contains(expandedModule)) return SETTINGS_H;
+            if (expandedModule != null && mods != null && mods.contains(expandedModule)) {
+                if (!expandedModule.hasSettings()) return 20;
+                return 20 + (expandedModule.getSettings().size() * 14);
+            }
             return 0;
         }
     }

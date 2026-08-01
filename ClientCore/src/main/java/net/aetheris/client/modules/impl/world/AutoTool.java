@@ -8,12 +8,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.aetheris.client.settings.BooleanSetting;
 
 public class AutoTool extends Module {
+    private final BooleanSetting switchBack = new BooleanSetting("switchBack", "Switch Back", "Ripristina Oggetto", true);
+    private final BooleanSetting saveDurability = new BooleanSetting("saveDurability", "Save Durability", "Salva Durabilità", true);
+    
     private int lastSlot = -1;
 
     public AutoTool() {
         super("AutoTool", "Seleziona automaticamente lo strumento migliore.", Category.WORLD);
+        addSetting(switchBack);
+        addSetting(saveDurability);
     }
 
     @Override
@@ -49,7 +55,7 @@ public class AutoTool extends Module {
 
     @Override
     public void onDisable() {
-        if (lastSlot != -1 && mc.player != null) {
+        if (switchBack.isOn() && lastSlot != -1 && mc.player != null) {
             mc.player.getInventory().selected = lastSlot;
             lastSlot = -1;
         }

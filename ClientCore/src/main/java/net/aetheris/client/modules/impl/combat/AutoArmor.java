@@ -2,14 +2,22 @@ package net.aetheris.client.modules.impl.combat;
 
 import net.aetheris.client.modules.Category;
 import net.aetheris.client.modules.Module;
+import net.aetheris.client.settings.BooleanSetting;
+import net.aetheris.client.settings.SliderSetting;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class AutoArmor extends Module {
+    private final SliderSetting swapDelay = new SliderSetting("swapDelay", "Swap Delay", "Ritardo Scambio", 2, 0, 20, 1, "ticks");
+    private final BooleanSetting preferElytra = new BooleanSetting("preferElytra", "Prefer Elytra", "Preferisci Elytra", false);
+
     private int equipDelay = 0;
 
     public AutoArmor() {
         super("AutoArmor", "Equipaggia automaticamente la migliore armatura.", Category.COMBAT);
+        addSetting(swapDelay);
+        addSetting(preferElytra);
     }
 
     @Override
@@ -19,19 +27,27 @@ public class AutoArmor extends Module {
 
         for (int slot = 0; slot < 36; slot++) {
             ItemStack stack = mc.player.getInventory().getItem(slot);
-            if (stack.isEmpty() || !stack.has(net.minecraft.core.component.DataComponents.EQUIPPABLE)) continue;
+            if (stack.isEmpty()) continue;
+            
+            boolean isElytra = stack.getItem() == Items.ELYTRA;
+            if (!stack.has(net.minecraft.core.component.DataComponents.EQUIPPABLE) && !isElytra) continue;
 
-            int targetSlot = switch (stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE).slot().getIndex()) {
-                case 5 -> 39; // Head -> helmet slot
-                case 4 -> 38; // Chest -> chestplate slot
-                case 3 -> 37; // Legs -> leggings slot
-                case 2 -> 36; // Feet -> boots slot
-                default -> -1;
-            };
+            int targetSlot = -1;
+            if (isElytra) {
+                targetSlot = 38; // Chestplate slot
+            } else {
+                targetSlot = switch (stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE).slot().getIndex()) {
+                    case 5 -> 39; // Head -> helmet slot
+                    case 4 -> 38; // Chest -> chestplate slot
+                    case 3 -> 37; // Legs -> leggings slot
+                    case 2 -> 36; // Feet -> boots slot
+                    default -> -1;
+                };
+            }
             if (targetSlot == -1) continue;
 
             ItemStack equipped = mc.player.getInventory().getArmor(targetSlot - 36);
-            if (equipped.isEmpty() || isBetter(stack, equipped)) {
+            if (equipped.isEmpty() || isBetter(stack, equipped, targetSlot == 38)) {
                 mc.gameMode.handleInventoryMouseClick(
                     mc.player.containerMenu.containerId,
                     slot < 9 ? slot + 36 : slot,
@@ -39,13 +55,17 @@ public class AutoArmor extends Module {
                     net.minecraft.world.inventory.ClickType.QUICK_MOVE,
                     mc.player
                 );
-                equipDelay = 5;
+                equipDelay = swapDelay.getIntValue();
                 return;
             }
         }
     }
 
-    private boolean isBetter(ItemStack newStack, ItemStack oldStack) {
+    private boolean isBetter(ItemStack newStack, ItemStack oldStack, boolean isChest) {
+        if (isChest && preferElytra.isOn()) {
+            if (newStack.getItem() == Items.ELYTRA && oldStack.getItem() != Items.ELYTRA) return true;
+            if (oldStack.getItem() == Items.ELYTRA && newStack.getItem() != Items.ELYTRA) return false;
+        }
         return getDefense(newStack) > getDefense(oldStack);
     }
 

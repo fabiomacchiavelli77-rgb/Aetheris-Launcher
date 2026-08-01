@@ -4,12 +4,19 @@ import net.aetheris.client.modules.Category;
 import net.aetheris.client.modules.Module;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.ItemStack;
+import net.aetheris.client.settings.SliderSetting;
+import net.aetheris.client.settings.BooleanSetting;
 
 public class ChestStealer extends Module {
+    private final SliderSetting itemDelay = new SliderSetting("itemDelay", "Item Delay", "Ritardo Oggetti", 2.0, 0.0, 20.0, 1.0, "ticks");
+    private final BooleanSetting autoClose = new BooleanSetting("autoClose", "Auto Close", "Chiudi Automaticamente", true);
+    
     private int stealDelay = 0;
 
     public ChestStealer() {
         super("ChestStealer", "Ruba automaticamente il contenuto delle chest.", Category.PLAYER);
+        addSetting(itemDelay);
+        addSetting(autoClose);
     }
 
     @Override
@@ -33,7 +40,10 @@ public class ChestStealer extends Module {
                     break;
                 }
             }
-            stealDelay = stole ? 3 : 10;
+            if (!stole && autoClose.isOn()) {
+                mc.player.closeContainer();
+            }
+            stealDelay = stole ? itemDelay.getValue().intValue() : 10;
         }
     }
 }

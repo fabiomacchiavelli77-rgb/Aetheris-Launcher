@@ -1,8 +1,13 @@
 package net.aetheris.client.modules;
 
 import net.aetheris.client.config.ProfileManager;
+import net.aetheris.client.settings.Setting;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class Module {
     private final String name;
@@ -11,6 +16,9 @@ public abstract class Module {
     private boolean enabled;
     private int keybind;
     protected final Minecraft mc = Minecraft.getInstance();
+
+    // ── Settings system ──────────────────────────────────────────────
+    private final List<Setting<?>> settings = new ArrayList<>();
 
     public Module(String name, Category category) {
         this(name, null, category);
@@ -48,6 +56,31 @@ public abstract class Module {
 
     public void toggle() { setEnabled(!enabled); }
 
+    // ── Settings API ─────────────────────────────────────────────────
+    /** Register a setting for this module. Call in constructor. */
+    protected void addSetting(Setting<?> setting) {
+        settings.add(setting);
+    }
+
+    /** Returns an unmodifiable view of this module's settings */
+    public List<Setting<?>> getSettings() {
+        return Collections.unmodifiableList(settings);
+    }
+
+    /** Returns true if this module has configurable settings */
+    public boolean hasSettings() {
+        return !settings.isEmpty();
+    }
+
+    /** Find a setting by its ID */
+    public Setting<?> getSettingById(String id) {
+        for (Setting<?> s : settings) {
+            if (s.getId().equals(id)) return s;
+        }
+        return null;
+    }
+
+    // ── Lifecycle hooks ──────────────────────────────────────────────
     public void onEnable() {}
     public void onDisable() {}
     public void onTick() {}
