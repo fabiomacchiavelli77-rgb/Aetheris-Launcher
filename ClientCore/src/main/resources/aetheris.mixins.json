@@ -17,7 +17,8 @@
     "WorldRendererMixin",
     "BlockRenderManagerMixin",
     "BlockStateBaseMixin",
-    "BlockMixin"
+    "BlockMixin",
+    "AetherisClientPacketListenerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
