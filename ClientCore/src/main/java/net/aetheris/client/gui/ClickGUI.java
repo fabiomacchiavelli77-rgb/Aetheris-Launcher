@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -32,11 +33,13 @@ public class ClickGUI extends Screen {
     private static final int SETTINGS_H  = 20;     // expanded settings drawer height
     private static final int SEARCH_W    = 140;
     private static final int SEARCH_H    = 18;
-    private static final int SCROLL_BTN  = 10;     // scroll indicator size
 
     // ── state ──────────────────────────────────────────────────────────
+    private static final java.util.Map<Category, int[]> SAVED_POSITIONS = new java.util.EnumMap<>(Category.class);
+
     private final List<Column> columns = new ArrayList<>();
     private Module bindingModule = null;
+    private Module infoModule = null;
     private String searchQuery = "";
     private boolean searchFocused = false;
     private long openTime = 0;
@@ -57,6 +60,9 @@ public class ClickGUI extends Screen {
     protected void init() {
         super.init();
         openTime = System.currentTimeMillis();
+        draggingColumn = null;
+        bindingModule = null;
+        searchFocused = false;
         applyLayoutAndClamp();
     }
 
@@ -89,13 +95,27 @@ public class ClickGUI extends Screen {
 
     private void applyLayoutAndClamp() {
         ClickGUILayout.Layout layout = layout();
+        int maxColX = Math.max(0, width - layout.columnWidth());
+        int maxColY = Math.max(0, height - HEADER_H);
+
         for (int index = 0; index < columns.size(); index++) {
             Column column = columns.get(index);
             if (!column.positioned) {
-                column.x = layout.columnX(index);
-                column.y = layout.columnTopY();
+                int[] saved = SAVED_POSITIONS.get(column.category);
+                if (saved != null) {
+                    column.x = saved[0];
+                    column.y = saved[1];
+                } else {
+                    column.x = layout.columnX(index);
+                    column.y = layout.columnTopY();
+                }
                 column.positioned = true;
             }
+            // Clamp column coordinates within screen boundaries
+            column.x = Math.max(0, Math.min(column.x, maxColX));
+            column.y = Math.max(0, Math.min(column.y, maxColY));
+            SAVED_POSITIONS.put(column.category, new int[]{column.x, column.y});
+
             java.util.List<Module> modules = column.filteredModules(searchQuery);
             column.scrollOffset = layout.clampScrollOffset(column.scrollOffset, modules.size());
             if (column.expandedModule != null && !modules.contains(column.expandedModule)) {
@@ -104,8 +124,7 @@ public class ClickGUI extends Screen {
         }
     }
 
-
-        private void setSearchQuery(String query) {
+    private void setSearchQuery(String query) {
         searchQuery = query;
         applyLayoutAndClamp();
     }
@@ -144,10 +163,10 @@ public class ClickGUI extends Screen {
         // ── Search bar (bottom center, sleek) ──
         renderSearchBar(g, mouseX, mouseY);
 
-        // ── Binding notice ──
+        // ── Binding notice (positioned above dock to prevent search bar collision) ──
         if (bindingModule != null) {
             String notice = "§e⌨ Press key for §f" + bindingModule.getName() + " §7(ESC = clear)";
-            g.drawCenteredString(font, notice, width / 2, height - 28, 0xFFFFFF00);
+            g.drawCenteredString(font, notice, width / 2, height - SEARCH_H - 42, 0xFFFFFF00);
         }
 
         // ── Watermark ──
@@ -173,6 +192,9 @@ public class ClickGUI extends Screen {
             g.fill(bx, dockY, bx + btnW, dockY + dockH, hover ? 0xFF3A4050 : 0xFF2A3040);
             g.drawCenteredString(font, action.label, bx + btnW / 2, dockY + 4, 0xFFCCCCCC);
         }
+
+        // ── Info Modal Overlay ──
+        renderInfoModal(g, mouseX, mouseY);
     }
 
     private void renderColumn(GuiGraphics g, Column col, int mouseX, int mouseY) {
@@ -245,26 +267,30 @@ public class ClickGUI extends Screen {
                 g.fill(cx, ry, cx + 2, ry + ROW_H, accent);
             }
 
-            // Module name (truncated to fit column width)
-            int textCol = enabled ? 0xFFFFFFFF : (hover ? 0xFFDDDDDD : 0xFFAAAAAA);
-            if (!enabled && !hover) textCol = 0xFFAAAAAA;
-            String displayName = mod.getName();
-            int maxNameWidth = layout().columnWidth() - 22;
-            if (font.width(displayName) > maxNameWidth) {
-                displayName = font.plainSubstrByWidth(displayName, maxNameWidth - font.width("…")) + "…";
-            }
-            g.drawString(font, displayName, cx + 6, ry + 4, textCol);
-
-            // Keybind label (right-aligned, dimmed)
+            // Calculate reserved right-hand space for Keybind and Arrow to prevent overflow/overlap
+            int rightReserved = 10; // Margin + expansion arrow
             if (mod.getKeybind() != GLFW.GLFW_KEY_UNKNOWN) {
                 String kn = keyName(mod.getKeybind());
                 int tw = font.width(kn);
-                g.drawString(font, kn, cx + layout().columnWidth() - tw - 5, ry + 4, 0xFF555555);
+                rightReserved += tw + 4;
+                // Keybind label (right-aligned before arrow)
+                g.drawString(font, kn, cx + layout().columnWidth() - 10 - tw, ry + 4, 0xFF555555);
             }
 
-            // Small expand arrow if right-clickable
+            // Expand arrow indicator
             String arrow = (col.expandedModule == mod) ? "▾" : "▸";
-            g.drawString(font, arrow, cx + layout().columnWidth() - 10, ry + 4, 0xFF666666);
+            g.drawString(font, arrow, cx + layout().columnWidth() - 8, ry + 4, 0xFF666666);
+
+            // Module name truncated strictly within available width
+            int textCol = enabled ? 0xFFFFFFFF : (hover ? 0xFFDDDDDD : 0xFFAAAAAA);
+            String displayName = mod.getName();
+            int maxNameWidth = layout().columnWidth() - 6 - rightReserved;
+            if (font.width(displayName) > maxNameWidth) {
+                int ellipsisW = font.width("…");
+                int availableForText = Math.max(1, maxNameWidth - ellipsisW);
+                displayName = font.plainSubstrByWidth(displayName, availableForText) + "…";
+            }
+            g.drawString(font, displayName, cx + 6, ry + 4, textCol);
 
             ry += ROW_H;
 
@@ -344,6 +370,36 @@ public class ClickGUI extends Screen {
     // ── mouse handling ─────────────────────────────────────────────────
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
+        if (infoModule != null && button == 0) {
+            int mW = 330;
+            int mH = 175;
+            int mX = (width - mW) / 2;
+            int mY = (height - mH) / 2;
+
+            // X close button check
+            if (mx >= mX + mW - 22 && mx <= mX + mW - 6 && my >= mY + 4 && my <= mY + 20) {
+                infoModule = null;
+                return true;
+            }
+
+            // Status toggle button check
+            int btnX = mX + 10;
+            int btnY = mY + 30;
+            int btnW = 130;
+            int btnH = 18;
+            if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH) {
+                infoModule.toggle();
+                return true;
+            }
+
+            // Click outside modal
+            if (mx < mX || mx > mX + mW || my < mY || my > mY + mH) {
+                infoModule = null;
+                return true;
+            }
+            return true;
+        }
+
         // Utility dock (check BEFORE binding dismiss so dock always works)
         int dockW = 200;
         int dockH = 16;
@@ -376,14 +432,17 @@ public class ClickGUI extends Screen {
             searchFocused = false;
         }
 
-        // Column header drag start
+        // Column header drag start (move column to end of list so it renders in foreground)
         if (button == 0) {
-            for (Column col : columns) {
+            for (int i = columns.size() - 1; i >= 0; i--) {
+                Column col = columns.get(i);
                 if (mx >= col.x && mx <= col.x + layout().columnWidth()
                     && my >= col.y && my <= col.y + HEADER_H) {
                     draggingColumn = col;
                     dragOffsetX = (int) mx - col.x;
                     dragOffsetY = (int) my - col.y;
+                    columns.remove(i);
+                    columns.add(col);
                     return true;
                 }
             }
@@ -458,9 +517,14 @@ public class ClickGUI extends Screen {
     @Override
     public boolean mouseDragged(double mx, double my, int button, double deltaX, double deltaY) {
         if (draggingColumn != null && button == 0) {
-            draggingColumn.x = (int) mx - dragOffsetX;
-            draggingColumn.y = (int) my - dragOffsetY;
+            int maxColX = Math.max(0, width - layout().columnWidth());
+            int maxColY = Math.max(0, height - HEADER_H);
+            int newX = (int) mx - dragOffsetX;
+            int newY = (int) my - dragOffsetY;
+            draggingColumn.x = Math.max(0, Math.min(newX, maxColX));
+            draggingColumn.y = Math.max(0, Math.min(newY, maxColY));
             draggingColumn.positioned = true;
+            SAVED_POSITIONS.put(draggingColumn.category, new int[]{draggingColumn.x, draggingColumn.y});
             return true;
         }
         return super.mouseDragged(mx, my, button, deltaX, deltaY);
@@ -478,6 +542,13 @@ public class ClickGUI extends Screen {
     // ── keyboard handling ──────────────────────────────────────────────
     @Override
     public boolean keyPressed(int key, int scancode, int modifiers) {
+        if (infoModule != null) {
+            if (key == GLFW.GLFW_KEY_ESCAPE) {
+                infoModule = null;
+                return true;
+            }
+        }
+
         // Keybind recording
         if (bindingModule != null) {
             if (key == GLFW.GLFW_KEY_ESCAPE) {
@@ -521,6 +592,15 @@ public class ClickGUI extends Screen {
     }
 
     @Override
+    public void onClose() {
+        draggingColumn = null;
+        bindingModule = null;
+        infoModule = null;
+        searchFocused = false;
+        super.onClose();
+    }
+
+    @Override
     public boolean isPauseScreen() { return false; }
 
     // ── helpers ────────────────────────────────────────────────────────
@@ -537,6 +617,8 @@ public class ClickGUI extends Screen {
             Minecraft.getInstance().setScreen(new XrayBlockSelectorScreen(this));
         } else if (n.equals("seedcracker")) {
             Minecraft.getInstance().setScreen(new SeedCrackerConfigScreen(this));
+        } else {
+            this.infoModule = mod;
         }
     }
 
@@ -566,6 +648,160 @@ public class ClickGUI extends Screen {
         };
     }
 
+    // ── Info Modal Overlay ─────────────────────────────────────────────
+    private void renderInfoModal(GuiGraphics g, int mouseX, int mouseY) {
+        if (infoModule == null) return;
+
+        // Dark dim backdrop for modal
+        g.fill(0, 0, width, height, 0xCC000000);
+
+        int mW = 330;
+        int mH = 175;
+        int mX = (width - mW) / 2;
+        int mY = (height - mH) / 2;
+        int accent = accentOf(infoModule.getCategory());
+
+        // Card shadow & background
+        g.fill(mX + 3, mY + 3, mX + mW + 3, mY + mH + 3, 0x60000000);
+        g.fill(mX, mY, mX + mW, mY + mH, 0xF0121620);
+
+        // Header bar with accent line
+        g.fill(mX, mY, mX + mW, mY + 24, 0xF01A202C);
+        g.fill(mX, mY, mX + mW, mY + 2, accent);
+
+        // Title text
+        String titleText = "§l" + infoModule.getName() + " §8[" + infoModule.getCategory().getName() + "]";
+        g.drawString(font, titleText, mX + 10, mY + 7, 0xFFFFFFFF);
+
+        // Close 'X' button on header
+        boolean hoverX = mouseX >= mX + mW - 22 && mouseX <= mX + mW - 6 && mouseY >= mY + 4 && mouseY <= mY + 20;
+        g.drawString(font, "§c✖", mX + mW - 16, mY + 7, hoverX ? 0xFFFF5555 : 0xFFAAAA);
+
+        // Status & Toggle Button
+        boolean enabled = infoModule.isEnabled();
+        int btnX = mX + 10;
+        int btnY = mY + 30;
+        int btnW = 130;
+        int btnH = 18;
+        boolean hoverToggle = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
+        int btnBg = enabled ? (hoverToggle ? 0xFF358035 : 0xFF256025) : (hoverToggle ? 0xFF803535 : 0xFF602525);
+        g.fill(btnX, btnY, btnX + btnW, btnY + btnH, btnBg);
+        String toggleLabel = enabled ? "✔ ABILITATO (ON)" : "✖ DISABILITATO (OFF)";
+        g.drawCenteredString(font, toggleLabel, btnX + btnW / 2, btnY + 5, 0xFFFFFFFF);
+
+        // Keybind info badge
+        String keyText = "Tasto: §e" + keyName(infoModule.getKeybind());
+        g.drawString(font, keyText, mX + 150, mY + 35, 0xFFCCCCCC);
+
+        // Separator line
+        g.fill(mX + 10, mY + 54, mX + mW - 10, mY + 55, 0x40FFFFFF);
+
+        // Description IT
+        String descIT = getModuleDescIT(infoModule);
+        g.drawString(font, "§6🇮🇹 Italiano:", mX + 10, mY + 60, 0xFFFFAA00);
+        drawWrappedText(g, descIT, mX + 10, mY + 72, mW - 20, 0xFFDDDDDD);
+
+        // Description EN
+        String descEN = getModuleDescEN(infoModule);
+        g.drawString(font, "§b🇬🇧 English:", mX + 10, mY + 112, 0xFF55FFFF);
+        drawWrappedText(g, descEN, mX + 10, mY + 124, mW - 20, 0xFFBBBBBB);
+
+        // Footer note
+        g.drawString(font, "§7(Clicca per chiudere / Click to close)", mX + 10, mY + mH - 14, 0xFF666666);
+    }
+
+    private void drawWrappedText(GuiGraphics g, String text, int x, int y, int maxWidth, int color) {
+        if (text == null || text.isEmpty()) return;
+        List<FormattedCharSequence> lines = font.split(Component.literal(text), maxWidth);
+        int curY = y;
+        for (FormattedCharSequence line : lines) {
+            g.drawString(font, line, x, curY, color);
+            curY += 9;
+        }
+    }
+
+    private static String getModuleDescIT(Module mod) {
+        String n = mod.getName().toLowerCase();
+        return switch (n) {
+            case "killaura" -> "Attacca automaticamente tutte le entità ostili nel tuo raggio d'azione.";
+            case "velocity" -> "Annulla il rinculo (knockback) subito quando vieni colpito.";
+            case "criticals" -> "Forza colpi critici ad ogni attacco senza bisogno di saltare.";
+            case "reach" -> "Aumenta la distanza massima a cui puoi colpire o interagire.";
+            case "autoarmor" -> "Equipaggia automaticamente la migliore armatura nell'inventario.";
+            case "autototem" -> "Mette automaticamente un Totem della non-morte nella mano secondaria.";
+            case "triggerbot" -> "Attacca automaticamente l'entità quando la miri col mirino.";
+            case "surround" -> "Piazza rapidamente blocchi di ossidiana attorno ai tuoi piedi.";
+            case "autosprint" -> "Mantiene la corsa (sprint) sempre attiva mentre ti muovi.";
+            case "speed" -> "Aumenta la velocità di movimento a terra del personaggio.";
+            case "fly" -> "Ti permette di volare liberamente anche in sopravvivenza.";
+            case "nofall" -> "Elimina completamente tutti i danni subiti da caduta dall'alto.";
+            case "step" -> "Permette di salire i blocchi d'altezza senza dover saltare.";
+            case "noslowdown" -> "Impedisce i rallentamenti quando mangi o usi l'arco.";
+            case "noclip" -> "Ti permette di camminare ed attraversare i blocchi solidi.";
+            case "fullbright" -> "Porta la luminosità al massimo rendendo visibili le caverne buie.";
+            case "esp" -> "Mostra il contorno di giocatori ed entità anche dietro i muri.";
+            case "nohurtcam" -> "Rimuove l'effetto di scuotimento della telecamera quando subisci danno.";
+            case "xray" -> "Rende trasparenti i blocchi comuni per evidenziare i minerali.";
+            case "nametags" -> "Mostra nomi e vita dei giocatori ingranditi attraverso i muri.";
+            case "tracers" -> "Disegna linee dal mirino verso le posizioni degli altri giocatori.";
+            case "freecam" -> "Separa la telecamera dal corpo per esplorare in modalità spettatore.";
+            case "fastbreak" -> "Velocizza lo scavo dei blocchi accelerandone la rottura.";
+            case "scaffold" -> "Piazza automaticamente blocchi sotto i piedi mentre cammini nell'aria.";
+            case "timer" -> "Modifica la velocità generale del ciclo di gioco (TPS locali).";
+            case "autotool" -> "Seleziona l'attrezzo migliore nella barra rapida per il blocco che scavi.";
+            case "installedplugins" -> "Analizza i comandi inviati dal server per rilevare i plugin installati.";
+            case "autorespawn" -> "Rinasce automaticamente all'istante senza dover cliccare alla morte.";
+            case "fastplace" -> "Rimuove il ritardo nel piazzamento continuo tenendo premuto il mouse.";
+            case "nohunger" -> "Previene o riduce il consumo della barra della fame durante le azioni.";
+            case "cheststealer" -> "Svuota e sposta tutti gli oggetti dalle casse aperte nel tuo inventario.";
+            case "autofish" -> "Pesca e rilancia la canna da pesca in modo automatico.";
+            case "inventorycleaner" -> "Scarta automaticamente gli oggetti inutili o doppioni dall'inventario.";
+            case "seedcracker" -> "Ricostruisce il seed del mondo analizzando le strutture del server.";
+            default -> mod.getDescription().isEmpty() ? "Nessuna descrizione disponibile." : mod.getDescription();
+        };
+    }
+
+    private static String getModuleDescEN(Module mod) {
+        String n = mod.getName().toLowerCase();
+        return switch (n) {
+            case "killaura" -> "Automatically attacks all hostile entities around you.";
+            case "velocity" -> "Cancels knockback received from attacks or explosions.";
+            case "criticals" -> "Forces critical hits on every attack without needing to jump.";
+            case "reach" -> "Increases your attack and interaction reach distance.";
+            case "autoarmor" -> "Automatically equips the best armor pieces in your inventory.";
+            case "autototem" -> "Automatically places a Totem of Undying in your offhand.";
+            case "triggerbot" -> "Automatically attacks entities whenever your crosshair hits them.";
+            case "surround" -> "Quickly places obsidian blocks around your feet for protection.";
+            case "autosprint" -> "Keeps sprinting enabled continuously while moving.";
+            case "speed" -> "Increases your ground movement speed.";
+            case "fly" -> "Allows you to fly freely even in survival mode.";
+            case "nofall" -> "Prevents all fall damage from high drops.";
+            case "step" -> "Allows walking up block ledges without jumping.";
+            case "noslowdown" -> "Prevents movement slowdown while eating or using bows.";
+            case "noclip" -> "Allows walking through solid walls and blocks.";
+            case "fullbright" -> "Sets maximum brightness, illuminating dark areas and caves.";
+            case "esp" -> "Highlights players and entities through solid walls.";
+            case "nohurtcam" -> "Removes the camera shake wobble when taking damage.";
+            case "xray" -> "Makes common blocks transparent to reveal hidden ores.";
+            case "nametags" -> "Renders enlarged, readable player tags and health through walls.";
+            case "tracers" -> "Draws lines from your crosshair to all surrounding players.";
+            case "freecam" -> "Detaches your camera from your body for free spectator viewing.";
+            case "fastbreak" -> "Increases block mining speed.";
+            case "scaffold" -> "Automatically builds blocks beneath your feet as you walk in mid-air.";
+            case "timer" -> "Changes the overall game tick speed.";
+            case "autotool" -> "Automatically switches to the best tool for the targeted block.";
+            case "installedplugins" -> "Intercepts server packets to discover and list installed plugins.";
+            case "autorespawn" -> "Instantly respawns upon death without pressing any button.";
+            case "fastplace" -> "Removes placement delay when holding right-click.";
+            case "nohunger" -> "Reduces food bar exhaustion during actions and sprinting.";
+            case "cheststealer" -> "Automatically loots all items from opened chests into your inventory.";
+            case "autofish" -> "Automatically catches fish and recasts your fishing rod.";
+            case "inventorycleaner" -> "Drops trash items and low-quality duplicates from inventory.";
+            case "seedcracker" -> "Reconstructs the world seed by inspecting server structures.";
+            default -> mod.getDescription().isEmpty() ? "No description available." : mod.getDescription();
+        };
+    }
+
     // ── column model ───────────────────────────────────────────────────
     private static class Column {
         final Category category;
@@ -580,17 +816,20 @@ public class ClickGUI extends Screen {
 
         List<Module> filteredModules(String query) {
             List<Module> all = ModuleManager.getModules(category);
+            if (all == null) return List.of();
             if (query == null || query.isEmpty()) return all;
             String q = query.toLowerCase();
             List<Module> out = new ArrayList<>();
             for (Module m : all) {
-                if (m.getName().toLowerCase().contains(q)) out.add(m);
+                if (m != null && m.getName() != null && m.getName().toLowerCase().contains(q)) {
+                    out.add(m);
+                }
             }
             return out;
         }
 
         int expandedExtra(List<Module> mods) {
-            if (expandedModule != null && mods.contains(expandedModule)) return SETTINGS_H;
+            if (expandedModule != null && mods != null && mods.contains(expandedModule)) return SETTINGS_H;
             return 0;
         }
     }
