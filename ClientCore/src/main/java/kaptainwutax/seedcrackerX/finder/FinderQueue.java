@@ -19,16 +19,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class FinderQueue {
 
+    private static final AtomicLong TASK_GENERATION = new AtomicLong(0);
     private final static FinderQueue INSTANCE = new FinderQueue();
     private static final Logger log = LoggerFactory.getLogger(FinderQueue.class);
     public static ExecutorService SERVICE = Executors.newFixedThreadPool(5);
 
-
     public FinderControl finderControl = new FinderControl();
+    private volatile Set<Cuboid> currentCuboids = Collections.emptySet();
 
     private FinderQueue() {
         this.clear();
@@ -48,15 +50,22 @@ public class FinderQueue {
     public void onChunkData(Level world, ChunkPos chunkPos) {
         if (!Config.get().active) return;
 
+        long currentGen = TASK_GENERATION.get();
+
         getActiveFinderTypes().forEach(type -> {
             SERVICE.submit(() -> {
                 try {
+                    if (currentGen != TASK_GENERATION.get() || !Config.get().active) return;
+
                     List<Finder> finders = type.finderBuilder.build(world, chunkPos);
 
                     finders.forEach(finder -> {
+                        if (currentGen != TASK_GENERATION.get() || !Config.get().active) return;
                         if (finder.isValidDimension(world.dimensionType())) {
                             finder.findInChunk();
-                            this.finderControl.addFinder(type, finder);
+                            if (currentGen == TASK_GENERATION.get() && Config.get().active) {
+                                this.finderControl.addFinder(type, finder);
+                            }
                         }
                     });
                 } catch (Exception e) {
@@ -80,10 +89,9 @@ public class FinderQueue {
         this.currentCuboids = cuboids;
     }
 
-    private Set<Cuboid> currentCuboids = Collections.emptySet();
-
     public void renderCuboids(MultiBufferSource submitter, PoseStack poseStack) {
         if (!Config.get().active || Config.get().render == Config.RenderType.OFF) {
+            this.currentCuboids = Collections.emptySet();
             return;
         }
         Set<Cuboid> cuboids = this.currentCuboids;
@@ -100,7 +108,14 @@ public class FinderQueue {
     }
 
     public void clear() {
-        this.finderControl = new FinderControl();
+        if (TASK_GENERATION != null) {
+            TASK_GENERATION.incrementAndGet();
+        }
+        if (this.finderControl != null) {
+            this.finderControl.deleteFinders();
+        } else {
+            this.finderControl = new FinderControl();
+        }
         this.currentCuboids = Collections.emptySet();
     }
 }
