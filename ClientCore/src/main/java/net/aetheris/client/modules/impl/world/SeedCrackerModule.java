@@ -9,16 +9,25 @@ public class SeedCrackerModule extends Module {
 
     public SeedCrackerModule() {
         super("SeedCracker", "Finds world seed from world structures and decorators.", Category.SEEDCRACKER);
+        if (Config.get() != null) {
+            Config.get().active = isEnabled();
+        }
     }
 
     @Override
     public void onEnable() {
-        Config.get().active = true;
+        if (Config.get() != null) {
+            Config.get().active = true;
+        }
     }
 
     @Override
     public void onDisable() {
-        Config.get().active = false;
-        FinderQueue.get().clear();
+        if (Config.get() != null) {
+            Config.get().active = false;
+        }
+        if (FinderQueue.get() != null) {
+            FinderQueue.get().clear();
+        }
     }
 }

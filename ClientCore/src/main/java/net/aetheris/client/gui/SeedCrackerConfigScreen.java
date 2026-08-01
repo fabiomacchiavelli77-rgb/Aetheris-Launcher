@@ -132,12 +132,16 @@ public class SeedCrackerConfigScreen extends Screen {
         g.drawCenteredString(this.font, "§e§lSEEDCRACKER X CONFIGURATION", this.width / 2, 10, 0xFFFFFFFF);
 
         if (currentTab == Tab.SEEDS) {
-            Set<Long> worldSeeds = SeedCracker.get().getDataStorage().getTimeMachine().worldSeeds;
-            Set<Long> structureSeeds = SeedCracker.get().getDataStorage().getTimeMachine().structureSeeds;
+            if (SeedCracker.get() != null && SeedCracker.get().getDataStorage() != null && SeedCracker.get().getDataStorage().getTimeMachine() != null) {
+                Set<Long> worldSeeds = SeedCracker.get().getDataStorage().getTimeMachine().worldSeeds;
+                Set<Long> structureSeeds = SeedCracker.get().getDataStorage().getTimeMachine().structureSeeds;
 
-            int y = 70;
-            g.drawCenteredString(this.font, "§aWorld Seeds Cracked: " + (worldSeeds.isEmpty() ? "None" : worldSeeds.toString()), this.width / 2, y, 0xFFFFFFFF);
-            g.drawCenteredString(this.font, "§bStructure Seeds Cracked: " + (structureSeeds.isEmpty() ? "None" : structureSeeds.toString()), this.width / 2, y + 25, 0xFFFFFFFF);
+                int y = 70;
+                g.drawCenteredString(this.font, "§aWorld Seeds Cracked: " + (worldSeeds.isEmpty() ? "None" : worldSeeds.toString()), this.width / 2, y, 0xFFFFFFFF);
+                g.drawCenteredString(this.font, "§bStructure Seeds Cracked: " + (structureSeeds.isEmpty() ? "None" : structureSeeds.toString()), this.width / 2, y + 25, 0xFFFFFFFF);
+            } else {
+                g.drawCenteredString(this.font, "§cNo seed cracking data available.", this.width / 2, 70, 0xFFFFFFFF);
+            }
         }
     }
 

@@ -26,9 +26,15 @@ public class BlockRenderManagerMixin {
         for (var mod : ModuleManager.getModules()) {
             if (mod instanceof Xray && mod.isEnabled()) {
                 if (!Xray.isXrayBlock(state.getBlock())) {
-                    ci.cancel();
-                    return;
+                    // If opacity is 0, hide the block completely (original behavior)
+                    if (Xray.getOpacity() == 0) {
+                        ci.cancel();
+                        return;
+                    }
+                    // If opacity > 0, let it render — brightness is controlled
+                    // via BlockStateBaseMixin.getShadeBrightness using the opacity factor
                 }
+                return;
             }
         }
     }

@@ -18,9 +18,11 @@ public class BlockMixin {
         for (var mod : ModuleManager.getModules()) {
             if (mod instanceof Xray xray && xray.isEnabled()) {
                 if (Xray.isXrayBlock(state.getBlock())) {
-                    cir.setReturnValue(true);
+                    cir.setReturnValue(true); // Always render xray ore faces
                 } else {
-                    cir.setReturnValue(false);
+                    // If opacity > 0, still render the face (dimmed via shade brightness)
+                    // If opacity == 0, hide it completely
+                    cir.setReturnValue(Xray.getOpacity() > 0);
                 }
                 return;
             }

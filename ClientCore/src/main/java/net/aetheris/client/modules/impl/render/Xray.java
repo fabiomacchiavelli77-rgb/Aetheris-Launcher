@@ -10,6 +10,12 @@ import java.util.Set;
 public class Xray extends Module {
     private static final Set<Block> XRAY_BLOCKS = new HashSet<>();
 
+    /** Opacity of non-xray blocks: 0 = fully hidden, 100 = fully visible */
+    private static int opacity = 0;
+
+    /** Whether to apply Night Vision effect while Xray is active */
+    private static boolean nightVisionEnabled = true;
+
     static {
         XRAY_BLOCKS.add(Blocks.DIAMOND_ORE);
         XRAY_BLOCKS.add(Blocks.DEEPSLATE_DIAMOND_ORE);
@@ -42,7 +48,28 @@ public class Xray extends Module {
         super("Xray", "Mostra solo minerali e blocchi preziosi.", Category.RENDER);
     }
 
+    // ── Opacity ──────────────────────────────────────────────────────
+    public static int getOpacity() { return opacity; }
+
+    public static void setOpacity(int value) {
+        opacity = Math.max(0, Math.min(100, value));
+        if (net.minecraft.client.Minecraft.getInstance().levelRenderer != null) {
+            net.minecraft.client.Minecraft.getInstance().levelRenderer.allChanged();
+        }
+    }
+
+    /** Returns the opacity as a float factor 0.0–1.0 */
+    public static float getOpacityFactor() { return opacity / 100f; }
+
+    // ── Night Vision ─────────────────────────────────────────────────
+    public static boolean isNightVisionEnabled() { return nightVisionEnabled; }
+
+    public static void setNightVisionEnabled(boolean enabled) { nightVisionEnabled = enabled; }
+
+    // ── Block management ─────────────────────────────────────────────
     public static boolean isXrayBlock(Block block) { return XRAY_BLOCKS.contains(block); }
+
+    public static Set<Block> getXrayBlocks() { return XRAY_BLOCKS; }
 
     public static void toggleXrayBlock(Block block) {
         if (XRAY_BLOCKS.contains(block)) {
@@ -105,7 +132,7 @@ public class Xray extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player != null) {
+        if (mc.player != null && nightVisionEnabled) {
             mc.player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
                 net.minecraft.world.effect.MobEffects.NIGHT_VISION, 520, 0, false, false, false
             ));

@@ -606,7 +606,7 @@ public class ClickGUI extends Screen {
     // ── helpers ────────────────────────────────────────────────────────
     private String settingsLabelFor(Module mod) {
         String n = mod.getName().toLowerCase();
-        if (n.equals("xray")) return "§fOres ⚙";
+        if (n.equals("xray")) return "§fSettings ⚙";
         if (n.equals("seedcracker")) return "§fConfig ⚙";
         return "§7Info";
     }
@@ -614,7 +614,7 @@ public class ClickGUI extends Screen {
     private void openSettingsFor(Module mod) {
         String n = mod.getName().toLowerCase();
         if (n.equals("xray")) {
-            Minecraft.getInstance().setScreen(new XrayBlockSelectorScreen(this));
+            Minecraft.getInstance().setScreen(new XraySettingsScreen(this));
         } else if (n.equals("seedcracker")) {
             Minecraft.getInstance().setScreen(new SeedCrackerConfigScreen(this));
         } else {

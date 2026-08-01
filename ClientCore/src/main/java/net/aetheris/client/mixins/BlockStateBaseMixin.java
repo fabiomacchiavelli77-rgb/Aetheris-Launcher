@@ -27,7 +27,8 @@ public abstract class BlockStateBaseMixin {
                 if (Xray.isXrayBlock(this.getBlock())) {
                     cir.setReturnValue(false); // Mai saltare le facce dei blocchi minerale visibile
                 } else {
-                    cir.setReturnValue(true);  // Salta/Nascondi tutti i blocchi non Xray
+                    // If opacity > 0, don't skip (render dimmed), else skip completely
+                    cir.setReturnValue(Xray.getOpacity() == 0);
                 }
                 return;
             }
@@ -47,7 +48,19 @@ public abstract class BlockStateBaseMixin {
     @Inject(method = "getShadeBrightness", at = @At("HEAD"), cancellable = true)
     private void onGetShadeBrightness(BlockGetter level, BlockPos pos, CallbackInfoReturnable<Float> cir) {
         for (var mod : ModuleManager.getModules()) {
-            if ((mod instanceof Xray xray && xray.isEnabled()) || (mod instanceof FullBright fb && fb.isEnabled())) {
+            if (mod instanceof Xray xray && xray.isEnabled()) {
+                if (Xray.isXrayBlock(this.getBlock())) {
+                    // Xray blocks: full brightness so they stand out
+                    cir.setReturnValue(1.0f);
+                } else {
+                    // Non-xray blocks: use opacity to dim them
+                    // opacity 0 = hidden (handled by renderBatched cancel)
+                    // opacity 1-100 = dim to full brightness
+                    cir.setReturnValue(Xray.getOpacityFactor() * 0.4f); // max 40% brightness so ores always stand out
+                }
+                return;
+            }
+            if (mod instanceof FullBright fb && fb.isEnabled()) {
                 cir.setReturnValue(1.0f); // 100% luminosità uniforme senza ombre scure sotterranee
                 return;
             }
