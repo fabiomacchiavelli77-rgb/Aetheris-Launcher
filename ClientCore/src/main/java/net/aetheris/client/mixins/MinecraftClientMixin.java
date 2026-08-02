@@ -15,8 +15,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Minecraft.class)
 public class MinecraftClientMixin {
 
+    @org.spongepowered.asm.mixin.Shadow
+    private int rightClickDelay;
+
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo ci) {
+        for (var mod : ModuleManager.getModules()) {
+            if (mod instanceof net.aetheris.client.modules.impl.player.FastPlace fp && fp.isEnabled()) {
+                rightClickDelay = fp.getDelay();
+            }
+        }
         ModuleManager.onTick();
     }
 

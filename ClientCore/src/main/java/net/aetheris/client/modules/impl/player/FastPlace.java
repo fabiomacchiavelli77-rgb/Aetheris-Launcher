@@ -14,10 +14,9 @@ public class FastPlace extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null) return;
-        // Resetta il cooldown di utilizzo oggetti
-        if (mc.player.getUseItemRemainingTicks() > delay.getValue().intValue()) {
-            mc.player.getUseItemRemainingTicks();
-        }
+    }
+
+    public int getDelay() {
+        return delay.getValue().intValue();
     }
 }
