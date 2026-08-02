@@ -22,8 +22,13 @@ public class AutoFish extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null) return;
-        if (recastDelay > 0) { recastDelay--; return; }
+        if (mc.player == null || mc.gameMode == null) return;
+        
+        if (recastDelay > 0) { 
+            recastDelay--; 
+            return; 
+        }
+        
         if (reelDelay > 0) {
             reelDelay--;
             if (reelDelay == 0) {
@@ -44,13 +49,15 @@ public class AutoFish extends Module {
         if (!holdingRod) return;
 
         if (mc.player.fishing != null) {
-            boolean hasCaught = mc.player.fishing.getHookedIn() != null;
+            var hook = mc.player.fishing;
+            // Un pesce ha abboccato se l'amo subisce una spinta verso il basso (Y < -0.1) o se ha agganciato qualcosa
+            boolean hasCaught = hook.getHookedIn() != null || hook.getDeltaMovement().y < -0.1;
+            
             if (hasCaught && reelDelay == 0) {
-                // Imposta il ritardo di raccolta
                 reelDelay = Math.max(1, reelDelaySetting.getValue().intValue());
             }
         } else if (!wasCasting && recastDelay == 0) {
-            // Lancia la lenza
+            // Lancia la lenza se non c'è un amo attivo
             InteractionHand hand = mc.player.getMainHandItem().getItem() instanceof FishingRodItem
                 ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
             mc.gameMode.useItem(mc.player, hand);
