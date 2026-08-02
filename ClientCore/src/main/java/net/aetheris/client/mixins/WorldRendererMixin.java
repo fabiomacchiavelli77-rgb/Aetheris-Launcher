@@ -16,11 +16,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LevelRenderer.class)
 public class WorldRendererMixin {
 
-    @Inject(method = "renderLevel", at = @At("TAIL"))
-    private void afterRenderEntities(GraphicsResourceAllocator graphicsResourceAllocator,
-                                     DeltaTracker deltaTracker, boolean renderBlockOutline,
-                                     Camera camera, GameRenderer gameRenderer,
-                                     Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci) {
-        // No longer needed: ESP is handled by Minecraft.shouldEntityAppearGlowing
+    @Inject(method = "collectVisibleEntities", at = @At("RETURN"))
+    private void onCollectVisibleEntities(Camera camera, net.minecraft.client.renderer.culling.Frustum frustum, java.util.List<net.minecraft.world.entity.Entity> list, org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Boolean> cir) {
+        for (var mod : ModuleManager.getModules()) {
+            if (mod instanceof net.aetheris.client.modules.impl.render.FreeCam fc && fc.isEnabled()) {
+                net.minecraft.world.entity.Entity dummy = fc.getDummyEntity();
+                if (dummy != null && !list.contains(dummy)) {
+                    list.add(dummy);
+                }
+            }
+        }
     }
 }

@@ -95,4 +95,8 @@ public class FreeCam extends Module {
         
         // Sincronizza la velocità di volo in base alle impostazioni se necessario
     }
+
+    public RemotePlayer getDummyEntity() {
+        return dummyEntity;
+    }
 }
