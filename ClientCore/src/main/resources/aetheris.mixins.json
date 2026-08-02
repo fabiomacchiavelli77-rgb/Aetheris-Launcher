@@ -18,7 +18,9 @@
     "BlockRenderManagerMixin",
     "BlockStateBaseMixin",
     "BlockMixin",
-    "AetherisClientPacketListenerMixin"
+    "AetherisClientPacketListenerMixin",
+    "ConnectionMixin",
+    "ServerboundMovePlayerPacketAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
