@@ -13,7 +13,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.util.Mth;
 
 public class KillAura extends Module {
-    private final SliderSetting range = new SliderSetting("range", "Range", "Portata", 3.8, 1.0, 6.0, 0.1, "blocks");
+    private final SliderSetting range = new SliderSetting("range", "Range", "Portata", 6.0, 1.0, 15.0, 0.5, "blocks");
     private final SliderSetting cps = new SliderSetting("cps", "Attack Speed", "Velocità Attacco", 12.0, 1.0, 20.0, 0.5, "CPS");
     private final BooleanSetting cooldownSync = new BooleanSetting("cooldownSync", "Cooldown Sync", "Sinc. Cooldown", true);
     private final BooleanSetting targetPlayers = new BooleanSetting("targetPlayers", "Target Players", "Bersaglia Giocatori", true);
@@ -24,7 +24,7 @@ public class KillAura extends Module {
     private int attackCooldown = 0;
 
     public KillAura() {
-        super("KillAura", "Attacca automaticamente le entità vicine.", Category.COMBAT);
+        super("KillAura", "Attacca automaticamente le entità vicine (fino a 15 blocchi).", Category.COMBAT);
         addSetting(range);
         addSetting(cps);
         addSetting(cooldownSync);
