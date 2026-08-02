@@ -2,13 +2,10 @@ package net.aetheris.client.modules.impl.world;
 
 import net.aetheris.client.modules.Category;
 import net.aetheris.client.modules.Module;
+import net.aetheris.client.settings.BooleanSetting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.aetheris.client.settings.BooleanSetting;
 
 public class AutoTool extends Module {
     private final BooleanSetting switchBack = new BooleanSetting("switchBack", "Switch Back", "Ripristina Oggetto", true);
@@ -17,38 +14,43 @@ public class AutoTool extends Module {
     private int lastSlot = -1;
 
     public AutoTool() {
-        super("AutoTool", "Seleziona automaticamente lo strumento migliore.", Category.WORLD);
+        super("AutoTool", "Seleziona automaticamente lo strumento migliore per il blocco che stai scavando.", Category.WORLD);
         addSetting(switchBack);
         addSetting(saveDurability);
     }
 
-    @Override
-    public void onTick() {
-        if (mc.player == null || mc.hitResult == null || mc.hitResult.getType() != HitResult.Type.BLOCK) return;
-        if (!mc.options.keyAttack.isDown()) return;
-        if (mc.gameMode == null || !mc.gameMode.isDestroying()) return;
-
-        BlockPos pos = ((BlockHitResult) mc.hitResult).getBlockPos();
-        if (pos == null) return;
+    public void updateTool(BlockPos pos) {
+        if (mc.player == null || mc.level == null || pos == null) return;
 
         BlockState state = mc.level.getBlockState(pos);
         if (state.isAir()) return;
 
-        int best = findBestTool(state);
-        if (best != -1 && best != mc.player.getInventory().selected) {
-            if (lastSlot == -1) lastSlot = mc.player.getInventory().selected;
-            mc.player.getInventory().selected = best;
+        int bestSlot = findBestTool(state);
+        if (bestSlot != -1 && bestSlot != mc.player.getInventory().selected) {
+            if (lastSlot == -1) {
+                lastSlot = mc.player.getInventory().selected;
+            }
+            mc.player.getInventory().selected = bestSlot;
         }
     }
 
     private int findBestTool(BlockState state) {
         int bestSlot = -1;
         float bestSpeed = 1.0f;
+
         for (int i = 0; i < 9; i++) {
             ItemStack stack = mc.player.getInventory().getItem(i);
             if (stack.isEmpty()) continue;
+
+            if (saveDurability.isOn() && stack.isDamageableItem() && (stack.getMaxDamage() - stack.getDamageValue() <= 2)) {
+                continue;
+            }
+
             float speed = stack.getDestroySpeed(state);
-            if (speed > bestSpeed) { bestSpeed = speed; bestSlot = i; }
+            if (speed > bestSpeed) {
+                bestSpeed = speed;
+                bestSlot = i;
+            }
         }
         return bestSlot;
     }

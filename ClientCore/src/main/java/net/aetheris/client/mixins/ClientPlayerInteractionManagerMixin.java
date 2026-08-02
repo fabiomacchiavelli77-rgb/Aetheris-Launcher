@@ -24,12 +24,24 @@ public class ClientPlayerInteractionManagerMixin {
     @Shadow
     private float destroyProgress;
 
+    @Inject(method = "startDestroyBlock", at = @At("HEAD"))
+    private void onStartDestroyBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        for (var mod : ModuleManager.getModules()) {
+            if (mod instanceof net.aetheris.client.modules.impl.world.AutoTool autoTool && autoTool.isEnabled()) {
+                autoTool.updateTool(pos);
+            }
+        }
+    }
+
     /**
      * FastBreak — accelera il progresso di rottura blocchi.
      */
     @Inject(method = "continueDestroyBlock", at = @At("HEAD"))
     private void onContinueDestroyBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         for (var mod : ModuleManager.getModules()) {
+            if (mod instanceof net.aetheris.client.modules.impl.world.AutoTool autoTool && autoTool.isEnabled()) {
+                autoTool.updateTool(pos);
+            }
             if (mod instanceof FastBreak fb && fb.isEnabled()) {
                 if (destroyProgress > 0f) {
                     float extra = fb.getSpeedMultiplier() * 0.015f;
