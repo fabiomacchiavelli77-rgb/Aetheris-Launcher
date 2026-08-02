@@ -37,16 +37,20 @@ public class FreeCam extends Module {
 
         dummyEntity = new RemotePlayer(mc.level, mc.player.getGameProfile());
         dummyEntity.setPos(startX, startY, startZ);
+        dummyEntity.xo = startX;
+        dummyEntity.yo = startY;
+        dummyEntity.zo = startZ;
         dummyEntity.setYRot(startYaw);
         dummyEntity.setXRot(startPitch);
+        dummyEntity.yRotO = startYaw;
+        dummyEntity.xRotO = startPitch;
         dummyEntity.yHeadRot = mc.player.yHeadRot;
+        dummyEntity.yHeadRotO = mc.player.yHeadRot;
         dummyEntity.yBodyRot = mc.player.yBodyRot;
+        dummyEntity.yBodyRotO = mc.player.yBodyRot;
         
-        // Copia l'inventario per renderizzarlo
+        // Copia l'inventario per renderizzarlo (armatura, oggetti in mano)
         dummyEntity.getInventory().replaceWith(mc.player.getInventory());
-
-        // Aggiungiamo un ID negativo finto per non confliggere con le entità vere
-        dummyEntity.setId(-1337); 
         
         mc.level.addEntity(dummyEntity);
 
