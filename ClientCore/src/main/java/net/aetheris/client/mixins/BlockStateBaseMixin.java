@@ -76,4 +76,14 @@ public abstract class BlockStateBaseMixin {
             }
         }
     }
+
+    @Inject(method = "getCollisionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;", at = @At("HEAD"), cancellable = true)
+    private void onGetCollisionShape(BlockGetter level, BlockPos pos, net.minecraft.world.phys.shapes.CollisionContext context, CallbackInfoReturnable<net.minecraft.world.phys.shapes.VoxelShape> cir) {
+        for (var mod : ModuleManager.getModules()) {
+            if (mod instanceof net.aetheris.client.modules.impl.movement.NoClip nc && nc.isEnabled()) {
+                cir.setReturnValue(net.minecraft.world.phys.shapes.Shapes.empty());
+                return;
+            }
+        }
+    }
 }

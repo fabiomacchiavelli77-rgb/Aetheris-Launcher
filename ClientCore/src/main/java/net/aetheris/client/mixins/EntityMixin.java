@@ -21,7 +21,7 @@ public class EntityMixin {
      */
     @Inject(method = "move", at = @At("HEAD"))
     private void onMove(MoverType moverType, Vec3 vec3, CallbackInfo ci) {
-        if ((Object) this == Minecraft.getInstance().player) {
+        if ((Object) this instanceof net.minecraft.world.entity.player.Player) {
             for (var mod : ModuleManager.getModules()) {
                 if (mod instanceof NoClip nc && nc.isEnabled()) {
                     ((Entity) (Object) this).noPhysics = true;
