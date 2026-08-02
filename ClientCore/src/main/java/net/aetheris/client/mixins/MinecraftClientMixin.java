@@ -29,6 +29,21 @@ public class MinecraftClientMixin {
         }
     }
 
+    @Inject(method = "getTickTargetMillis", at = @At("HEAD"), cancellable = true)
+    private void onGetTickTargetMillis(float f, CallbackInfoReturnable<Float> cir) {
+        for (var mod : ModuleManager.getModules()) {
+            if (mod instanceof Timer timer && timer.isEnabled()) {
+                float normal = f;
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.level != null && mc.level.tickRateManager().runsNormally()) {
+                    normal = Math.max(f, mc.level.tickRateManager().millisecondsPerTick());
+                }
+                cir.setReturnValue(normal / timer.getTimerSpeed());
+                return;
+            }
+        }
+    }
+
     @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
     private void onStartAttack(CallbackInfoReturnable<Boolean> cir) {
         for (var mod : ModuleManager.getModules()) {
