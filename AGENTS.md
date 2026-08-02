@@ -140,8 +140,15 @@ Multiple GUIs available:
 | Aetheris mixin config | `ClientCore/src/main/resources/aetheris.mixins.json` |
 | SeedCracker mixin config | `ClientCore/src/main/resources/seedcracker.mixins.json` |
 | Fabric mod manifest | `ClientCore/src/main/resources/fabric.mod.json` |
+| Testing Checklist Excel | `Aetheris_Checklist_Test.xlsx` |
+| Untested & Proposed Modules | `MODULI_MANCANTI.md` |
 | Web Installer backend | `Installer/server.js` |
 | Root installer entry | `src/main/java/me/deftware/installer/Main.java` |
+
+## Module Tracking & Expansion Context
+
+- The current testing status and roadmap of modules are tracked in `Aetheris_Checklist_Test.xlsx`.
+- Detailed descriptions of untested modules and proposed expansions inspired by Meteor/Wurst are documented in `MODULI_MANCANTI.md`.
 
 ## Module List (33 total)
 
