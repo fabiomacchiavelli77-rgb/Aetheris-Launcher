@@ -24,7 +24,8 @@ public class EntityMixin {
     private void onMove(MoverType moverType, Vec3 vec3, CallbackInfo ci) {
         if ((Object) this instanceof net.minecraft.world.entity.player.Player) {
             for (var mod : ModuleManager.getModules()) {
-                if (mod instanceof NoClip nc && nc.isEnabled()) {
+                if ((mod instanceof NoClip nc && nc.isEnabled()) ||
+                    (mod instanceof net.aetheris.client.modules.impl.render.FreeCam fc && fc.isEnabled())) {
                     ((Entity) (Object) this).noPhysics = true;
                 }
             }
@@ -38,7 +39,8 @@ public class EntityMixin {
     private void onIsInWall(CallbackInfoReturnable<Boolean> cir) {
         if ((Object) this instanceof net.minecraft.world.entity.player.Player) {
             for (var mod : ModuleManager.getModules()) {
-                if (mod instanceof NoClip nc && nc.isEnabled()) {
+                if ((mod instanceof NoClip nc && nc.isEnabled()) ||
+                    (mod instanceof net.aetheris.client.modules.impl.render.FreeCam fc && fc.isEnabled())) {
                     cir.setReturnValue(false);
                     return;
                 }
