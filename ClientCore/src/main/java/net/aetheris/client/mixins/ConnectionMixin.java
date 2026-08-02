@@ -8,10 +8,28 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(Connection.class)
 public class ConnectionMixin {
+
+    @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;)V", at = @At("HEAD"), cancellable = true)
+    private void onSendPacket(Packet<?> packet, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+        for (var mod : ModuleManager.getModules()) {
+            if (mod instanceof net.aetheris.client.modules.impl.render.FreeCam fc && fc.isEnabled()) {
+                if (packet instanceof ServerboundMovePlayerPacket ||
+                    packet instanceof net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket ||
+                    packet instanceof net.minecraft.network.protocol.game.ServerboundSwingPacket ||
+                    packet instanceof net.minecraft.network.protocol.game.ServerboundInteractPacket ||
+                    packet instanceof net.minecraft.network.protocol.game.ServerboundUseItemPacket ||
+                    packet instanceof net.minecraft.network.protocol.game.ServerboundPlayerActionPacket) {
+                    ci.cancel();
+                    return;
+                }
+            }
+        }
+    }
 
     @ModifyVariable(method = "send(Lnet/minecraft/network/protocol/Packet;)V", at = @At("HEAD"), argsOnly = true)
     private Packet<?> modifyPacketForNoFall(Packet<?> packet) {
