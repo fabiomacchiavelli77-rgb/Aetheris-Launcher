@@ -21,10 +21,6 @@ public class WorldRendererMixin {
                                      DeltaTracker deltaTracker, boolean renderBlockOutline,
                                      Camera camera, GameRenderer gameRenderer,
                                      Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof ESP esp && esp.isEnabled()) {
-                esp.renderESP(matrix4f, camera);
-            }
-        }
+        // No longer needed: ESP is handled by Minecraft.shouldEntityAppearGlowing
     }
 }

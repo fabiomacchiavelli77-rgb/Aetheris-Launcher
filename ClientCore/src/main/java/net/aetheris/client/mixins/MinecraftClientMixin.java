@@ -46,4 +46,16 @@ public class MinecraftClientMixin {
             }
         }
     }
+
+    @Inject(method = "shouldEntityAppearGlowing", at = @At("HEAD"), cancellable = true)
+    private void onShouldEntityAppearGlowing(Entity entity, CallbackInfoReturnable<Boolean> cir) {
+        for (var mod : ModuleManager.getModules()) {
+            if (mod instanceof net.aetheris.client.modules.impl.render.ESP esp && esp.isEnabled()) {
+                if (esp.shouldGlow(entity)) {
+                    cir.setReturnValue(true);
+                    return;
+                }
+            }
+        }
+    }
 }
