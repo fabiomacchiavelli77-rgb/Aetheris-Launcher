@@ -18,6 +18,10 @@ public class NoSlowdown extends Module {
         addSetting(cobweb);
     }
 
+    public boolean getItems() {
+        return items.isOn();
+    }
+
     @Override
     public void onTick() {
         if (mc.player == null) return;
