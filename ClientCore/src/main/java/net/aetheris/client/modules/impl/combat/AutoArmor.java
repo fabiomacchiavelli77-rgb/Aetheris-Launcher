@@ -4,7 +4,7 @@ import net.aetheris.client.modules.Category;
 import net.aetheris.client.modules.Module;
 import net.aetheris.client.settings.BooleanSetting;
 import net.aetheris.client.settings.SliderSetting;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -15,7 +15,7 @@ public class AutoArmor extends Module {
     private int equipDelay = 0;
 
     public AutoArmor() {
-        super("AutoArmor", "Equipaggia automaticamente la migliore armatura.", Category.COMBAT);
+        super("AutoArmor", "Equipaggia automaticamente la migliore armatura per ogni slot.", Category.COMBAT);
         addSetting(swapDelay);
         addSetting(preferElytra);
     }
@@ -30,17 +30,19 @@ public class AutoArmor extends Module {
             if (stack.isEmpty()) continue;
             
             boolean isElytra = stack.getItem() == Items.ELYTRA;
-            if (!stack.has(net.minecraft.core.component.DataComponents.EQUIPPABLE) && !isElytra) continue;
+            var equippable = stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE);
+            if (equippable == null && !isElytra) continue;
 
             int targetSlot = -1;
             if (isElytra) {
                 targetSlot = 38; // Chestplate slot
-            } else {
-                targetSlot = switch (stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE).slot().getIndex()) {
-                    case 5 -> 39; // Head -> helmet slot
-                    case 4 -> 38; // Chest -> chestplate slot
-                    case 3 -> 37; // Legs -> leggings slot
-                    case 2 -> 36; // Feet -> boots slot
+            } else if (equippable != null) {
+                EquipmentSlot eqSlot = equippable.slot();
+                targetSlot = switch (eqSlot) {
+                    case HEAD -> 39;
+                    case CHEST -> 38;
+                    case LEGS -> 37;
+                    case FEET -> 36;
                     default -> -1;
                 };
             }
