@@ -2,8 +2,11 @@ package net.aetheris.client.mixins;
 
 import net.aetheris.client.modules.ModuleManager;
 import net.aetheris.client.modules.impl.combat.Velocity;
+import net.aetheris.client.modules.impl.movement.NoClip;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,6 +14,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
 public class EntityMixin {
+
+    /**
+     * NoClip — assicura che noPhysics sia true all'inizio di Entity.move()
+     * per evitare che il motore di fisica controlli le collisioni dei blocchi.
+     */
+    @Inject(method = "move", at = @At("HEAD"))
+    private void onMove(MoverType moverType, Vec3 vec3, CallbackInfo ci) {
+        if ((Object) this == Minecraft.getInstance().player) {
+            for (var mod : ModuleManager.getModules()) {
+                if (mod instanceof NoClip nc && nc.isEnabled()) {
+                    ((Entity) (Object) this).noPhysics = true;
+                }
+            }
+        }
+    }
 
     /**
      * Velocity — cancella la spinta da collisione con altre entità.
