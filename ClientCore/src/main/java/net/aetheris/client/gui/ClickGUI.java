@@ -55,9 +55,9 @@ public class ClickGUI extends Screen {
     private int dragOffsetX = 0;
     private int dragOffsetY = 0;
 
-    private int settingsHeight(Module mod) {
+    private static int settingsHeight(Module mod) {
         if (!mod.hasSettings()) return 20;
-        return 20 + (mod.getSettings().size() * 14);
+        return 20 + (mod.getSettings().size() * 18);
     }
 
     public ClickGUI() {
@@ -358,45 +358,50 @@ public class ClickGUI extends Screen {
         // ── Render settings ──
         if (mod.hasSettings()) {
             int sy = ry + 20; // Start below the buttons
+            int colW = layout().columnWidth();
             for (Setting<?> setting : mod.getSettings()) {
-                boolean hover = mouseX >= cx + 3 && mouseX <= cx + layout().columnWidth() - 3
-                             && mouseY >= sy && mouseY < sy + 14;
+                boolean hover = mouseX >= cx + 3 && mouseX <= cx + colW - 3
+                             && mouseY >= sy && mouseY < sy + 18;
                 if (hover) {
-                    g.fill(cx + 3, sy, cx + layout().columnWidth() - 3, sy + 14, 0x1AFFFFFF);
+                    g.fill(cx + 3, sy, cx + colW - 3, sy + 18, 0x1AFFFFFF);
                 }
 
-                g.drawString(font, setting.getDisplayName(), cx + 8, sy + 3, 0xFFCCCCCC);
+                // Truncate setting label strictly to prevent overlap with right-hand controls
+                int maxLabelW = colW - 48;
+                String labelStr = setting.getDisplayName();
+                if (font.width(labelStr) > maxLabelW) {
+                    labelStr = font.plainSubstrByWidth(labelStr, Math.max(1, maxLabelW - font.width("…"))) + "…";
+                }
+                g.drawString(font, labelStr, cx + 6, sy + 4, 0xFFCCCCCC);
 
                 // Right side control
                 if (setting instanceof BooleanSetting bs) {
                     String toggle = bs.isOn() ? "§a[✔]" : "§c[✖]";
-                    g.drawString(font, toggle, cx + layout().columnWidth() - 8 - font.width(toggle), sy + 3, 0xFFFFFFFF);
+                    g.drawString(font, toggle, cx + colW - 6 - font.width(toggle), sy + 4, 0xFFFFFFFF);
                 } else if (setting instanceof ModeSetting<?> ms) {
                     String modeText = "§7< §f" + ms.getValueDisplay() + " §7>";
-                    g.drawString(font, modeText, cx + layout().columnWidth() - 8 - font.width(modeText), sy + 3, 0xFFFFFFFF);
+                    g.drawString(font, modeText, cx + colW - 6 - font.width(modeText), sy + 4, 0xFFFFFFFF);
                 } else if (setting instanceof SliderSetting ss) {
-                    int trackW = 50;
-                    int trackX = cx + layout().columnWidth() - 8 - trackW;
-                    int trackY = sy + 5;
-                    // Background track
-                    g.fill(trackX, trackY, trackX + trackW, trackY + 4, 0xFF111111);
-                    // Filled track
+                    String valText = ss.getValueDisplay();
+                    int valW = font.width(valText);
+                    g.drawString(font, valText, cx + colW - 6 - valW, sy + 4, 0xFF55FFFF);
+
+                    // Mini track line below value
+                    int trackW = 36;
+                    int trackX = cx + colW - 6 - trackW;
+                    int trackY = sy + 14;
+                    g.fill(trackX, trackY, trackX + trackW, trackY + 2, 0xFF111111);
                     int fillW = (int) (ss.getRatio() * trackW);
                     int accent = accentOf(mod.getCategory());
-                    g.fill(trackX, trackY, trackX + fillW, trackY + 4, accent);
-                    
-                    // Value text
-                    String valText = ss.getValueDisplay();
-                    g.drawString(font, valText, trackX - 4 - font.width(valText), sy + 3, 0xFFAAAAAA);
-                    
-                    // Handle drag immediate feedback
+                    g.fill(trackX, trackY, trackX + fillW, trackY + 2, accent);
+
                     if (draggingSetting == ss) {
                         double newRatio = (double) (mouseX - trackX) / trackW;
                         newRatio = Math.max(0.0, Math.min(1.0, newRatio));
                         ss.setFromRatio(newRatio);
                     }
                 }
-                sy += 14;
+                sy += 18;
             }
         }
     }
@@ -433,8 +438,10 @@ public class ClickGUI extends Screen {
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
         if (infoModule != null && button == 0) {
-            int mW = 330;
-            int mH = 175;
+            int mW = 340;
+            int settingsCount = infoModule.hasSettings() ? infoModule.getSettings().size() : 0;
+            int settingsExtra = settingsCount > 0 ? (24 + settingsCount * 22) : 0;
+            int mH = 175 + settingsExtra;
             int mX = (width - mW) / 2;
             int mY = (height - mH) / 2;
 
@@ -452,6 +459,33 @@ public class ClickGUI extends Screen {
             if (mx >= btnX && mx <= btnX + btnW && my >= btnY && my <= btnY + btnH) {
                 infoModule.toggle();
                 return true;
+            }
+
+            // Modal settings interaction
+            if (infoModule.hasSettings()) {
+                int sy = mY + 168; // mY + 152 + 16
+                for (Setting<?> setting : infoModule.getSettings()) {
+                    if (my >= sy && my < sy + 22) {
+                        if (setting instanceof BooleanSetting bs) {
+                            bs.toggle();
+                            ProfileManager.getInstance().save();
+                        } else if (setting instanceof ModeSetting<?> ms) {
+                            ms.cycle();
+                            ProfileManager.getInstance().save();
+                        } else if (setting instanceof SliderSetting ss) {
+                            draggingSetting = ss;
+                            String valText = ss.getValueDisplay();
+                            int valW = font.width(valText);
+                            int trackW = 90;
+                            int trackX = mX + mW - 20 - valW - trackW;
+                            double newRatio = (double) (mx - trackX) / trackW;
+                            newRatio = Math.max(0.0, Math.min(1.0, newRatio));
+                            ss.setFromRatio(newRatio);
+                        }
+                        return true;
+                    }
+                    sy += 22;
+                }
             }
 
             // Click outside modal
@@ -549,7 +583,7 @@ public class ClickGUI extends Screen {
                         } else if (mod.hasSettings()) {
                             int sy = ry + 20;
                             for (Setting<?> setting : mod.getSettings()) {
-                                if (my >= sy && my < sy + 14) {
+                                if (my >= sy && my < sy + 18) {
                                     if (setting instanceof BooleanSetting bs) {
                                         bs.toggle();
                                         ProfileManager.getInstance().save();
@@ -558,15 +592,16 @@ public class ClickGUI extends Screen {
                                         ProfileManager.getInstance().save();
                                     } else if (setting instanceof SliderSetting ss) {
                                         draggingSetting = ss;
-                                        int trackW = 50;
-                                        int trackX = cx + layout().columnWidth() - 8 - trackW;
+                                        int colW = layout().columnWidth();
+                                        int trackW = 36;
+                                        int trackX = cx + colW - 6 - trackW;
                                         double newRatio = (double) (mx - trackX) / trackW;
                                         newRatio = Math.max(0.0, Math.min(1.0, newRatio));
                                         ss.setFromRatio(newRatio);
                                     }
                                     return true;
                                 }
-                                sy += 14;
+                                sy += 18;
                             }
                         }
                         return true;
@@ -741,15 +776,17 @@ public class ClickGUI extends Screen {
         };
     }
 
-    // ── Info Modal Overlay ─────────────────────────────────────────────
+    // ── Info & Settings Modal Overlay ──────────────────────────────────
     private void renderInfoModal(GuiGraphics g, int mouseX, int mouseY) {
         if (infoModule == null) return;
 
         // Dark dim backdrop for modal
         g.fill(0, 0, width, height, 0xCC000000);
 
-        int mW = 330;
-        int mH = 175;
+        int mW = 340;
+        int settingsCount = infoModule.hasSettings() ? infoModule.getSettings().size() : 0;
+        int settingsExtra = settingsCount > 0 ? (24 + settingsCount * 22) : 0;
+        int mH = 175 + settingsExtra;
         int mX = (width - mW) / 2;
         int mY = (height - mH) / 2;
         int accent = accentOf(infoModule.getCategory());
@@ -796,11 +833,58 @@ public class ClickGUI extends Screen {
 
         // Description EN
         String descEN = getModuleDescEN(infoModule);
-        g.drawString(font, "§b🇬🇧 English:", mX + 10, mY + 112, 0xFF55FFFF);
-        drawWrappedText(g, descEN, mX + 10, mY + 124, mW - 20, 0xFFBBBBBB);
+        g.drawString(font, "§b🇬🇧 English:", mX + 10, mY + 106, 0xFF55FFFF);
+        drawWrappedText(g, descEN, mX + 10, mY + 118, mW - 20, 0xFFBBBBBB);
+
+        // ── Render Full Settings inside Modal Card ──
+        if (infoModule.hasSettings()) {
+            int sy = mY + 152;
+            g.fill(mX + 10, sy - 4, mX + mW - 10, sy - 3, 0x40FFFFFF);
+            g.drawString(font, "§e⚙ Impostazioni / Settings:", mX + 10, sy, 0xFFFFAA00);
+            sy += 16;
+
+            for (Setting<?> setting : infoModule.getSettings()) {
+                boolean hover = mouseX >= mX + 10 && mouseX <= mX + mW - 10
+                             && mouseY >= sy && mouseY < sy + 20;
+                if (hover) {
+                    g.fill(mX + 10, sy, mX + mW - 10, sy + 20, 0x1AFFFFFF);
+                }
+
+                // Full, un-truncated label
+                g.drawString(font, setting.getDisplayName(), mX + 14, sy + 5, 0xFFFFFFFF);
+
+                if (setting instanceof BooleanSetting bs) {
+                    String toggle = bs.isOn() ? "§a[✔ ON]" : "§c[✖ OFF]";
+                    int tw = font.width(toggle);
+                    g.drawString(font, toggle, mX + mW - 14 - tw, sy + 5, 0xFFFFFFFF);
+                } else if (setting instanceof ModeSetting<?> ms) {
+                    String modeText = "§7< §f" + ms.getValueDisplay() + " §7>";
+                    int tw = font.width(modeText);
+                    g.drawString(font, modeText, mX + mW - 14 - tw, sy + 5, 0xFFFFFFFF);
+                } else if (setting instanceof SliderSetting ss) {
+                    String valText = ss.getValueDisplay();
+                    int valW = font.width(valText);
+                    g.drawString(font, valText, mX + mW - 14 - valW, sy + 5, 0xFF55FFFF);
+
+                    int trackW = 90;
+                    int trackX = mX + mW - 20 - valW - trackW;
+                    int trackY = sy + 7;
+                    g.fill(trackX, trackY, trackX + trackW, trackY + 5, 0xFF111111);
+                    int fillW = (int) (ss.getRatio() * trackW);
+                    g.fill(trackX, trackY, trackX + fillW, trackY + 5, accent);
+
+                    if (draggingSetting == ss) {
+                        double newRatio = (double) (mouseX - trackX) / trackW;
+                        newRatio = Math.max(0.0, Math.min(1.0, newRatio));
+                        ss.setFromRatio(newRatio);
+                    }
+                }
+                sy += 22;
+            }
+        }
 
         // Footer note
-        g.drawString(font, "§7(Clicca per chiudere / Click to close)", mX + 10, mY + mH - 14, 0xFF666666);
+        g.drawString(font, "§7(ESC o clicca fuori per chiudere / ESC or click outside to close)", mX + 10, mY + mH - 14, 0xFF666666);
     }
 
     private void drawWrappedText(GuiGraphics g, String text, int x, int y, int maxWidth, int color) {
@@ -923,8 +1007,7 @@ public class ClickGUI extends Screen {
 
         int expandedExtra(List<Module> mods) {
             if (expandedModule != null && mods != null && mods.contains(expandedModule)) {
-                if (!expandedModule.hasSettings()) return 20;
-                return 20 + (expandedModule.getSettings().size() * 14);
+                return settingsHeight(expandedModule);
             }
             return 0;
         }
