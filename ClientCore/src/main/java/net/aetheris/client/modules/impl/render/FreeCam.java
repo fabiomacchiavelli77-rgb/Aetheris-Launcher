@@ -35,8 +35,16 @@ public class FreeCam extends Module {
         startYaw = mc.player.getYRot();
         startPitch = mc.player.getXRot();
 
-        dummyEntity = new RemotePlayer(mc.level, mc.player.getGameProfile());
-        dummyEntity.setId(-1337);
+        dummyEntity = new RemotePlayer(mc.level, mc.player.getGameProfile()) {
+            @Override
+            protected net.minecraft.client.multiplayer.PlayerInfo getPlayerInfo() {
+                if (mc.getConnection() != null) {
+                    return mc.getConnection().getPlayerInfo(mc.player.getUUID());
+                }
+                return super.getPlayerInfo();
+            }
+        };
+        dummyEntity.setId(mc.player.getId() + 100000);
         dummyEntity.copyPosition(mc.player);
         dummyEntity.setYHeadRot(mc.player.getYHeadRot());
         dummyEntity.setYBodyRot(mc.player.yBodyRot);
@@ -45,6 +53,10 @@ public class FreeCam extends Module {
         dummyEntity.xo = startX;
         dummyEntity.yo = startY;
         dummyEntity.zo = startZ;
+        dummyEntity.yRotO = startYaw;
+        dummyEntity.xRotO = startPitch;
+        dummyEntity.yHeadRotO = mc.player.getYHeadRot();
+        dummyEntity.yBodyRotO = mc.player.yBodyRot;
         
         // Copia l'inventario per renderizzarlo (armatura, oggetti in mano)
         dummyEntity.getInventory().replaceWith(mc.player.getInventory());
