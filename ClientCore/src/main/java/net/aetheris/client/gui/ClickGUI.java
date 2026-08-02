@@ -54,6 +54,11 @@ public class ClickGUI extends Screen {
     private SliderSetting draggingSetting = null;
     private int dragOffsetX = 0;
     private int dragOffsetY = 0;
+    private boolean draggingModal = false;
+    private int modalX = -1;
+    private int modalY = -1;
+    private int modalDragOffsetX = 0;
+    private int modalDragOffsetY = 0;
 
     private static int settingsHeight(Module mod) {
         return 20;
@@ -391,12 +396,25 @@ public class ClickGUI extends Screen {
             int settingsCount = infoModule.hasSettings() ? infoModule.getSettings().size() : 0;
             int settingsExtra = settingsCount > 0 ? (24 + settingsCount * 22) : 0;
             int mH = 175 + settingsExtra;
-            int mX = (width - mW) / 2;
-            int mY = (height - mH) / 2;
+            if (modalX == -1 || modalY == -1) {
+                modalX = (width - mW) / 2;
+                modalY = (height - mH) / 2;
+            }
+            int mX = modalX;
+            int mY = modalY;
 
             // X close button check
             if (mx >= mX + mW - 22 && mx <= mX + mW - 6 && my >= mY + 4 && my <= mY + 20) {
                 infoModule = null;
+                modalX = -1; modalY = -1; draggingModal = false;
+                return true;
+            }
+
+            // Header drag start
+            if (mx >= mX && mx <= mX + mW - 24 && my >= mY && my <= mY + 24) {
+                draggingModal = true;
+                modalDragOffsetX = (int) mx - mX;
+                modalDragOffsetY = (int) my - mY;
                 return true;
             }
 
@@ -440,6 +458,7 @@ public class ClickGUI extends Screen {
             // Click outside modal
             if (mx < mX || mx > mX + mW || my < mY || my > mY + mH) {
                 infoModule = null;
+                modalX = -1; modalY = -1; draggingModal = false;
                 return true;
             }
             return true;
@@ -577,6 +596,10 @@ public class ClickGUI extends Screen {
 
     @Override
     public boolean mouseReleased(double mx, double my, int button) {
+        if (draggingModal && button == 0) {
+            draggingModal = false;
+            return true;
+        }
         if (draggingSetting != null && button == 0) {
             draggingSetting = null;
             ProfileManager.getInstance().save();
@@ -710,8 +733,19 @@ public class ClickGUI extends Screen {
         int settingsCount = infoModule.hasSettings() ? infoModule.getSettings().size() : 0;
         int settingsExtra = settingsCount > 0 ? (24 + settingsCount * 22) : 0;
         int mH = 175 + settingsExtra;
-        int mX = (width - mW) / 2;
-        int mY = (height - mH) / 2;
+
+        if (modalX == -1 || modalY == -1) {
+            modalX = (width - mW) / 2;
+            modalY = (height - mH) / 2;
+        }
+
+        if (draggingModal) {
+            modalX = mouseX - modalDragOffsetX;
+            modalY = mouseY - modalDragOffsetY;
+        }
+
+        int mX = modalX;
+        int mY = modalY;
         int accent = accentOf(infoModule.getCategory());
 
         // Card shadow & background
