@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public class EntityMixin {
@@ -25,6 +26,21 @@ public class EntityMixin {
             for (var mod : ModuleManager.getModules()) {
                 if (mod instanceof NoClip nc && nc.isEnabled()) {
                     ((Entity) (Object) this).noPhysics = true;
+                }
+            }
+        }
+    }
+
+    /**
+     * Previene i danni da soffocamento (inWall) e l'oscuramento della vista quando si è dentro un blocco.
+     */
+    @Inject(method = "isInWall", at = @At("HEAD"), cancellable = true)
+    private void onIsInWall(CallbackInfoReturnable<Boolean> cir) {
+        if ((Object) this instanceof net.minecraft.world.entity.player.Player) {
+            for (var mod : ModuleManager.getModules()) {
+                if (mod instanceof NoClip nc && nc.isEnabled()) {
+                    cir.setReturnValue(false);
+                    return;
                 }
             }
         }
