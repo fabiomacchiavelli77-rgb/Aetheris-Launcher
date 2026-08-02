@@ -43,9 +43,15 @@ public class FreeCam extends Module {
                 }
                 return super.getPlayerInfo();
             }
+
+            @Override
+            public boolean shouldRenderAtSqrDistance(double distance) {
+                return true;
+            }
         };
         dummyEntity.setId(mc.player.getId() + 100000);
         dummyEntity.copyPosition(mc.player);
+        dummyEntity.refreshDimensions();
         dummyEntity.setYHeadRot(mc.player.getYHeadRot());
         dummyEntity.setYBodyRot(mc.player.yBodyRot);
         dummyEntity.setXRot(mc.player.getXRot());
