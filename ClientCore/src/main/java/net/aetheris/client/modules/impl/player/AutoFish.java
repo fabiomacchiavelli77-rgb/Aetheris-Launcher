@@ -50,14 +50,18 @@ public class AutoFish extends Module {
 
         if (mc.player.fishing != null) {
             var hook = mc.player.fishing;
-            // Un pesce ha abboccato se l'amo subisce una spinta verso il basso (Y < -0.1) o se ha agganciato qualcosa
-            boolean hasCaught = hook.getHookedIn() != null || hook.getDeltaMovement().y < -0.1;
+            
+            // L'amo deve essere in acqua da almeno 30 tick (1.5s) per evitare falsi positivi durante il lancio
+            boolean settledInWater = hook.isInWater() && hook.tickCount > 30;
+            
+            // Quando un pesce abbocca, l'amo subisce una spinta improvvisa verso il basso (Y < -0.15)
+            boolean hasCaught = hook.getHookedIn() != null || (settledInWater && hook.getDeltaMovement().y < -0.12);
             
             if (hasCaught && reelDelay == 0) {
                 reelDelay = Math.max(1, reelDelaySetting.getValue().intValue());
             }
         } else if (!wasCasting && recastDelay == 0) {
-            // Lancia la lenza se non c'è un amo attivo
+            // Lancia la lenza solo se non c'è già un amo attivo nel mondo
             InteractionHand hand = mc.player.getMainHandItem().getItem() instanceof FishingRodItem
                 ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
             mc.gameMode.useItem(mc.player, hand);
