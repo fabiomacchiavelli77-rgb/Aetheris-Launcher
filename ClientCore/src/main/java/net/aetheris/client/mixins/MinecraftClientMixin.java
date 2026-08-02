@@ -20,14 +20,7 @@ public class MinecraftClientMixin {
         ModuleManager.onTick();
     }
 
-    @Inject(method = "getDeltaTracker", at = @At("RETURN"), cancellable = true)
-    private void onGetFrameTime(CallbackInfoReturnable<Float> cir) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof Timer timer && timer.isEnabled()) {
-                cir.setReturnValue(cir.getReturnValue() * timer.getTimerSpeed());
-            }
-        }
-    }
+
 
     @Inject(method = "getTickTargetMillis", at = @At("HEAD"), cancellable = true)
     private void onGetTickTargetMillis(float f, CallbackInfoReturnable<Float> cir) {
