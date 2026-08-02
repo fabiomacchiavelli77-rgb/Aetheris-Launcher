@@ -56,8 +56,7 @@ public class ClickGUI extends Screen {
     private int dragOffsetY = 0;
 
     private static int settingsHeight(Module mod) {
-        if (!mod.hasSettings()) return 20;
-        return 20 + (mod.getSettings().size() * 18);
+        return 20;
     }
 
     public ClickGUI() {
@@ -354,56 +353,6 @@ public class ClickGUI extends Screen {
 
         String cfgLabel = settingsLabelFor(mod);
         g.drawCenteredString(font, cfgLabel, cx + 3 + halfW + 2 + (halfW - 2) / 2, btnY + 3, 0xFFDDDDDD);
-
-        // ── Render settings ──
-        if (mod.hasSettings()) {
-            int sy = ry + 20; // Start below the buttons
-            int colW = layout().columnWidth();
-            for (Setting<?> setting : mod.getSettings()) {
-                boolean hover = mouseX >= cx + 3 && mouseX <= cx + colW - 3
-                             && mouseY >= sy && mouseY < sy + 18;
-                if (hover) {
-                    g.fill(cx + 3, sy, cx + colW - 3, sy + 18, 0x1AFFFFFF);
-                }
-
-                // Truncate setting label strictly to prevent overlap with right-hand controls
-                int maxLabelW = colW - 48;
-                String labelStr = setting.getDisplayName();
-                if (font.width(labelStr) > maxLabelW) {
-                    labelStr = font.plainSubstrByWidth(labelStr, Math.max(1, maxLabelW - font.width("…"))) + "…";
-                }
-                g.drawString(font, labelStr, cx + 6, sy + 4, 0xFFCCCCCC);
-
-                // Right side control
-                if (setting instanceof BooleanSetting bs) {
-                    String toggle = bs.isOn() ? "§a[✔]" : "§c[✖]";
-                    g.drawString(font, toggle, cx + colW - 6 - font.width(toggle), sy + 4, 0xFFFFFFFF);
-                } else if (setting instanceof ModeSetting<?> ms) {
-                    String modeText = "§7< §f" + ms.getValueDisplay() + " §7>";
-                    g.drawString(font, modeText, cx + colW - 6 - font.width(modeText), sy + 4, 0xFFFFFFFF);
-                } else if (setting instanceof SliderSetting ss) {
-                    String valText = ss.getValueDisplay();
-                    int valW = font.width(valText);
-                    g.drawString(font, valText, cx + colW - 6 - valW, sy + 4, 0xFF55FFFF);
-
-                    // Mini track line below value
-                    int trackW = 36;
-                    int trackX = cx + colW - 6 - trackW;
-                    int trackY = sy + 14;
-                    g.fill(trackX, trackY, trackX + trackW, trackY + 2, 0xFF111111);
-                    int fillW = (int) (ss.getRatio() * trackW);
-                    int accent = accentOf(mod.getCategory());
-                    g.fill(trackX, trackY, trackX + fillW, trackY + 2, accent);
-
-                    if (draggingSetting == ss) {
-                        double newRatio = (double) (mouseX - trackX) / trackW;
-                        newRatio = Math.max(0.0, Math.min(1.0, newRatio));
-                        ss.setFromRatio(newRatio);
-                    }
-                }
-                sy += 18;
-            }
-        }
     }
 
     private void renderSearchBar(GuiGraphics g, int mouseX, int mouseY) {
@@ -571,42 +520,16 @@ public class ClickGUI extends Screen {
 
                 // Settings drawer click
                 if (col.expandedModule == mod) {
-                    int sh = settingsHeight(mod);
-                    if (my >= ry && my < ry + sh) {
-                        if (my < ry + 20) {
-                            int halfW = (layout().columnWidth() - 6) / 2;
-                            if (mx >= cx + 3 && mx <= cx + 3 + halfW) {
-                                bindingModule = mod;
-                            } else if (mx >= cx + 3 + halfW + 2 && mx <= cx + layout().columnWidth() - 3) {
-                                openSettingsFor(mod);
-                            }
-                        } else if (mod.hasSettings()) {
-                            int sy = ry + 20;
-                            for (Setting<?> setting : mod.getSettings()) {
-                                if (my >= sy && my < sy + 18) {
-                                    if (setting instanceof BooleanSetting bs) {
-                                        bs.toggle();
-                                        ProfileManager.getInstance().save();
-                                    } else if (setting instanceof ModeSetting<?> ms) {
-                                        ms.cycle();
-                                        ProfileManager.getInstance().save();
-                                    } else if (setting instanceof SliderSetting ss) {
-                                        draggingSetting = ss;
-                                        int colW = layout().columnWidth();
-                                        int trackW = 36;
-                                        int trackX = cx + colW - 6 - trackW;
-                                        double newRatio = (double) (mx - trackX) / trackW;
-                                        newRatio = Math.max(0.0, Math.min(1.0, newRatio));
-                                        ss.setFromRatio(newRatio);
-                                    }
-                                    return true;
-                                }
-                                sy += 18;
-                            }
+                    if (my >= ry && my < ry + 20) {
+                        int halfW = (layout().columnWidth() - 6) / 2;
+                        if (mx >= cx + 3 && mx <= cx + 3 + halfW) {
+                            bindingModule = mod;
+                        } else if (mx >= cx + 3 + halfW + 2 && mx <= cx + layout().columnWidth() - 3) {
+                            openSettingsFor(mod);
                         }
                         return true;
                     }
-                    ry += sh;
+                    ry += 20;
                 }
             }
         }
