@@ -8,11 +8,11 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 
 public class Reach extends Module {
     
-    private final SliderSetting combatReach = new SliderSetting("combatReach", "Combat Reach", "Portata Combattimento", 5.0, 3.0, 10.0, 0.5, "blocks");
-    private final SliderSetting blockReach = new SliderSetting("blockReach", "Block Reach", "Portata Blocchi", 7.0, 4.5, 12.0, 0.5, "blocks");
+    private final SliderSetting combatReach = new SliderSetting("combatReach", "Combat Reach", "Portata Combattimento", 4.5, 3.0, 6.0, 0.1, "blocks");
+    private final SliderSetting blockReach = new SliderSetting("blockReach", "Block Reach", "Portata Blocchi", 5.5, 4.5, 6.0, 0.1, "blocks");
 
     public Reach() {
-        super("Reach", "Estende la distanza di attacco e interazione fino a 10-12 blocchi.", Category.COMBAT);
+        super("Reach", "Estende la distanza di attacco (max 6m engine limit) e posizionamento blocchi.", Category.COMBAT);
         addSetting(combatReach);
         addSetting(blockReach);
     }

@@ -826,7 +826,7 @@ public class ClickGUI extends Screen {
             case "killaura" -> "Attacca automaticamente tutte le entità ostili nel tuo raggio d'azione.";
             case "velocity" -> "Annulla il rinculo (knockback) subito quando vieni colpito.";
             case "criticals" -> "Forza colpi critici ad ogni attacco senza bisogno di saltare.";
-            case "reach" -> "Aumenta la distanza massima a cui puoi colpire o interagire.";
+            case "reach" -> "Aumenta la portata. • Portata Combattimento: distanza max per colpire mob (Max 6.0m limite server). • Portata Blocchi: distanza max per piazzare/rompere blocchi.";
             case "autoarmor" -> "Equipaggia automaticamente la migliore armatura nell'inventario.";
             case "autototem" -> "Mette automaticamente un Totem della non-morte nella mano secondaria.";
             case "triggerbot" -> "Attacca automaticamente l'entità quando la miri col mirino.";
@@ -867,7 +867,7 @@ public class ClickGUI extends Screen {
             case "killaura" -> "Automatically attacks all hostile entities around you.";
             case "velocity" -> "Cancels knockback received from attacks or explosions.";
             case "criticals" -> "Forces critical hits on every attack without needing to jump.";
-            case "reach" -> "Increases your attack and interaction reach distance.";
+            case "reach" -> "Increases reach distance. • Combat Reach: max distance to attack mobs (Max 6.0m server limit). • Block Reach: max distance to place/break blocks.";
             case "autoarmor" -> "Automatically equips the best armor pieces in your inventory.";
             case "autototem" -> "Automatically places a Totem of Undying in your offhand.";
             case "triggerbot" -> "Automatically attacks entities whenever your crosshair hits them.";
