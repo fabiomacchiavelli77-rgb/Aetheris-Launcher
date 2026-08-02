@@ -48,17 +48,22 @@ public class ClientPlayerInteractionManagerMixin {
      */
     @Inject(method = "attack", at = @At("HEAD"))
     private void onAttack(Player player, Entity target, CallbackInfo ci) {
+        boolean tpSpoofed = false;
         for (var mod : ModuleManager.getModules()) {
             if (mod instanceof Reach reach && reach.isEnabled()) {
-                reach.tryTpAttack(target);
+                tpSpoofed = reach.tryTpAttack(target);
             }
+        }
+        for (var mod : ModuleManager.getModules()) {
             if (mod instanceof Criticals crit && crit.isEnabled()) {
                 if (crit.shouldForceCritical(target)) {
                     Minecraft mc = Minecraft.getInstance();
                     if (player.onGround() && mc.getConnection() != null) {
-                        double x = player.getX();
-                        double y = player.getY();
-                        double z = player.getZ();
+                        // Se abbiamo appena fatto TP-Spoof, il server ci vede vicini al target.
+                        // Usiamo le coordinate del bersaglio (o quelle attuali se non tpSpoofed).
+                        double x = tpSpoofed ? target.getX() : player.getX();
+                        double y = tpSpoofed ? target.getY() : player.getY();
+                        double z = tpSpoofed ? target.getZ() : player.getZ();
 
                         switch (crit.getMode()) {
                             case PACKET -> {
@@ -67,8 +72,12 @@ public class ClientPlayerInteractionManagerMixin {
                                 mc.getConnection().send(new ServerboundMovePlayerPacket.Pos(x, y + 0.011, z, false, false));
                                 mc.getConnection().send(new ServerboundMovePlayerPacket.Pos(x, y, z, false, false));
                             }
-                            case JUMP -> player.jumpFromGround();
-                            case MINI_JUMP -> player.setDeltaMovement(player.getDeltaMovement().x, 0.25, player.getDeltaMovement().z);
+                            case JUMP -> {
+                                if (!tpSpoofed) player.jumpFromGround();
+                            }
+                            case MINI_JUMP -> {
+                                if (!tpSpoofed) player.setDeltaMovement(player.getDeltaMovement().x, 0.25, player.getDeltaMovement().z);
+                            }
                         }
                     }
 

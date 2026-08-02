@@ -7,8 +7,6 @@ import net.aetheris.client.settings.SliderSetting;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 
 public class Reach extends Module {
     
@@ -45,40 +43,13 @@ public class Reach extends Module {
     }
 
     /**
-     * Trova la prima entità vivente lungo la linea di vista del giocatore entro maxDist.
-     */
-    public Entity getTargetInLookVector(double maxDist) {
-        if (mc.player == null || mc.level == null) return null;
-        Vec3 eyePos = mc.player.getEyePosition();
-        Vec3 lookVec = mc.player.getViewVector(1.0f);
-        AABB searchBox = mc.player.getBoundingBox().expandTowards(lookVec.scale(maxDist)).inflate(3.0);
-
-        Entity closest = null;
-        double minDst = maxDist;
-
-        for (Entity entity : mc.level.getEntities(mc.player, searchBox, e -> e.isAlive() && e instanceof net.minecraft.world.entity.LivingEntity)) {
-            Vec3 pToE = entity.position().subtract(eyePos);
-            double proj = pToE.dot(lookVec);
-            if (proj > 0 && proj <= maxDist) {
-                Vec3 closestPointOnRay = eyePos.add(lookVec.scale(proj));
-                double distToRay = closestPointOnRay.distanceTo(entity.position().add(0, entity.getBbHeight() / 2.0, 0));
-                if (distToRay <= 2.5 && proj < minDst) { // Tollera fino a 2.5m di scostamento dal mirino
-                    minDst = proj;
-                    closest = entity;
-                }
-            }
-        }
-        return closest;
-    }
-
-    /**
-     * Se il bersaglio è oltre i 5.5 metri ed il TP-Reach è attivo, invia pacchetti di movimento
+     * Se il bersaglio è oltre i 2.8 metri ed il TP-Reach è attivo, invia pacchetti di movimento
      * passo-passo per teletrasportare temporaneamente l'attacco accanto al bersaglio e tornare indietro.
      */
     public boolean tryTpAttack(Entity target) {
         if (!isEnabled() || !tpReach.isOn() || mc.player == null || mc.getConnection() == null) return false;
         double dist = mc.player.distanceTo(target);
-        if (dist > 5.5 && dist <= combatReach.getValue()) {
+        if (dist > 2.8 && dist <= combatReach.getValue()) {
             double px = mc.player.getX();
             double py = mc.player.getY();
             double pz = mc.player.getZ();
@@ -103,7 +74,7 @@ public class Reach extends Module {
     public void finishTpAttack(Entity target) {
         if (!isEnabled() || !tpReach.isOn() || mc.player == null || mc.getConnection() == null) return;
         double dist = mc.player.distanceTo(target);
-        if (dist > 5.5 && dist <= combatReach.getValue()) {
+        if (dist > 2.8 && dist <= combatReach.getValue()) {
             double px = mc.player.getX();
             double py = mc.player.getY();
             double pz = mc.player.getZ();
