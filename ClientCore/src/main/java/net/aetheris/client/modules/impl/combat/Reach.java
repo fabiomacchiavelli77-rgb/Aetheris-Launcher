@@ -7,6 +7,8 @@ import net.aetheris.client.settings.SliderSetting;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class Reach extends Module {
     
@@ -42,10 +44,30 @@ public class Reach extends Module {
         if (blockRange != null) blockRange.setBaseValue(4.5);
     }
 
-    /**
-     * Se il bersaglio è oltre i 2.8 metri ed il TP-Reach è attivo, invia pacchetti di movimento
-     * passo-passo per teletrasportare temporaneamente l'attacco accanto al bersaglio e tornare indietro.
-     */
+    public Entity getTargetInLookVector(float maxDist) {
+        if (mc.player == null || mc.level == null) return null;
+        Vec3 eyePos = mc.player.getEyePosition(1.0f);
+        Vec3 lookVec = mc.player.getViewVector(1.0f);
+        Vec3 maxPos = eyePos.add(lookVec.x * maxDist, lookVec.y * maxDist, lookVec.z * maxDist);
+        AABB searchBox = mc.player.getBoundingBox().expandTowards(lookVec.scale(maxDist)).inflate(1.0, 1.0, 1.0);
+
+        Entity closest = null;
+        double minDst = Double.MAX_VALUE;
+
+        for (Entity entity : mc.level.getEntities(mc.player, searchBox, e -> e.isAlive() && e instanceof net.minecraft.world.entity.LivingEntity)) {
+            AABB aabb = entity.getBoundingBox().inflate(entity.getPickRadius());
+            java.util.Optional<Vec3> hit = aabb.clip(eyePos, maxPos);
+            if (hit.isPresent()) {
+                double dist = eyePos.distanceTo(hit.get());
+                if (dist < minDst && dist <= maxDist) {
+                    minDst = dist;
+                    closest = entity;
+                }
+            }
+        }
+        return closest;
+    }
+
     public boolean tryTpAttack(Entity target) {
         if (!isEnabled() || !tpReach.isOn() || mc.player == null || mc.getConnection() == null) return false;
         double dist = mc.player.distanceTo(target);
