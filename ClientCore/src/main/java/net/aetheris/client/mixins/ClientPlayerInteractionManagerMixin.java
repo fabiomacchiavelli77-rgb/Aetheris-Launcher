@@ -2,6 +2,7 @@ package net.aetheris.client.mixins;
 
 import net.aetheris.client.modules.ModuleManager;
 import net.aetheris.client.modules.impl.combat.Criticals;
+import net.aetheris.client.modules.impl.combat.Reach;
 import net.aetheris.client.modules.impl.world.FastBreak;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -43,12 +44,14 @@ public class ClientPlayerInteractionManagerMixin {
     }
 
     /**
-     * Criticals — forza colpi critici reali inviando pacchetti o saltando prima dell'attacco,
-     * e genera le particelle critiche visive ("stelline / scintille") sul bersaglio.
+     * Criticals & Reach (TP-Bypass) — prima dell'attacco.
      */
     @Inject(method = "attack", at = @At("HEAD"))
     private void onAttack(Player player, Entity target, CallbackInfo ci) {
         for (var mod : ModuleManager.getModules()) {
+            if (mod instanceof Reach reach && reach.isEnabled()) {
+                reach.tryTpAttack(target);
+            }
             if (mod instanceof Criticals crit && crit.isEnabled()) {
                 if (crit.shouldForceCritical(target)) {
                     Minecraft mc = Minecraft.getInstance();
@@ -59,7 +62,6 @@ public class ClientPlayerInteractionManagerMixin {
 
                         switch (crit.getMode()) {
                             case PACKET -> {
-                                // Spoof movement packets so server registers fallDistance > 0 for 1.5x critical damage
                                 mc.getConnection().send(new ServerboundMovePlayerPacket.Pos(x, y + 0.0625, z, false, false));
                                 mc.getConnection().send(new ServerboundMovePlayerPacket.Pos(x, y, z, false, false));
                                 mc.getConnection().send(new ServerboundMovePlayerPacket.Pos(x, y + 0.011, z, false, false));
@@ -70,12 +72,23 @@ public class ClientPlayerInteractionManagerMixin {
                         }
                     }
 
-                    // Genera le particelle critiche visive (stelline / scintille) sul bersaglio colpito
                     if (mc.particleEngine != null) {
                         mc.particleEngine.createTrackingEmitter(target, ParticleTypes.CRIT);
                         mc.particleEngine.createTrackingEmitter(target, ParticleTypes.ENCHANTED_HIT);
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Reach (TP-Bypass) — dopo l'attacco, riporta istantaneamente la posizione al punto iniziale.
+     */
+    @Inject(method = "attack", at = @At("RETURN"))
+    private void onAttackReturn(Player player, Entity target, CallbackInfo ci) {
+        for (var mod : ModuleManager.getModules()) {
+            if (mod instanceof Reach reach && reach.isEnabled()) {
+                reach.finishTpAttack(target);
             }
         }
     }
