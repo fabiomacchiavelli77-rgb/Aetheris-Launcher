@@ -145,10 +145,14 @@ Multiple GUIs available:
 | Web Installer backend | `Installer/server.js` |
 | Root installer entry | `src/main/java/me/deftware/installer/Main.java` |
 
-## Module Tracking & Expansion Context
+## Module Tracking & Guidance for AI Agents
 
-- The current testing status and roadmap of modules are tracked in `Aetheris_Checklist_Test.xlsx`.
-- Detailed descriptions of untested modules and proposed expansions inspired by Meteor/Wurst are documented in `MODULI_MANCANTI.md`.
+- **Testing Checklist**: Track testing progress and bug notes in `Aetheris_Checklist_Test.xlsx`.
+- **Roadmap & Missing Modules**: Check `MODULI_MANCANTI.md` for a comprehensive overview of modules pending verification and proposed expansions inspired by Meteor/Wurst.
+- **Guidance for AI Assistants / LLMs**:
+  1. When continuing development or debugging, read `Aetheris_Checklist_Test.xlsx` and `MODULI_MANCANTI.md` to understand current module verification status.
+  2. Always use **Mojang Official Mappings** for Minecraft 1.21.4 (Java 21). Do not mix Yarn mapping class names.
+  3. Keep `AGENTS.md` and `CLAUDE.md` synchronized whenever project structure, architecture, or key guidelines change.
 
 ## Module List (33 total)
 
