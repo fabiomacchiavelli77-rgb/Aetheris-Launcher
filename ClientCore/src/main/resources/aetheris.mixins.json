@@ -3,7 +3,8 @@
   "package": "net.aetheris.client.mixins",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "PlayerEntityMixin"
+    "PlayerEntityMixin",
+    "BlockItemMixin"
   ],
   "client": [
     "EntityMixin",
@@ -20,7 +21,9 @@
     "BlockMixin",
     "AetherisClientPacketListenerMixin",
     "ConnectionMixin",
-    "ServerboundMovePlayerPacketAccessor"
+    "ServerboundMovePlayerPacketAccessor",
+    "AutoSignMixin",
+    "StorageESPMixin"
   ],
   "injectors": {
     "defaultRequire": 1

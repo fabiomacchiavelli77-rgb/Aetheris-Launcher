@@ -72,6 +72,12 @@ public class MinecraftClientMixin {
                     return;
                 }
             }
+            if (mod instanceof net.aetheris.client.modules.impl.render.ItemESP itemEsp && itemEsp.isEnabled()) {
+                if (itemEsp.shouldGlow(entity)) {
+                    cir.setReturnValue(true);
+                    return;
+                }
+            }
         }
     }
 }

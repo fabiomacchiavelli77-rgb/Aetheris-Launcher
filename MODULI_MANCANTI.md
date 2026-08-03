@@ -29,22 +29,52 @@ Questo documento contiene l'elenco completo dei moduli di **Aetheris Client** in
 
 ---
 
-## 2. Nuovi Moduli Proposti (Ispirati a Meteor / Wurst)
+## 2. ✅ Implementati (ex proposti — Batch 2025-08)
 
-### Combat (4)
-- **CrystalAura**: Gestione automatica del piazzamento ed esplosione degli End Crystal per PvP.
-- **BedAura**: Posizionamento ed esplosione automatica dei letti nelle dimensioni del Nether/End.
-- **AimAssist**: Assistenza nel puntamento del mirino sulle entità vicine.
-- **SelfTrap**: Posizionamento rapido di blocchi protettivi attorno e sopra la testa del giocatore.
+### Combat (4) ✅
+- **CrystalAura**: Attacca automaticamente gli End Crystal vicini per esploderli. `modules/impl/combat/CrystalAura.java` — rotation + attack, cooldown sync opzionale, CPS configurabile. (Solo explode, no placement).
+- **BedAura**: Click destro automatico sui letti vicini (Nether/End) per esploderli. `modules/impl/combat/BedAura.java` — usa mano vuota per evitare placement accidentali, scan area ±range.
+- **AimAssist**: Rotazione graduale del mirino verso le entità nel FOV. `modules/impl/combat/AimAssist.java` — settings range/speed/fov/targetPlayers.
+- **SelfTrap**: Piazzamento rapido di blocchi attorno e sopra la testa. `modules/impl/combat/SelfTrap.java` — 6 offset (4 lati y+1, testa y+1, sopra y+2), auto-disable a trappola completa.
 
-### Render (2)
-- **StorageESP**: Evidenzia ceste, shulker box e bauli con box colorati attraverso le pareti.
-- **ItemESP**: Evidenzia gli oggetti rilasciati a terra visibili a distanza.
+### Render (2) ✅
+- **StorageESP**: Box colorati sulle storage (chest=oro, shulker=viola, ender chest=rosso scuro) attraverso i muri. `modules/impl/render/StorageESP.java` + `mixins/StorageESPMixin.java` (hook su `LevelRenderer.renderLevel` TAIL, disegno con `RenderType.lines()`).
+- **ItemESP**: Glow sugli oggetti a terra (sistema glow vanilla via `MinecraftClientMixin.shouldEntityAppearGlowing`). `modules/impl/render/ItemESP.java` — range configurabile.
 
-### World (2)
-- **LiquidInteract**: Consente di posizionare blocchi direttamente sopra superfici di acqua o lava.
-- **AutoSign**: Compila automaticamente il testo sui cartelli piazzati con una frase preimpostata.
+### World (2) ✅
+- **LiquidInteract**: Piazzamento blocchi sopra acqua/lava. `modules/impl/world/LiquidInteract.java` + `mixins/BlockItemMixin.java` (override `BlockItem.canPlace`).
+- **AutoSign**: Compila e conferma automaticamente i cartelli piazzati. `modules/impl/world/AutoSign.java` + `mixins/AutoSignMixin.java` (Accessor su `AbstractSignEditScreen` — scrive `messages[]` + `text`, chiama `onDone()`). **Righe hardcoded in `AutoSign.LINES`** (default "Aetheris Client").
 
-### Player (2)
-- **AutoEat**: Consuma automaticamente cibo dall'inventario quando il livello di fame scende.
-- **AntiAFK**: Esegue movimenti periodici per prevenire la disconnessione per inattività (kick AFK).
+### Player (2) ✅
+- **AutoEat**: Consuma automaticamente cibo dalla hotbar quando la fame scende sotto soglia. `modules/impl/player/AutoEat.java` — detect cibo via `DataComponents.FOOD`, settings threshold/eatInWater.
+- **AntiAFK**: Rotazione periodica + swing per evitare il kick AFK. `modules/impl/player/AntiAFK.java` — invia `ServerboundMovePlayerPacket.Rot` per sincronizzare col server.
+
+### Note tecniche Batch
+- Registrati in `ModuleManager.init()`: Combat 8→12, Render 7→9, World 5→7, Player 6→8 (totale 43).
+- Mixin nuovi in `aetheris.mixins.json`: `BlockItemMixin` (comune), `AutoSignMixin` + `StorageESPMixin` (client).
+- Build verificata: `cd ClientCore && ./gradlew build` ✅
+
+---
+
+## 3. Nuovi Moduli Proposti (Futuri)
+
+### Combat
+- ~~CrystalAura~~ ✅ → estensione possibile: **auto-placement** dei crystal (calcolo posizione sopra blocchi di ossidiana).
+- ~~BedAura~~ ✅ → estensione possibile: **BedTrap** (piazza letto + esplode in loop).
+
+### Render
+- ~~StorageESP~~ ✅ / ~~ItemESP~~ ✅ → estensione possibile: **ChestStealer ESP** (evidenzia le chest già svuotate).
+- **Trajectories**: Predice la traiettoria degli oggetti lanciati (richiede calcolo fisica — draw code già possibile con il pattern StorageESP).
+
+### World
+- ~~LiquidInteract~~ ✅ / ~~AutoSign~~ ✅
+- **AirPlace**: Piazzamento blocchi in aria senza blocco adiacente (richiede packet spoof posizione — pattern Criticals PACKET).
+
+### Player
+- ~~AutoEat~~ ✅ / ~~AntiAFK~~ ✅
+- **InventorySort**: Ordina automaticamente l'inventario (pattern ChestStealer `handleInventoryMouseClick`).
+
+### Altri (ispirati Meteor/Wurst)
+- **AmbientSound** / **CameraClip**: Rimozione clipping camera nei blocchi.
+- **TimerRange** / **SpeedHack**: Raffinamenti Speed/Timer esistenti.
+- **ClickGUI**: Tema premium già presente — possibile aggiunta **HUD Editor**.

@@ -63,6 +63,9 @@ All hacks extend `modules.Module` (abstract: `onEnable()`, `onDisable()`, `onTic
 - `WorldRendererMixin` — ESP render hook (with 1.21.4 `GraphicsResourceAllocator`)
 - `BlockRenderManagerMixin` — Xray block filter (cancel non-Xray `renderBatched`)
 - `PlayerEntityMixin` — NoHunger (cancel `causeFoodExhaustion`)
+- `BlockItemMixin` — LiquidInteract (override `canPlace` per piazzare su liquidi)
+- `AutoSignMixin` — AutoSign (Accessor/Invoker su `AbstractSignEditScreen`: scrive `messages[]`+`text`, chiama `onDone`)
+- `StorageESPMixin` — StorageESP (hook su `LevelRenderer.renderLevel` TAIL, box `RenderType.lines()`)
 
 *Note: `Reach` uses native Minecraft 1.21.4 `Attributes.ENTITY_INTERACTION_RANGE` & `Attributes.BLOCK_INTERACTION_RANGE` directly in `Reach.onTick()`, requiring no Mixin.*
 
@@ -154,11 +157,13 @@ Multiple GUIs available:
   2. Always use **Mojang Official Mappings** for Minecraft 1.21.4 (Java 21). Do not mix Yarn mapping class names.
   3. Keep `AGENTS.md` and `CLAUDE.md` synchronized whenever project structure, architecture, or key guidelines change.
 
-## Module List (33 total)
+## Module List (43 total)
 
-**Combat (8):** KillAura, Velocity, Criticals, Reach, AutoArmor, AutoTotem, TriggerBot, Surround
+**Combat (12):** KillAura, Velocity, Criticals, Reach, AutoArmor, AutoTotem, TriggerBot, Surround, AimAssist, SelfTrap, BedAura, CrystalAura
 **Movement (7):** AutoSprint, Speed, Fly, NoFall, Step, NoSlowdown, NoClip
-**Render (7):** FullBright, ESP, NoHurtCam, Xray, NameTags, Tracers, FreeCam
-**World (5):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins
-**Player (6):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner
+**Render (9):** FullBright, ESP, NoHurtCam, Xray, NameTags, Tracers, FreeCam, ItemESP, StorageESP
+**World (7):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins, LiquidInteract, AutoSign
+**Player (8):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat
+
+*Batch 2025-08: 10 nuovi moduli (AimAssist, SelfTrap, BedAura, CrystalAura, ItemESP, StorageESP, LiquidInteract, AutoSign, AntiAFK, AutoEat) — vedi `MODULI_MANCANTI.md` sezione 2. AutoSign: righe hardcoded in `AutoSign.LINES`.*
 

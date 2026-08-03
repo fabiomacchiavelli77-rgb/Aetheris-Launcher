@@ -32,4 +32,5 @@ installer.log
 seedcracker/build/
 seedcracker/.gradle/
 
-/local.properties
+/local.properties*.bak
+~

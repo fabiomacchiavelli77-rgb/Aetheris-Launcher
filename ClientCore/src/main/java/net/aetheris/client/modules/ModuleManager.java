@@ -20,7 +20,7 @@ public class ModuleManager {
     private static final List<Module> modules = new ArrayList<>();
 
     public static void init() {
-        // === COMBAT (8) ===
+        // === COMBAT (12) ===
         addModule(new KillAura());
         addModule(new Velocity());
         addModule(new Criticals());
@@ -29,6 +29,10 @@ public class ModuleManager {
         addModule(new AutoTotem());
         addModule(new TriggerBot());
         addModule(new Surround());
+        addModule(new AimAssist());
+        addModule(new SelfTrap());
+        addModule(new BedAura());
+        addModule(new CrystalAura());
 
         // === MOVEMENT (7) ===
         addModule(new AutoSprint());
@@ -39,7 +43,7 @@ public class ModuleManager {
         addModule(new NoSlowdown());
         addModule(new NoClip());
 
-        // === RENDER (7) ===
+        // === RENDER (9) ===
         addModule(new FullBright());
         addModule(new ESP());
         addModule(new NoHurtCam());
@@ -47,21 +51,27 @@ public class ModuleManager {
         addModule(new NameTags());
         addModule(new Tracers());
         addModule(new FreeCam());
+        addModule(new ItemESP());
+        addModule(new StorageESP());
 
-        // === WORLD (5) ===
+        // === WORLD (7) ===
         addModule(new FastBreak());
         addModule(new Scaffold());
         addModule(new Timer());
         addModule(new AutoTool());
         addModule(new InstalledPlugins());
+        addModule(new LiquidInteract());
+        addModule(new AutoSign());
 
-        // === PLAYER (6) ===
+        // === PLAYER (8) ===
         addModule(new AutoRespawn());
         addModule(new FastPlace());
         addModule(new NoHunger());
         addModule(new ChestStealer());
         addModule(new AutoFish());
         addModule(new InventoryCleaner());
+        addModule(new AntiAFK());
+        addModule(new AutoEat());
 
         // === SEEDCRACKER (1) ===
         addModule(new SeedCrackerModule());
