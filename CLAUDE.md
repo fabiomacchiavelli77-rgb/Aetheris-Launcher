@@ -159,13 +159,12 @@ Multiple GUIs available:
   4. **CRITICAL DEBUGGING NOTE FOR MIXINS**: In Minecraft 1.21.4, if a Mixin fails to apply at runtime (e.g. an `@Accessor` method is not marked `abstract`), Fabric throws a `RuntimeException`. If this happens while connected to a world, the networking thread catches it, forcefully disconnects the player, and triggers `clearClientLevel()`. This causes `updateScreenAndTick()` to tick the world with `mc.player == null`, resulting in cascaded `NullPointerException`s in `GameRenderer.renderLevel` and `MultiPlayerGameMode.ensureHasSentCarriedItem`. **If you see an NPE involving a null player or camera entity, ALWAYS check the start of `latest.log` for a Mixin application failure.**
   5. **Mixin Accessors**: Always ensure that `@Accessor` and `@Invoker` methods in Mixins are strictly `abstract` to prevent the aforementioned crash.
 
-## Module List (43 total)
+## Module List (47 total)
 
 **Combat (12):** KillAura, Velocity, Criticals, Reach, AutoArmor, AutoTotem, TriggerBot, Surround, AimAssist, SelfTrap, BedAura, CrystalAura
-**Movement (7):** AutoSprint, Speed, Fly, NoFall, Step, NoSlowdown, NoClip
+**Movement (10):** AutoSprint, Speed, Fly, NoFall, Step, NoSlowdown, NoClip, BunnyJump, Jetpack, Sneak
 **Render (9):** FullBright, ESP, NoHurtCam, Xray, NameTags, Tracers, FreeCam, ItemESP, StorageESP
-**World (7):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins, LiquidInteract, AutoSign
+**World (8):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins, LiquidInteract, AutoSign, AutoFarm
 **Player (8):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat
 
-*Batch 2025-08: 10 nuovi moduli (AimAssist, SelfTrap, BedAura, CrystalAura, ItemESP, StorageESP, LiquidInteract, AutoSign, AntiAFK, AutoEat) — vedi `MODULI_MANCANTI.md` sezione 2. AutoSign: righe hardcoded in `AutoSign.LINES`.*
-
+*Batch 2026-08 (ultimi moduli aggiunti): BunnyJump, Jetpack, Sneak, AutoFarm (con supporto alla risemina automatica).*

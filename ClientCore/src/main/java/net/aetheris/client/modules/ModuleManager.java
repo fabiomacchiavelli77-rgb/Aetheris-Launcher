@@ -34,7 +34,7 @@ public class ModuleManager {
         addModule(new BedAura());
         addModule(new CrystalAura());
 
-        // === MOVEMENT (7) ===
+        // === MOVEMENT (10) ===
         addModule(new AutoSprint());
         addModule(new Speed());
         addModule(new Fly());
@@ -42,6 +42,9 @@ public class ModuleManager {
         addModule(new Step());
         addModule(new NoSlowdown());
         addModule(new NoClip());
+        addModule(new BunnyJump());
+        addModule(new Jetpack());
+        addModule(new Sneak());
 
         // === RENDER (9) ===
         addModule(new FullBright());
@@ -54,7 +57,7 @@ public class ModuleManager {
         addModule(new ItemESP());
         addModule(new StorageESP());
 
-        // === WORLD (7) ===
+        // === WORLD (8) ===
         addModule(new FastBreak());
         addModule(new Scaffold());
         addModule(new Timer());
@@ -62,6 +65,7 @@ public class ModuleManager {
         addModule(new InstalledPlugins());
         addModule(new LiquidInteract());
         addModule(new AutoSign());
+        addModule(new AutoFarm());
 
         // === PLAYER (8) ===
         addModule(new AutoRespawn());
