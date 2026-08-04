@@ -156,6 +156,8 @@ Multiple GUIs available:
   1. When continuing development or debugging, read `Aetheris_Checklist_Test.xlsx` and `MODULI_MANCANTI.md` to understand current module verification status.
   2. Always use **Mojang Official Mappings** for Minecraft 1.21.4 (Java 21). Do not mix Yarn mapping class names.
   3. Keep `AGENTS.md` and `CLAUDE.md` synchronized whenever project structure, architecture, or key guidelines change.
+  4. **CRITICAL DEBUGGING NOTE FOR MIXINS**: In Minecraft 1.21.4, if a Mixin fails to apply at runtime (e.g. an `@Accessor` method is not marked `abstract`), Fabric throws a `RuntimeException`. If this happens while connected to a world, the networking thread catches it, forcefully disconnects the player, and triggers `clearClientLevel()`. This causes `updateScreenAndTick()` to tick the world with `mc.player == null`, resulting in cascaded `NullPointerException`s in `GameRenderer.renderLevel` and `MultiPlayerGameMode.ensureHasSentCarriedItem`. **If you see an NPE involving a null player or camera entity, ALWAYS check the start of `latest.log` for a Mixin application failure.**
+  5. **Mixin Accessors**: Always ensure that `@Accessor` and `@Invoker` methods in Mixins are strictly `abstract` to prevent the aforementioned crash.
 
 ## Module List (43 total)
 

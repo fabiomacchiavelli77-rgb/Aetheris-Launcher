@@ -14,7 +14,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 public class GameRendererMixin {
 
     /**
-     * NoHurtCam — disabilita l'effetto di danno (bob della visuale).
+     * NoHurtCam - disabilita l'effetto di danno (bob della visuale).
      */
     @Inject(method = "bobHurt", at = @At("HEAD"), cancellable = true)
     private void onBobHurt(PoseStack poseStack, float partialTick, CallbackInfo ci) {
@@ -23,6 +23,17 @@ public class GameRendererMixin {
                 ci.cancel();
                 return;
             }
+        }
+    }
+
+    /**
+     * Prevents crash when mc.player is null but level is not null.
+     */
+    @Inject(method = "renderLevel", at = @At("HEAD"), cancellable = true)
+    private void onRenderLevel(net.minecraft.client.DeltaTracker deltaTracker, CallbackInfo ci) {
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+        if (mc.player == null && mc.getCameraEntity() == null) {
+            ci.cancel();
         }
     }
 }

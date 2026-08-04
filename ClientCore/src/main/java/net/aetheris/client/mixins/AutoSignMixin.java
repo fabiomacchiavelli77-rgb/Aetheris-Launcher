@@ -14,22 +14,22 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractSignEditScreen.class)
-public class AutoSignMixin {
+public abstract class AutoSignMixin {
 
     @Unique
     private boolean aetheris$filled = false;
 
     @Accessor("text")
-    private SignText getText() { throw new AssertionError(); }
+    public abstract SignText getText();
 
     @Accessor("text")
-    private void setText(SignText value) { throw new AssertionError(); }
+    public abstract void setText(SignText value);
 
     @Accessor("messages")
-    private String[] getMessages() { throw new AssertionError(); }
+    public abstract String[] getMessages();
 
     @Invoker("onDone")
-    private void callOnDone() { throw new AssertionError(); }
+    public abstract void callOnDone();
 
     @Inject(method = "init", at = @At("RETURN"))
     private void autoFillSign(CallbackInfo ci) {

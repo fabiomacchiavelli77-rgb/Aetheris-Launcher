@@ -24,6 +24,13 @@ public class ClientPlayerInteractionManagerMixin {
     @Shadow
     private float destroyProgress;
 
+    @Inject(method = "ensureHasSentCarriedItem", at = @At("HEAD"), cancellable = true)
+    private void onEnsureHasSentCarriedItem(CallbackInfo ci) {
+        if (Minecraft.getInstance().player == null) {
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "startDestroyBlock", at = @At("HEAD"))
     private void onStartDestroyBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
         for (var mod : ModuleManager.getModules()) {
