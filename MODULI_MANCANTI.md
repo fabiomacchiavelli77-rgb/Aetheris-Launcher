@@ -50,8 +50,8 @@ Questo documento contiene l'elenco completo dei moduli di **Aetheris Client** in
 - **AntiAFK**: Rotazione periodica + swing per evitare il kick AFK. `modules/impl/player/AntiAFK.java` — invia `ServerboundMovePlayerPacket.Rot` per sincronizzare col server.
 
 ### Note tecniche Batch
-- Registrati in `ModuleManager.init()`: Combat 8→12, Render 7→9, World 5→7, Player 6→8 (totale 43).
-- Mixin nuovi in `aetheris.mixins.json`: `BlockItemMixin` (comune), `AutoSignMixin` + `StorageESPMixin` (client).
+- Registrati in `ModuleManager.init()`: Combat 12, Render 9, World 8, Movement 10, Player 8 (totale 47).
+- Moduli più recenti (Batch 2026-08): `BunnyJump`, `Jetpack`, `Sneak`, `AutoFarm` (con auto-replant).
 - Build verificata: `cd ClientCore && ./gradlew build` ✅
 
 ---
