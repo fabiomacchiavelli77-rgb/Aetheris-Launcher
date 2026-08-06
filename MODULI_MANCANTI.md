@@ -1,25 +1,18 @@
-# Moduli Aetheris Client — Moduli da Implementare (Roadmap)
+# Moduli Aetheris Client — Roadmap & Moduli Mancanti
 
-Questo documento contiene le funzionalità e i moduli proposti non ancora creati nel codice di **Aetheris Client**.
+Tutti i moduli proposti e pianificati per Aetheris Client sono stati ufficialmente creati e integrati con successo! 🎉
 
 ---
 
-## Moduli / Funzionalità da Implementare
+## Stato Moduli (Totale 52)
+- **Combat (13)**: KillAura, Velocity, Criticals, Reach, AutoArmor, AutoTotem, TriggerBot, Surround, AimAssist, SelfTrap, BedAura, BedTrap, CrystalAura (con auto-placement)
+- **Movement (10)**: AutoSprint, Speed, Fly, NoFall, Step, NoSlowdown, NoClip, BunnyJump, Jetpack, Sneak
+- **Render (11)**: FullBright, ESP, NoHurtCam, Xray, NameTags, Tracers, FreeCam, ItemESP, StorageESP (con hideEmpty), CameraClip, Trajectories
+- **World (9)**: FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins, LiquidInteract, AutoSign, AutoFarm, AirPlace
+- **Player (9)**: AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat, InventorySort
+- **SeedCracker (1)**: SeedCrackerModule
 
-### Combat
-- **CrystalAura (Auto-Placement)**: Posizionamento automatico dell'ossidiana e degli End Crystal prima dell'esplosione.
-- **BedTrap**: Posizionamento automatico dei letti ed esplosione a ciclo continuo (Nether/End).
+---
 
-### Render
-- **Trajectories**: Predice e disegna in 3D la traiettoria di frecce, perle ed oggetti lanciati.
-- **CameraClip**: Impedisce alla telecamera in terza persona di clippare dentro i blocchi.
-- **ChestStealer ESP**: Evidenzia visivamente le ceste già svuotate per distinguerle da quelle piene.
-
-### World
-- **AirPlace**: Permette di piazzare blocchi nell'aria senza dover puntare su un blocco adiacente.
-
-### Player
-- **InventorySort**: Ordina automaticamente gli oggetti nell'inventario.
-
-### GUI / HUD
-- **HUD Editor**: Editor su schermo per spostare ed personalizzare gli elementi dell'interfaccia.
+## Prossimi Passi Consigliati
+- Testare in-game i moduli contrassegnati con "NO" nella checklist Excel (`Aetheris_Checklist_Test.xlsx`).
