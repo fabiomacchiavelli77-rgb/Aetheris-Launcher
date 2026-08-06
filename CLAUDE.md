@@ -66,6 +66,7 @@ All hacks extend `modules.Module` (abstract: `onEnable()`, `onDisable()`, `onTic
 - `BlockItemMixin` — LiquidInteract (override `canPlace` per piazzare su liquidi)
 - `AutoSignMixin` — AutoSign (Accessor/Invoker su `AbstractSignEditScreen`: scrive `messages[]`+`text`, chiama `onDone`)
 - `StorageESPMixin` — StorageESP (hook su `LevelRenderer.renderLevel` TAIL, box `RenderType.lines()`)
+- `AntiDetectMixin` — AntiDetect (hook su `Connection.send`: spoofa `BrandPayload` → "vanilla" e cancella payload `fabric:*`)
 
 *Note: `Reach` uses native Minecraft 1.21.4 `Attributes.ENTITY_INTERACTION_RANGE` & `Attributes.BLOCK_INTERACTION_RANGE` directly in `Reach.onTick()`, requiring no Mixin.*
 
@@ -221,6 +222,7 @@ All hacks extend `modules.Module` (abstract: `onEnable()`, `onDisable()`, `onTic
 - `BlockItemMixin` — LiquidInteract (override `canPlace` per piazzare su liquidi)
 - `AutoSignMixin` — AutoSign (Accessor/Invoker su `AbstractSignEditScreen`: scrive `messages[]`+`text`, chiama `onDone`)
 - `StorageESPMixin` — StorageESP (hook su `LevelRenderer.renderLevel` TAIL, box `RenderType.lines()`)
+- `AntiDetectMixin` — AntiDetect (hook su `Connection.send`: spoofa `BrandPayload` → "vanilla" e cancella payload `fabric:*`)
 
 *Note: `Reach` uses native Minecraft 1.21.4 `Attributes.ENTITY_INTERACTION_RANGE` & `Attributes.BLOCK_INTERACTION_RANGE` directly in `Reach.onTick()`, requiring no Mixin.*
 
@@ -299,16 +301,14 @@ Multiple GUIs available:
 | SeedCracker mixin config | `ClientCore/src/main/resources/seedcracker.mixins.json` |
 | Fabric mod manifest | `ClientCore/src/main/resources/fabric.mod.json` |
 | Testing Checklist Excel | `Aetheris_Checklist_Test.xlsx` |
-| Untested & Proposed Modules | `MODULI_MANCANTI.md` |
 | Web Installer backend | `Installer/server.js` |
 | Root installer entry | `src/main/java/me/deftware/installer/Main.java` |
 
 ## Module Tracking & Guidance for AI Agents
 
 - **Testing Checklist**: Track testing progress and bug notes in `Aetheris_Checklist_Test.xlsx`.
-- **Roadmap & Missing Modules**: Check `MODULI_MANCANTI.md` for a comprehensive overview of modules pending verification and proposed expansions inspired by Meteor/Wurst.
 - **Guidance for AI Assistants / LLMs**:
-  1. When continuing development or debugging, read `Aetheris_Checklist_Test.xlsx` and `MODULI_MANCANTI.md` to understand current module verification status.
+  1. When continuing development or debugging, read `Aetheris_Checklist_Test.xlsx` to understand current module verification status.
   2. Always use **Mojang Official Mappings** for Minecraft 1.21.4 (Java 21). Do not mix Yarn mapping class names.
   3. Keep `AGENTS.md` and `CLAUDE.md` synchronized whenever project structure, architecture, or key guidelines change.
   4. **CRITICAL DEBUGGING NOTE FOR MIXINS**: In Minecraft 1.21.4, if a Mixin fails to apply at runtime (e.g. an `@Accessor` method is not marked `abstract`), Fabric throws a `RuntimeException`. If this happens while connected to a world, the networking thread catches it, forcefully disconnects the player, and triggers `clearClientLevel()`. This causes `updateScreenAndTick()` to tick the world with `mc.player == null`, resulting in cascaded `NullPointerException`s in `GameRenderer.renderLevel` and `MultiPlayerGameMode.ensureHasSentCarriedItem`. **If you see an NPE involving a null player or camera entity, ALWAYS check the start of `latest.log` for a Mixin application failure.**
@@ -320,6 +320,6 @@ Multiple GUIs available:
 **Movement (10):** AutoSprint, Speed, Fly, NoFall, Step, NoSlowdown, NoClip, BunnyJump, Jetpack, Sneak
 **Render (11):** FullBright, ESP, NoHurtCam, Xray, NameTags, Tracers, FreeCam, ItemESP, StorageESP (con hideEmpty), CameraClip, Trajectories
 **World (9):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins, LiquidInteract, AutoSign, AutoFarm, AirPlace
-**Player (9):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat, InventorySort
+**Player (10):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat, InventorySort, AntiDetect
 
 *Batch 2026-08 Roadmap (ultimi moduli completati in parallelo): CameraClip, Trajectories, AirPlace, InventorySort, BedTrap, CrystalAura (Auto-Place), StorageESP (Hide Empty).*
