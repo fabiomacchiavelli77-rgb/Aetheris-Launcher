@@ -2,27 +2,107 @@ package net.aetheris.client.modules.impl.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import java.util.HashSet;
+import java.util.Set;
 import net.aetheris.client.modules.Category;
 import net.aetheris.client.modules.Module;
+import net.aetheris.client.settings.BooleanSetting;
 import net.aetheris.client.settings.SliderSetting;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class StorageESP extends Module {
     private final SliderSetting range = new SliderSetting("range", "Range", "Portata", 16.0, 4.0, 32.0, 2.0, "blocks");
+    private final BooleanSetting hideEmpty = new BooleanSetting("hideEmpty", "Hide Empty", "Nascondi Vuote", false);
+
+    private final Set<BlockPos> emptyChests = new HashSet<>();
+    private BlockPos lastInteractedPos = null;
 
     public StorageESP() {
         super("StorageESP", "Evidenzia ceste, shulker e bauli con box colorati attraverso i muri.", Category.RENDER);
         addSetting(range);
+        addSetting(hideEmpty);
+    }
+
+    @Override
+    public void onTick() {
+        if (mc.player == null || mc.level == null) return;
+
+        if (mc.hitResult instanceof BlockHitResult bhr && mc.options.keyUse.isDown()) {
+            BlockPos pos = bhr.getBlockPos();
+            if (mc.level.getBlockEntity(pos) != null) {
+                lastInteractedPos = pos.immutable();
+            }
+        }
+
+        if (mc.player.containerMenu instanceof ChestMenu chestMenu) {
+            Container container = chestMenu.getContainer();
+            boolean isEmpty = true;
+            for (int i = 0; i < container.getContainerSize(); i++) {
+                ItemStack stack = container.getItem(i);
+                if (!stack.isEmpty()) {
+                    isEmpty = false;
+                    break;
+                }
+            }
+
+            BlockPos pos = null;
+            if (container instanceof BlockEntity be) {
+                pos = be.getBlockPos();
+            } else if (lastInteractedPos != null && mc.level.getBlockEntity(lastInteractedPos) != null) {
+                pos = lastInteractedPos;
+            }
+
+            if (pos != null) {
+                markContainerState(pos, isEmpty);
+            }
+        }
+    }
+
+    private void markContainerState(BlockPos pos, boolean isEmpty) {
+        if (isEmpty) {
+            emptyChests.add(pos);
+            markAdjacentChestIfAny(pos, true);
+        } else {
+            emptyChests.remove(pos);
+            markAdjacentChestIfAny(pos, false);
+        }
+    }
+
+    private void markAdjacentChestIfAny(BlockPos pos, boolean isEmpty) {
+        BlockState state = mc.level.getBlockState(pos);
+        if (state.getBlock() instanceof ChestBlock) {
+            for (Direction dir : Direction.Plane.HORIZONTAL) {
+                BlockPos adj = pos.relative(dir);
+                BlockState adjState = mc.level.getBlockState(adj);
+                if (adjState.getBlock() == state.getBlock()) {
+                    if (isEmpty) emptyChests.add(adj);
+                    else emptyChests.remove(adj);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        emptyChests.clear();
+        lastInteractedPos = null;
     }
 
     /** Chiamato dal WorldRendererMixin a fine renderLevel. */
@@ -72,6 +152,10 @@ public class StorageESP extends Module {
     }
 
     private int getColor(BlockEntity be) {
+        if (emptyChests.contains(be.getBlockPos())) {
+            return hideEmpty.isOn() ? 0 : 0x707070;
+        }
+
         if (be instanceof EnderChestBlockEntity) return 0x8B0000;
         if (be instanceof ShulkerBoxBlockEntity) return 0xA020F0;
         if (be instanceof BaseContainerBlockEntity) return 0xE8A33D;

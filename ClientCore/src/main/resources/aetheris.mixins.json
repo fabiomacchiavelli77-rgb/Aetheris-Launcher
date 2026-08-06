@@ -23,7 +23,8 @@
     "ConnectionMixin",
     "ServerboundMovePlayerPacketAccessor",
     "AutoSignMixin",
-    "StorageESPMixin"
+    "StorageESPMixin",
+    "CameraMixin"
   ],
   "injectors": {
     "defaultRequire": 1

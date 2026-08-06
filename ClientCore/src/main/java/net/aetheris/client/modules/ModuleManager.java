@@ -32,6 +32,7 @@ public class ModuleManager {
         addModule(new AimAssist());
         addModule(new SelfTrap());
         addModule(new BedAura());
+        addModule(new BedTrap());
         addModule(new CrystalAura());
 
         // === MOVEMENT (10) ===
@@ -46,7 +47,7 @@ public class ModuleManager {
         addModule(new Jetpack());
         addModule(new Sneak());
 
-        // === RENDER (9) ===
+        // === RENDER (11) ===
         addModule(new FullBright());
         addModule(new ESP());
         addModule(new NoHurtCam());
@@ -56,8 +57,10 @@ public class ModuleManager {
         addModule(new FreeCam());
         addModule(new ItemESP());
         addModule(new StorageESP());
+        addModule(new CameraClip());
+        addModule(new Trajectories());
 
-        // === WORLD (8) ===
+        // === WORLD (9) ===
         addModule(new FastBreak());
         addModule(new Scaffold());
         addModule(new Timer());
@@ -66,8 +69,9 @@ public class ModuleManager {
         addModule(new LiquidInteract());
         addModule(new AutoSign());
         addModule(new AutoFarm());
+        addModule(new AirPlace());
 
-        // === PLAYER (8) ===
+        // === PLAYER (9) ===
         addModule(new AutoRespawn());
         addModule(new FastPlace());
         addModule(new NoHunger());
@@ -76,6 +80,7 @@ public class ModuleManager {
         addModule(new InventoryCleaner());
         addModule(new AntiAFK());
         addModule(new AutoEat());
+        addModule(new InventorySort());
 
         // === SEEDCRACKER (1) ===
         addModule(new SeedCrackerModule());

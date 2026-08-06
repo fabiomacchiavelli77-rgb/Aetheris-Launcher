@@ -27,4 +27,15 @@ public class WorldRendererMixin {
             }
         }
     }
+
+    @Inject(method = "renderLevel", at = @At("TAIL"))
+    private void onRenderLevel(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker,
+                               boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer,
+                               Matrix4f projectionMatrix, Matrix4f projectionMatrix2, CallbackInfo ci) {
+        for (var mod : ModuleManager.getModules()) {
+            if (mod.isEnabled() && mod instanceof net.aetheris.client.modules.impl.render.Trajectories trajectories) {
+                trajectories.render(camera, deltaTracker);
+            }
+        }
+    }
 }
