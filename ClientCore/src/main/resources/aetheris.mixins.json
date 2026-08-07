@@ -24,7 +24,9 @@
     "ServerboundMovePlayerPacketAccessor",
     "AutoSignMixin",
     "StorageESPMixin",
-    "CameraMixin"
+    "CameraMixin",
+    "AntiDetectMixin",
+    "AbstractFurnaceMenuAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

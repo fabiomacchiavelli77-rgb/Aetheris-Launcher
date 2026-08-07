@@ -30,12 +30,13 @@ public class ModuleManager {
         addModule(new TriggerBot());
         addModule(new Surround());
         addModule(new AimAssist());
+        addModule(new BowAimbot());
         addModule(new SelfTrap());
         addModule(new BedAura());
         addModule(new BedTrap());
         addModule(new CrystalAura());
 
-        // === MOVEMENT (10) ===
+        // === MOVEMENT (11) ===
         addModule(new AutoSprint());
         addModule(new Speed());
         addModule(new Fly());
@@ -46,8 +47,9 @@ public class ModuleManager {
         addModule(new BunnyJump());
         addModule(new Jetpack());
         addModule(new Sneak());
+        addModule(new AutoWalk());
 
-        // === RENDER (11) ===
+        // === RENDER (12) ===
         addModule(new FullBright());
         addModule(new ESP());
         addModule(new NoHurtCam());
@@ -59,8 +61,9 @@ public class ModuleManager {
         addModule(new StorageESP());
         addModule(new CameraClip());
         addModule(new Trajectories());
+        addModule(new Waypoints());
 
-        // === WORLD (9) ===
+        // === WORLD (14) ===
         addModule(new FastBreak());
         addModule(new Scaffold());
         addModule(new Timer());
@@ -70,8 +73,13 @@ public class ModuleManager {
         addModule(new AutoSign());
         addModule(new AutoFarm());
         addModule(new AirPlace());
+        addModule(new AutoBrewer());
+        addModule(new AutoSmelter());
+        addModule(new StrongholdFinder());
+        addModule(new PacketLogger());
+        addModule(new ServerFinder());
 
-        // === PLAYER (9) ===
+        // === PLAYER (10) ===
         addModule(new AutoRespawn());
         addModule(new FastPlace());
         addModule(new NoHunger());
@@ -81,6 +89,8 @@ public class ModuleManager {
         addModule(new AntiAFK());
         addModule(new AutoEat());
         addModule(new InventorySort());
+        addModule(new AntiDetect());
+        addModule(new NoChatReports());
 
         // === SEEDCRACKER (1) ===
         addModule(new SeedCrackerModule());

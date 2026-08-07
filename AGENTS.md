@@ -314,12 +314,12 @@ Multiple GUIs available:
   4. **CRITICAL DEBUGGING NOTE FOR MIXINS**: In Minecraft 1.21.4, if a Mixin fails to apply at runtime (e.g. an `@Accessor` method is not marked `abstract`), Fabric throws a `RuntimeException`. If this happens while connected to a world, the networking thread catches it, forcefully disconnects the player, and triggers `clearClientLevel()`. This causes `updateScreenAndTick()` to tick the world with `mc.player == null`, resulting in cascaded `NullPointerException`s in `GameRenderer.renderLevel` and `MultiPlayerGameMode.ensureHasSentCarriedItem`. **If you see an NPE involving a null player or camera entity, ALWAYS check the start of `latest.log` for a Mixin application failure.**
   5. **Mixin Accessors**: Always ensure that `@Accessor` and `@Invoker` methods in Mixins are strictly `abstract` to prevent the aforementioned crash.
 
-## Module List (52 total)
+## Module List (61 total)
 
-**Combat (13):** KillAura, Velocity, Criticals, Reach, AutoArmor, AutoTotem, TriggerBot, Surround, AimAssist, SelfTrap, BedAura, BedTrap, CrystalAura (con auto-placement)
-**Movement (10):** AutoSprint, Speed, Fly, NoFall, Step, NoSlowdown, NoClip, BunnyJump, Jetpack, Sneak
-**Render (11):** FullBright, ESP, NoHurtCam, Xray, NameTags, Tracers, FreeCam, ItemESP, StorageESP (con hideEmpty), CameraClip, Trajectories
-**World (9):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins, LiquidInteract, AutoSign, AutoFarm, AirPlace
-**Player (10):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat, InventorySort, AntiDetect
+**Combat (14):** KillAura, Velocity, Criticals, Reach, AutoArmor, AutoTotem, TriggerBot, Surround, AimAssist, SelfTrap, BedAura, BedTrap, CrystalAura (con auto-placement), BowAimbot (con anticipo balistico)
+**Movement (11):** AutoSprint, Speed, Fly, NoFall, Step, NoSlowdown, NoClip, BunnyJump, Jetpack, Sneak, AutoWalk
+**Render (12):** FullBright, ESP, NoHurtCam, Xray, NameTags, Tracers, FreeCam, ItemESP, StorageESP (con hideEmpty), CameraClip, Trajectories, Waypoints (marcatura 3D)
+**World (14):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins, LiquidInteract, AutoSign, AutoFarm, AirPlace, AutoBrewer, AutoSmelter, StrongholdFinder, PacketLogger, ServerFinder
+**Player (9):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat, InventorySort, NoChatReports
 
-*Batch 2026-08 Roadmap (ultimi moduli completati in parallelo): CameraClip, Trajectories, AirPlace, InventorySort, BedTrap, CrystalAura (Auto-Place), StorageESP (Hide Empty).*
+*Batch 2026-08 (Mappatura Qwen3.8-max): AutoBrewer, AutoSmelter, StrongholdFinder, PacketLogger, ServerFinder, Waypoints, NoChatReports, BowAimbot, AutoWalk.*

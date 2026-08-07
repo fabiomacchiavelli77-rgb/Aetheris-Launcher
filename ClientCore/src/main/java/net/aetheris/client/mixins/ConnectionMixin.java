@@ -17,6 +17,9 @@ public class ConnectionMixin {
     @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;)V", at = @At("HEAD"), cancellable = true)
     private void onSendPacket(Packet<?> packet, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
         for (var mod : ModuleManager.getModules()) {
+            if (mod instanceof net.aetheris.client.modules.impl.world.PacketLogger pl && pl.isEnabled()) {
+                pl.onSendPacket(packet);
+            }
             if (mod instanceof net.aetheris.client.modules.impl.render.FreeCam fc && fc.isEnabled()) {
                 if (packet instanceof ServerboundMovePlayerPacket ||
                     packet instanceof net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket ||
