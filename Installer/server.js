@@ -31,23 +31,23 @@ app.post('/install', async (req, res) => {
 
         // 1. Install Fabric 0.19.3 silently
         const fabricInstallerPath = path.join(__dirname, 'fabric-installer.jar');
-        await execPromise(`java -jar "${fabricInstallerPath}" client -dir "${mcDir}" -mcversion 1.21.4 -loader 0.19.3`);
+        await execPromise(`java -jar "${fabricInstallerPath}" client -dir "${mcDir}" -mcversion 1.21.11 -loader 0.19.3`);
 
         // 1.5 Rename profile to Aetheris
-        const oldVersionDir = path.join(mcDir, 'versions', 'fabric-loader-0.19.3-1.21.4');
-        const newVersionDir = path.join(mcDir, 'versions', 'Aetheris-1.21.4');
+        const oldVersionDir = path.join(mcDir, 'versions', 'fabric-loader-0.19.3-1.21.11');
+        const newVersionDir = path.join(mcDir, 'versions', 'Aetheris-1.21.11');
         if (fs.existsSync(oldVersionDir)) {
             if (fs.existsSync(newVersionDir)) {
                 fs.rmSync(newVersionDir, { recursive: true, force: true });
             }
             fs.renameSync(oldVersionDir, newVersionDir);
-            const oldJson = path.join(newVersionDir, 'fabric-loader-0.19.3-1.21.4.json');
-            const newJson = path.join(newVersionDir, 'Aetheris-1.21.4.json');
+            const oldJson = path.join(newVersionDir, 'fabric-loader-0.19.3-1.21.11.json');
+            const newJson = path.join(newVersionDir, 'Aetheris-1.21.11.json');
             if (fs.existsSync(oldJson)) fs.renameSync(oldJson, newJson);
             
             if (fs.existsSync(newJson)) {
                 let jsonContent = JSON.parse(fs.readFileSync(newJson, 'utf-8'));
-                jsonContent.id = 'Aetheris-1.21.4';
+                jsonContent.id = 'Aetheris-1.21.11';
                 fs.writeFileSync(newJson, JSON.stringify(jsonContent, null, 2));
             }
             
@@ -67,7 +67,7 @@ app.post('/install', async (req, res) => {
                 profilesData.profiles["Aetheris"] = {
                     name: "Aetheris",
                     type: "custom",
-                    lastVersionId: "Aetheris-1.21.4"
+                    lastVersionId: "Aetheris-1.21.11"
                 };
                 fs.writeFileSync(profilesPath, JSON.stringify(profilesData, null, 2));
             }
