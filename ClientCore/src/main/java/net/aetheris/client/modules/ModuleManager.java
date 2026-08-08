@@ -78,6 +78,7 @@ public class ModuleManager {
         addModule(new StrongholdFinder());
         addModule(new PacketLogger());
         addModule(new ServerFinder());
+        addModule(new PluginScanner());
 
         // === PLAYER (10) ===
         addModule(new AutoRespawn());
@@ -110,6 +111,15 @@ public class ModuleManager {
 
     public static Optional<Module> getModule(String name) {
         return modules.stream().filter(m -> m.getName().equalsIgnoreCase(name)).findFirst();
+    }
+
+    /** Lookup diretto per classe: evita di iterare tutti i moduli negli hot-path (mixin di rete). */
+    @SuppressWarnings("unchecked")
+    public static <T extends Module> T getModule(Class<T> clazz) {
+        for (Module m : modules) {
+            if (clazz.isInstance(m)) return (T) m;
+        }
+        return null;
     }
 
     public static void onTick() {

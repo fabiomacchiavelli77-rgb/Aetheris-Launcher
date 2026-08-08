@@ -67,6 +67,8 @@ All hacks extend `modules.Module` (abstract: `onEnable()`, `onDisable()`, `onTic
 - `AutoSignMixin` — AutoSign (Accessor/Invoker su `AbstractSignEditScreen`: scrive `messages[]`+`text`, chiama `onDone`)
 - `StorageESPMixin` — StorageESP (hook su `LevelRenderer.renderLevel` TAIL, box `RenderType.lines()`)
 - `AntiDetectMixin` — AntiDetect (hook su `Connection.send`: spoofa `BrandPayload` → "vanilla" e cancella payload `fabric:*`)
+- `ChatSignatureMixin` — NoChatReports (strip `MessageSignature` da `ServerboundChatPacket`/downgrade `ServerboundChatCommandSignedPacket` → `ServerboundChatCommandPacket` per bypassare plugin anti-hack che tracciano comandi firmati)
+- `ConnectionMixin` — PacketLogger outbound+inbound (`send` + `channelRead0`), FreeCam (cancella move/interact packet), NoFall (riscrive `ServerboundMovePlayerPacket` con `onGround=true`). Moduli cached via `ModuleManager.getModule(Class)` per performance.
 - `CameraMixin` — CameraClip (override `getMaxZoom`)
 - `AbstractFurnaceMenuAccessor` — AutoSmelter (accessor for furnace slot access)
 
@@ -140,6 +142,7 @@ Multiple GUIs available:
 | Alt Manager GUI | `ClientCore/.../gui/AltManagerScreen.java` |
 | Xray Ore Selector GUI | `ClientCore/.../gui/XrayBlockSelectorScreen.java` |
 | Keybind Manager GUI | `ClientCore/.../gui/KeybindManagerScreen.java` |
+| ChatSignature Mixin | `ClientCore/.../mixins/ChatSignatureMixin.java` |
 | SeedCracker Config GUI | `ClientCore/.../gui/SeedCrackerConfigScreen.java` |
 | Pause Menu Mixin | `ClientCore/.../mixins/PauseScreenMixin.java` |
 | Client entrypoint | `ClientCore/.../AetherisClient.java` |
@@ -165,7 +168,8 @@ Multiple GUIs available:
 **Combat (14):** KillAura, Velocity, Criticals, Reach, AutoArmor, AutoTotem, TriggerBot, Surround, AimAssist, SelfTrap, BedAura, BedTrap, CrystalAura (con auto-placement), BowAimbot (con anticipo balistico)
 **Movement (11):** AutoSprint, Speed, Fly, NoFall, Step, NoSlowdown, NoClip, BunnyJump, Jetpack, Sneak, AutoWalk
 **Render (12):** FullBright, ESP, NoHurtCam, Xray, NameTags, Tracers, FreeCam, ItemESP, StorageESP (con hideEmpty), CameraClip, Trajectories, Waypoints (marcatura 3D)
-**World (14):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins, LiquidInteract, AutoSign, AutoFarm, AirPlace, AutoBrewer, AutoSmelter, StrongholdFinder, PacketLogger, ServerFinder
+**World (15):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins, LiquidInteract, AutoSign, AutoFarm, AirPlace, AutoBrewer, AutoSmelter, StrongholdFinder, PacketLogger, ServerFinder, PluginScanner
 **Player (9):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat, InventorySort, NoChatReports
 
 *Batch 2026-08 (Mappatura Qwen3.8-max): AutoBrewer, AutoSmelter, StrongholdFinder, PacketLogger, ServerFinder, Waypoints, NoChatReports, BowAimbot, AutoWalk.*
+*PluginScanner (PluginScanner.java + hook handleSystemChat in AetherisClientPacketListenerMixin): scan /plugins, rileva PEX/LuckPerms/GroupManager, probe comandi permessi.*

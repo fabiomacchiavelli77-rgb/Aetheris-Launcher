@@ -2,10 +2,13 @@ package net.aetheris.client.mixins;
 
 import net.aetheris.client.modules.ModuleManager;
 import net.aetheris.client.modules.impl.combat.Velocity;
+import net.aetheris.client.modules.impl.world.PluginScanner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,6 +26,17 @@ public class AetherisClientPacketListenerMixin {
                     ci.cancel();
                     return;
                 }
+            }
+        }
+    }
+
+    @Inject(method = "handleSystemChat", at = @At("HEAD"))
+    private void onSystemChat(ClientboundSystemChatPacket packet, CallbackInfo ci) {
+        PluginScanner ps = PluginScanner.getInstance();
+        if (ps != null) {
+            Component content = packet.content();
+            if (content != null) {
+                ps.onSystemChat(content);
             }
         }
     }
