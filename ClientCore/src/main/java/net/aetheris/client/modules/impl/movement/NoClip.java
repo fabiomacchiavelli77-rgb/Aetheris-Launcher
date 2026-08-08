@@ -24,8 +24,8 @@ public class NoClip extends Module {
 
         // Movimento 3D controllato in base alla direzione dello sguardo e ai tasti premuti
         double yaw = Math.toRadians(mc.player.getYRot());
-        double forward = mc.player.input.forwardImpulse;
-        double side = mc.player.input.leftImpulse;
+        double forward = (mc.player.input.keyPresses.forward() ? 1 : 0) - (mc.player.input.keyPresses.backward() ? 1 : 0);
+        double side = (mc.player.input.keyPresses.left() ? 1 : 0) - (mc.player.input.keyPresses.right() ? 1 : 0);
 
         double dx = (forward * -Math.sin(yaw) + side * Math.cos(yaw)) * moveSpeed;
         double dz = (forward * Math.cos(yaw) + side * Math.sin(yaw)) * moveSpeed;

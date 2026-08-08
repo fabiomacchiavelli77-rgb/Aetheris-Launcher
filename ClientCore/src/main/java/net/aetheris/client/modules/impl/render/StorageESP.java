@@ -11,7 +11,7 @@ import net.aetheris.client.settings.SliderSetting;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
@@ -109,13 +109,13 @@ public class StorageESP extends Module {
     public void render(Camera camera, DeltaTracker deltaTracker) {
         if (mc.player == null || mc.level == null) return;
 
-        Vec3 camPos = camera.getPosition();
+        Vec3 camPos = camera.position();
         PoseStack poseStack = new PoseStack();
         poseStack.pushPose();
         poseStack.translate(-camPos.x, -camPos.y, -camPos.z);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-        VertexConsumer vc = bufferSource.getBuffer(RenderType.lines());
+        VertexConsumer vc = bufferSource.getBuffer(RenderTypes.lines());
 
         int rangeBlocks = range.getIntValue();
         BlockPos center = mc.player.blockPosition();
@@ -148,7 +148,7 @@ public class StorageESP extends Module {
         }
 
         poseStack.popPose();
-        bufferSource.endBatch(RenderType.lines());
+        bufferSource.endBatch(net.minecraft.client.renderer.rendertype.RenderTypes.lines());
     }
 
     private int getColor(BlockEntity be) {

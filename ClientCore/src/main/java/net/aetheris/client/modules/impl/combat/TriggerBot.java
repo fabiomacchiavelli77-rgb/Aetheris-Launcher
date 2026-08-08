@@ -6,8 +6,7 @@ import net.aetheris.client.settings.BooleanSetting;
 import net.aetheris.client.settings.SliderSetting;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.AxeItem;
+
 import net.minecraft.world.phys.EntityHitResult;
 
 public class TriggerBot extends Module {
@@ -29,7 +28,7 @@ public class TriggerBot extends Module {
         if (mc.player == null || mc.hitResult == null) return;
         
         if (weaponOnly.isOn()) {
-            boolean isWeapon = mc.player.getMainHandItem().getItem() instanceof SwordItem || mc.player.getMainHandItem().getItem() instanceof AxeItem;
+            boolean isWeapon = mc.player.getMainHandItem().is(net.minecraft.tags.ItemTags.SWORDS) || mc.player.getMainHandItem().is(net.minecraft.tags.ItemTags.AXES);
             if (!isWeapon) return;
         }
 

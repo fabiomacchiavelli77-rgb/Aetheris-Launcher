@@ -28,8 +28,8 @@ public class Speed extends Module {
         Vec3 delta = mc.player.getDeltaMovement();
         double yaw = Math.toRadians(mc.player.getYRot());
 
-        float forward = mc.player.input.forwardImpulse;
-        float sideways = mc.player.input.leftImpulse;
+        float forward = (mc.player.input.keyPresses.forward() ? 1f : 0f) - (mc.player.input.keyPresses.backward() ? 1f : 0f);
+        float sideways = (mc.player.input.keyPresses.left() ? 1f : 0f) - (mc.player.input.keyPresses.right() ? 1f : 0f);
 
         double x = -Math.sin(yaw) * forward - Math.cos(yaw) * sideways;
         double z = Math.cos(yaw) * forward - Math.sin(yaw) * sideways;
@@ -45,6 +45,6 @@ public class Speed extends Module {
 
     private boolean isMoving() {
         return mc.player != null &&
-               (mc.player.input.forwardImpulse != 0 || mc.player.input.leftImpulse != 0);
+               (mc.player.input.keyPresses.forward() || mc.player.input.keyPresses.backward() || mc.player.input.keyPresses.left() || mc.player.input.keyPresses.right());
     }
 }

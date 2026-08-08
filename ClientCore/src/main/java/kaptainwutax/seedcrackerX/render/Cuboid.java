@@ -38,13 +38,13 @@ public class Cuboid {
     }
 
     public Cuboid offset(Camera camera) {
-        return new Cuboid(this.box.move(camera.getPosition().scale(-1)), this.argb);
+        return new Cuboid(this.box.move(camera.position().scale(-1)), this.argb);
     }
 
     public void render(PoseStack poseStack, MultiBufferSource submitter) {
         VoxelShape shape = Shapes.box(this.box.minX, this.box.minY, this.box.minZ, this.box.maxX, this.box.maxY, this.box.maxZ);
-        com.mojang.blaze3d.vertex.VertexConsumer vertexConsumer = submitter.getBuffer(NoDepthLayer.LINES_NO_DEPTH_LAYER);
-        net.minecraft.client.renderer.ShapeRenderer.renderShape(poseStack, vertexConsumer, shape, 0, 0, 0, this.argb);
+        com.mojang.blaze3d.vertex.VertexConsumer vertexConsumer = submitter.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.lines());
+        net.minecraft.client.renderer.ShapeRenderer.renderShape(poseStack, vertexConsumer, shape, 0.0, 0.0, 0.0, this.argb, 1.0f);
     }
 }
 

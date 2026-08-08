@@ -38,7 +38,7 @@ public class SessionManager {
         try {
             String cleanName = username.trim();
             UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + cleanName).getBytes(StandardCharsets.UTF_8));
-            User newUser = new User(cleanName, uuid, "", Optional.empty(), Optional.empty(), User.Type.LEGACY);
+            User newUser = new User(cleanName, uuid, "", Optional.empty(), Optional.empty());
             
             Minecraft mc = Minecraft.getInstance();
             mc.user = newUser;

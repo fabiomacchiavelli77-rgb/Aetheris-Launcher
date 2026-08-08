@@ -24,12 +24,5 @@ public class NoSlowdown extends Module {
 
     @Override
     public void onTick() {
-        if (mc.player == null) return;
-        // Il mixin nel LocalPlayer impedisce il flag isUsingItem che rallenta
-        // Il modulo forza l'input a non essere influenzato dall'uso oggetti
-        if (mc.player.isUsingItem() && !items.isOn()) {
-            mc.player.input.leftImpulse = mc.player.input.leftImpulse * 0.2f;
-            mc.player.input.forwardImpulse = mc.player.input.forwardImpulse * 0.2f;
-        }
     }
 }

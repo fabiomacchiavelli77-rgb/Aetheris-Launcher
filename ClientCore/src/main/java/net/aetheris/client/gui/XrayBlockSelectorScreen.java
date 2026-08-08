@@ -148,8 +148,8 @@ public class XrayBlockSelectorScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float delta) {
-        super.render(g, mouseX, mouseY, delta);
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
 
         g.drawCenteredString(this.font, "§6§lXRAY FULL BLOCK SELECTOR", this.width / 2, 8, 0xFFFFFFFF);
 

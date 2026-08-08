@@ -12,15 +12,15 @@ public class Sneak extends Module {
 
     @Override
     public void onEnable() {
-        if (mc.player != null && mc.getConnection() != null) {
-            mc.getConnection().send(new ServerboundPlayerCommandPacket(mc.player, ServerboundPlayerCommandPacket.Action.PRESS_SHIFT_KEY));
+        if (mc.options != null && mc.options.keyShift != null) {
+            mc.options.keyShift.setDown(true);
         }
     }
 
     @Override
     public void onDisable() {
-        if (mc.player != null && mc.getConnection() != null) {
-            mc.getConnection().send(new ServerboundPlayerCommandPacket(mc.player, ServerboundPlayerCommandPacket.Action.RELEASE_SHIFT_KEY));
+        if (mc.options != null && mc.options.keyShift != null) {
+            mc.options.keyShift.setDown(false);
         }
     }
 

@@ -3,7 +3,7 @@ package net.aetheris.client.mixins;
 import net.aetheris.client.modules.impl.world.PluginScanner;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.DiscardedPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,8 +15,8 @@ import java.util.List;
 /**
  * PluginScanner - sniffa i canali registrati dal server (minecraft:register).
  *
- * In 1.21.4 il payload di registrazione arriva come DiscardedPayload e il buffer
- * viene scartato: il factory privato method_56491(int, ResourceLocation, FriendlyByteBuf)
+ * In 1.21.11 il payload di registrazione arriva come DiscardedPayload e il buffer
+ * viene scartato: il factory privato method_56491(int, Identifier, FriendlyByteBuf)
  * legge la lista di channel. Lo intercettiamo qui, leggiamo i nomi e ripristiniamo
  * la posizione del buffer, poi il client continua indisturbato.
  */
@@ -24,7 +24,7 @@ import java.util.List;
 public class DiscardedPayloadMixin {
 
     @Inject(method = "method_56491", at = @At("HEAD"))
-    private static void onDecodeRegisterPayload(int id, ResourceLocation payloadId, FriendlyByteBuf buf, CallbackInfoReturnable<DiscardedPayload> cir) {
+    private static void onDecodeRegisterPayload(int id, Identifier payloadId, FriendlyByteBuf buf, CallbackInfoReturnable<DiscardedPayload> cir) {
         if (!payloadId.getNamespace().equals("minecraft") || !payloadId.getPath().equals("register")) return;
         PluginScanner ps = PluginScanner.getInstance();
         if (ps == null || !ps.isEnabled()) return;

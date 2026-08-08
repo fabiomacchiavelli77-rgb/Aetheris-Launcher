@@ -8,7 +8,7 @@ import net.aetheris.client.settings.BooleanSetting;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
@@ -137,13 +137,13 @@ public class Trajectories extends Module {
     }
 
     private void renderTrajectory(Camera camera, List<Vec3> path, HitResult hitResult) {
-        Vec3 camPos = camera.getPosition();
+        Vec3 camPos = camera.position();
         PoseStack poseStack = new PoseStack();
         poseStack.pushPose();
         poseStack.translate(-camPos.x, -camPos.y, -camPos.z);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-        VertexConsumer vc = bufferSource.getBuffer(RenderType.lines());
+        VertexConsumer vc = bufferSource.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.lines());
 
         int r = 50, g = 220, b = 255, a = 255;
         if (hitResult != null) {
@@ -176,7 +176,7 @@ public class Trajectories extends Module {
         }
 
         poseStack.popPose();
-        bufferSource.endBatch(RenderType.lines());
+        bufferSource.endBatch(net.minecraft.client.renderer.rendertype.RenderTypes.lines());
     }
 
     private void drawBox(VertexConsumer vc, PoseStack.Pose pose, AABB box, int r, int g, int b, int a) {

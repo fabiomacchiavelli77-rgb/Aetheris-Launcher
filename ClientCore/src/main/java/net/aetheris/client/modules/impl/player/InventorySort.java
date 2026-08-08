@@ -9,7 +9,11 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.PotionItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -186,19 +190,19 @@ public class InventorySort extends Module {
 
     private int getItemCategory(ItemStack stack) {
         Item item = stack.getItem();
-        if (item instanceof SwordItem || item instanceof BowItem || item instanceof CrossbowItem || item instanceof TridentItem) {
+        if (stack.is(net.minecraft.tags.ItemTags.SWORDS) || (stack.is(net.minecraft.world.item.Items.BOW) || stack.is(net.minecraft.tags.ItemTags.BOW_ENCHANTABLE)) || item == Items.CROSSBOW || item == Items.TRIDENT) {
             return 0; // Weapons
         }
-        if (item instanceof PickaxeItem || item instanceof AxeItem || item instanceof ShovelItem || item instanceof HoeItem || item instanceof ShearsItem || item instanceof FishingRodItem) {
+        if (stack.is(net.minecraft.tags.ItemTags.PICKAXES) || stack.is(net.minecraft.tags.ItemTags.AXES) || stack.is(net.minecraft.tags.ItemTags.SHOVELS) || stack.is(net.minecraft.tags.ItemTags.HOES) || item == Items.SHEARS || item == Items.FISHING_ROD) {
             return 1; // Tools
         }
-        if (item instanceof ArmorItem || item instanceof ShieldItem || item == Items.ELYTRA) {
+        if (stack.has(net.minecraft.core.component.DataComponents.EQUIPPABLE) || item == Items.SHIELD || item == Items.ELYTRA) {
             return 2; // Armor
         }
         if (item == Items.GOLDEN_APPLE || item == Items.ENCHANTED_GOLDEN_APPLE || item == Items.TOTEM_OF_UNDYING || item == Items.ENDER_PEARL || item == Items.EXPERIENCE_BOTTLE || item instanceof PotionItem) {
             return 3; // Utility
         }
-        if (stack.has(DataComponents.FOOD)) {
+        if (stack.has(net.minecraft.core.component.DataComponents.FOOD)) {
             return 4; // Food
         }
         if (item == Items.DIAMOND || item == Items.NETHERITE_INGOT || item == Items.GOLD_INGOT || item == Items.IRON_INGOT || item == Items.EMERALD || item == Items.LAPIS_LAZULI || item == Items.REDSTONE || item == Items.COAL || item == Items.AMETHYST_SHARD) {

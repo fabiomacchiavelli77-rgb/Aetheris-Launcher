@@ -97,21 +97,21 @@ public abstract class Finder {
     public abstract boolean isValidDimension(DimensionType dimension);
 
     public boolean isOverworld(DimensionType dimension) {
-        return dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.OVERWORLD_EFFECTS);
+        return this.world.dimension() == net.minecraft.world.level.Level.OVERWORLD;
     }
 
     public boolean isNether(DimensionType dimension) {
-        return dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.NETHER_EFFECTS);
+        return this.world.dimension() == net.minecraft.world.level.Level.NETHER;
     }
 
     public boolean isEnd(DimensionType dimension) {
-        return dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.END_EFFECTS);
+        return this.world.dimension() == net.minecraft.world.level.Level.END;
     }
 
-    public static String inferDimension(DimensionType dimension) {
-        if (dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.OVERWORLD_EFFECTS)) return "overworld";
-        if (dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.NETHER_EFFECTS)) return "the_nether";
-        if (dimension.effectsLocation().equals(net.minecraft.world.level.dimension.BuiltinDimensionTypes.END_EFFECTS)) return "the_end";
+    public static String inferDimension(Level level) {
+        if (level.dimension() == net.minecraft.world.level.Level.OVERWORLD) return "overworld";
+        if (level.dimension() == net.minecraft.world.level.Level.NETHER) return "the_nether";
+        if (level.dimension() == net.minecraft.world.level.Level.END) return "the_end";
         return "unknown";
     }
 

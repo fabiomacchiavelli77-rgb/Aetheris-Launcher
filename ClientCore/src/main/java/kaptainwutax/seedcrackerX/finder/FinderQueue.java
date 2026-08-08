@@ -4,10 +4,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import kaptainwutax.seedcrackerX.config.Config;
 import kaptainwutax.seedcrackerX.render.Cuboid;
 
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +38,14 @@ public class FinderQueue {
     }
 
     public static void registerEvents() {
-        WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> {
-            FinderQueue.get().extractCuboids(context.camera());
-            FinderQueue.get().renderCuboids(context.consumers(), context.matrixStack());
+        net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents.BEFORE_TRANSLUCENT.register(context -> {
+            net.minecraft.client.Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+            FinderQueue.get().extractCuboids(camera);
+            com.mojang.blaze3d.vertex.PoseStack poseStack = new com.mojang.blaze3d.vertex.PoseStack();
+            poseStack.pushPose();
+            net.minecraft.world.phys.Vec3 camPos = camera.position();
+            poseStack.translate(-camPos.x, -camPos.y, -camPos.z);
+            FinderQueue.get().renderCuboids(Minecraft.getInstance().renderBuffers().bufferSource(), poseStack);
         });
     }
 

@@ -167,7 +167,7 @@ public class ClickGUI extends Screen {
 
     // ── rendering ──────────────────────────────────────────────────────
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         // Smooth fade-in
         long elapsed = System.currentTimeMillis() - openTime;
         int bgAlpha = (int) Math.min(0xB0, elapsed * 0.8);
@@ -390,7 +390,6 @@ public class ClickGUI extends Screen {
     }
 
     // ── mouse handling ─────────────────────────────────────────────────
-    @Override
     public boolean mouseClicked(double mx, double my, int button) {
         if (infoModule != null && button == 0) {
             ModalLayoutInfo layout = new ModalLayoutInfo(font, infoModule);
@@ -553,11 +552,11 @@ public class ClickGUI extends Screen {
             }
         }
 
-        return super.mouseClicked(mx, my, button);
+        return false;
     }
 
     @Override
-    public boolean mouseScrolled(double mx, double my, double hScroll, double vScroll) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         // Find which column the mouse is over
         ClickGUILayout.Layout l = layout();
         for (Column col : columns) {
@@ -566,19 +565,18 @@ public class ClickGUI extends Screen {
             List<Module> mods = col.filteredModules(searchQuery);
             int totalH = HEADER_H + Math.min(l.maxVisibleRows(), mods.size()) * ROW_H;
 
-            if (mx >= cx && mx <= cx + l.columnWidth() && my >= cy && my <= cy + totalH) {
-                if (vScroll > 0) {
+            if (mouseX >= cx && mouseX <= cx + l.columnWidth() && mouseY >= cy && mouseY <= cy + totalH) {
+                if (scrollY > 0) {
                     col.scrollOffset = l.clampScrollOffset(col.scrollOffset - 1, mods.size());
-                } else if (vScroll < 0) {
+                } else if (scrollY < 0) {
                     col.scrollOffset = l.clampScrollOffset(col.scrollOffset + 1, mods.size());
                 }
                 return true;
             }
         }
-        return super.mouseScrolled(mx, my, hScroll, vScroll);
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
-    @Override
     public boolean mouseDragged(double mx, double my, int button, double deltaX, double deltaY) {
         if (draggingColumn != null && button == 0) {
             int maxColX = Math.max(0, width - layout().columnWidth());
@@ -591,10 +589,9 @@ public class ClickGUI extends Screen {
             SAVED_POSITIONS.put(draggingColumn.category, new int[]{draggingColumn.x, draggingColumn.y});
             return true;
         }
-        return super.mouseDragged(mx, my, button, deltaX, deltaY);
+        return false;
     }
 
-    @Override
     public boolean mouseReleased(double mx, double my, int button) {
         if (draggingModal && button == 0) {
             draggingModal = false;
@@ -609,12 +606,13 @@ public class ClickGUI extends Screen {
             draggingColumn = null;
             return true;
         }
-        return super.mouseReleased(mx, my, button);
+        return false;
     }
 
     // ── keyboard handling ──────────────────────────────────────────────
     @Override
-    public boolean keyPressed(int key, int scancode, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int key = event.key();
         if (infoModule != null) {
             if (key == GLFW.GLFW_KEY_ESCAPE) {
                 infoModule = null;
@@ -652,16 +650,17 @@ public class ClickGUI extends Screen {
             onClose();
             return true;
         }
-        return super.keyPressed(key, scancode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
-    public boolean charTyped(char ch, int modifiers) {
+    public boolean charTyped(net.minecraft.client.input.CharacterEvent event) {
+        char ch = (char) event.codepoint();
         if (searchFocused && ch >= 32) {
             setSearchQuery(searchQuery + ch);
             return true;
         }
-        return super.charTyped(ch, modifiers);
+        return super.charTyped(event);
     }
 
     @Override

@@ -67,7 +67,7 @@ public class AetherisMenuScreen extends Screen {
             this.addRenderableWidget(Button.builder(
                 Component.literal(label),
                 button -> {
-                    if (hasShiftDown()) {
+                    if (com.mojang.blaze3d.platform.InputConstants.isKeyDown(net.minecraft.client.Minecraft.getInstance().getWindow(), org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT)) {
                         recordingKeybind = mod;
                         rebuildWidgets();
                     } else {
@@ -110,7 +110,8 @@ public class AetherisMenuScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int key, int scancode, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int key = event.key();
         if (recordingKeybind != null) {
             if (key == 256) {
                 recordingKeybind.setKeybind(-1);
@@ -125,12 +126,12 @@ public class AetherisMenuScreen extends Screen {
             this.onClose();
             return true;
         }
-        return super.keyPressed(key, scancode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        super.render(guiGraphics, mouseX, mouseY, delta);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
         guiGraphics.drawCenteredString(this.font,
             "AETHERIS - " + currentCategory.getName().toUpperCase(),
             this.width / 2, 8, 0xFFaa00aa);

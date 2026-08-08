@@ -35,7 +35,7 @@ public class Database {
     public static Component joinFakeServerForAuth() {
         try {
             Minecraft client = Minecraft.getInstance();
-            client.getMinecraftSessionService().joinServer(client.getUser().getProfileId(), client.getUser().getAccessToken(), "seedcrackerx");
+            client.services().sessionService().joinServer(client.getUser().getProfileId(), client.getUser().getAccessToken(), "seedcrackerx");
         }
         catch (AuthenticationUnavailableException authenticationUnavailableException) {
             return Component.translatable("disconnect.loginFailedInfo", Component.translatable("disconnect.loginFailedInfo.serversUnavailable"));
@@ -61,7 +61,7 @@ public class Database {
         Minecraft client = Minecraft.getInstance();
         Map<String,Object> data = new HashMap<>();
         data.put("serverIp", client.getConnection().getConnection().getRemoteAddress().toString());
-        data.put("dimension", Finder.inferDimension(client.level.dimensionType()));
+        data.put("dimension", Finder.inferDimension(client.level));
         data.put("seed", seed+"L"); //javascript backend likes floating point. so we need to convert it to a string
         data.put("version", Config.get().getVersion().name);
         data.put("username", client.player.getName().getString());

@@ -6,11 +6,11 @@ This file provides guidance to Gemini, Claude, Codex, and other AI agents when w
 
 ## Project Overview
 
-Aetheris Launcher — Minecraft 1.21.4 hacked client. Fork of Aristois Installer + SeedCrackerX, evolved into standalone Aetheris Client.
+Aetheris Launcher — Minecraft 1.21.11 / 26.2 hacked client. Fork of Aristois Installer + SeedCrackerX, evolved into standalone Aetheris Client.
 
 Three modules:
 - **Root installer** (`src/`) — GLFW desktop app that installs Aristois into Minecraft launchers. Legacy. Builds `packager/Aristois-Donor.jar`.
-- **Aetheris ClientCore** (`ClientCore/`) — Fabric mod with 61 hack modules + integrated SeedCrackerX. **Active development target. Fully migrated to 1.21.4 Mojang Official Mappings.**
+- **Aetheris ClientCore** (`ClientCore/`) — Fabric mod with 62 hack modules + integrated SeedCrackerX. **Active development target. Fully migrated to 1.21.11 (26.2) Mojang Official Mappings.**
 - **Web installer** (`Installer/`) — Electron/Vite replacement for root installer. Express backend, vanilla JS frontend.
 
 ## Build Commands
@@ -27,9 +27,9 @@ cd ClientCore
 ./gradlew build              # → build/libs/aetheris-core-1.0.0.jar
 ./gradlew runClient          # test in dev environment
 ```
-Minecraft 1.21.4, Fabric Loader 0.19.3, **Mojang official mappings**, Java 21. Uses Fabric Loom 1.9-SNAPSHOT.
+Minecraft 1.21.11 (26.2), Fabric Loader 0.19.3, **Mojang official mappings**, Java 21. Uses Fabric Loom 1.17.19.
 
-Key dependencies: Fabric API 0.114.0, Cloth Config 15.0.140, seedfinding libraries (mc_math, mc_seed, mc_core, mc_noise, mc_biome, mc_terrain, mc_feature, mc_reversal), LattiCG 1.07.
+Key dependencies: Fabric API 0.141.6+1.21.11, Cloth Config 15.0.140, seedfinding libraries (mc_math, mc_seed, mc_core, mc_noise, mc_biome, mc_terrain, mc_feature, mc_reversal), LattiCG 1.07.
 
 ### Web Installer
 ```bash

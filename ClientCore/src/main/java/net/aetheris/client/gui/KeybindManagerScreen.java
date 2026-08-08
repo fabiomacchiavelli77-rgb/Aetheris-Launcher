@@ -65,7 +65,8 @@ public class KeybindManagerScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int key, int scancode, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int key = event.key();
         if (listeningModule != null) {
             if (key == 256) {
                 listeningModule.setKeybind(-1);
@@ -76,12 +77,12 @@ public class KeybindManagerScreen extends Screen {
             rebuildWidgets();
             return true;
         }
-        return super.keyPressed(key, scancode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float delta) {
-        super.render(g, mouseX, mouseY, delta);
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
         g.drawCenteredString(this.font, "§b§lKEYBIND MANAGER", this.width / 2, 10, 0xFFFFFFFF);
     }
 

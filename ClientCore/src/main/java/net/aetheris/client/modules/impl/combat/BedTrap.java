@@ -41,7 +41,7 @@ public class BedTrap extends Module {
     @Override
     public void onTick() {
         if (mc.player == null || mc.level == null || mc.gameMode == null) return;
-        if (dimensionCheck.isOn() && mc.level.dimensionType().bedWorks()) return;
+        if (dimensionCheck.isOn() && mc.level.dimension() == net.minecraft.world.level.Level.OVERWORLD) return;
         if (mc.player.isSleeping()) return;
 
         if (placeCooldown > 0) placeCooldown--;

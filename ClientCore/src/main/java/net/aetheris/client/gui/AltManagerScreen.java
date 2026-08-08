@@ -89,8 +89,8 @@ public class AltManagerScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float delta) {
-        super.render(g, mouseX, mouseY, delta);
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
 
         g.drawCenteredString(this.font, "§d§lAETHERIS ALT MANAGER", this.width / 2, 12, 0xFFFFFFFF);
         g.drawCenteredString(this.font, "Logged in as: §e" + SessionManager.getInstance().getCurrentAlt(), this.width / 2, 30, 0xFFAAAAAA);

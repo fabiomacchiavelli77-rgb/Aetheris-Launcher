@@ -127,8 +127,8 @@ public class SeedCrackerConfigScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float delta) {
-        super.render(g, mouseX, mouseY, delta);
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.render(g, mouseX, mouseY, partialTick);
         g.drawCenteredString(this.font, "§e§lSEEDCRACKER X CONFIGURATION", this.width / 2, 10, 0xFFFFFFFF);
 
         if (currentTab == Tab.SEEDS) {

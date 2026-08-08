@@ -48,7 +48,7 @@ public class AutoArmor extends Module {
             }
             if (targetSlot == -1) continue;
 
-            ItemStack equipped = mc.player.getInventory().getArmor(targetSlot - 36);
+            ItemStack equipped = mc.player.getInventory().getItem(targetSlot);
             if (equipped.isEmpty() || isBetter(stack, equipped, targetSlot == 38)) {
                 mc.gameMode.handleInventoryMouseClick(
                     mc.player.containerMenu.containerId,

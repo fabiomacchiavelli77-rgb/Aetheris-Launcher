@@ -38,7 +38,7 @@ public class XraySettingsScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics g, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         // ── Dark overlay background ──────────────────────────────────
         g.fill(0, 0, width, height, 0xC0101018);
 
@@ -194,9 +194,8 @@ public class XraySettingsScreen extends Screen {
     }
 
     // ── Mouse interaction ────────────────────────────────────────────
-    @Override
     public boolean mouseClicked(double mx, double my, int button) {
-        if (button != 0) return super.mouseClicked(mx, my, button);
+        if (button != 0) return false;
 
         int cardH = 260;
         int cx = (width - CARD_W) / 2;
@@ -250,25 +249,23 @@ public class XraySettingsScreen extends Screen {
             return true;
         }
 
-        return super.mouseClicked(mx, my, button);
+        return false;
     }
 
-    @Override
     public boolean mouseDragged(double mx, double my, int button, double deltaX, double deltaY) {
         if (draggingSlider && button == 0) {
             updateSliderValue(mx);
             return true;
         }
-        return super.mouseDragged(mx, my, button, deltaX, deltaY);
+        return false;
     }
 
-    @Override
     public boolean mouseReleased(double mx, double my, int button) {
         if (draggingSlider && button == 0) {
             draggingSlider = false;
             return true;
         }
-        return super.mouseReleased(mx, my, button);
+        return false;
     }
 
     private void updateSliderValue(double mx) {
@@ -278,12 +275,13 @@ public class XraySettingsScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int key, int scancode, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int key = event.key();
         if (key == org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
             Minecraft.getInstance().setScreen(parent);
             return true;
         }
-        return super.keyPressed(key, scancode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
