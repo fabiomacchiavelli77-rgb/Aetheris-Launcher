@@ -5,12 +5,20 @@ import net.aetheris.client.modules.Module;
 import net.aetheris.client.settings.BooleanSetting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.BrandPayload;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.game.ClientboundCommandSuggestionsPacket;
+import net.minecraft.network.protocol.game.ServerboundCommandSuggestionPacket;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,9 +55,34 @@ public class PluginScanner extends Module {
 
     private static final Pattern PLUGIN_LIST = Pattern.compile("[A-Za-z0-9_\\-]+");
 
+    /** Comandi vanilla/Bukkit: esclusi dal tab-probe per non inquinare il report. */
+    private static final Set<String> VANILLA_COMMANDS = new HashSet<>(List.of(
+            "help", "msg", "teammsg", "say", "me", "tell", "trigger", "seed", "list",
+            "advance", "attribute", "bossbar", "clear", "clone", "damage", "data", "datapack",
+            "debug", "defaultgamemode", "deop", "difficulty", "effect", "enchant", "execute",
+            "experience", "xp", "fill", "fillbiome", "forceload", "function", "gamemode",
+            "gamerule", "give", "item", "jfr", "kick", "kill", "locate", "loot", "op",
+            "pardon", "particle", "playsound", "publish", "recipe", "reload", "replaceitem",
+            "ride", "rotate", "save-all", "save-off", "save-on", "schedule", "scoreboard",
+            "setblock", "setidletimeout", "setworldspawn", "spawnpoint", "spectate",
+            "spreadplayers", "stopsound", "summon", "tag", "team", "teleport", "tp",
+            "tellraw", "testfor", "testforblock", "testforblocks", "tick", "time", "title",
+            "toggledownfall", "transfer", "weather", "whitelist", "worldborder", "place",
+            "random", "return", "seed", "reload", "ban", "ban-ip", "banlist", "stop",
+            "plugins", "pl", "version", "ver", "about", "icanhasbukkit", "bukkit", "calc",
+            "console", "inventory", "invsee", "motd", "save", "tps", "essentials", "setworth"
+    ));
+
     private final List<String> foundPlugins = new ArrayList<>();
     private boolean waitingForResponse = false;
     private int tickCounter = 0;
+
+    // ---- Tab-probe (enumera comandi via CommandSuggestions, senza /plugins) ----
+    private final Queue<String> tabQueries = new ArrayDeque<>();
+    private boolean probingTab = false;
+    private int tabTick = 0;
+    private int tabSequence = 0;
+    private String serverBrand = null;
 
     public PluginScanner() {
         super("PluginScanner", "Scansiona i plugin del server e identifica plugin di permessi (PEX, LuckPerms...).", Category.WORLD);
@@ -65,6 +98,7 @@ public class PluginScanner extends Module {
     @Override
     public void onEnable() {
         foundPlugins.clear();
+        serverBrand = null;
         waitingForResponse = true;
         tickCounter = 0;
         if (mc.getConnection() != null) {
@@ -77,11 +111,129 @@ public class PluginScanner extends Module {
 
     @Override
     public void onTick() {
+        if (probingTab) {
+            tabTick++;
+            // Un query ogni 4 tick: evita flood che i plugin anti-cheat potrebbero flaggare.
+            if (tabTick % 4 == 0 && !tabQueries.isEmpty()) {
+                sendTabQuery(tabQueries.poll());
+            }
+            if (tabQueries.isEmpty()) {
+                probingTab = false;
+                if (!foundPlugins.isEmpty()) {
+                    displayMessage("§8[§bPluginScanner§8] §fTab-probe completato: §a" + String.join("§7, §a", foundPlugins));
+                }
+                analyzePlugins();
+            }
+        }
         if (!waitingForResponse) return;
         tickCounter++;
         // Timeout 3 secondi: il server potrebbe nascondere /plugins
         if (tickCounter > 60 && !foundPlugins.isEmpty()) {
             waitingForResponse = false;
+        }
+        // Timeout 5 secondi senza risposta -> fallback al tab-probe
+        if (tickCounter > 100) {
+            waitingForResponse = false;
+            displayMessage("§7Nessuna risposta a /plugins — avvio tab-probe.");
+            startTabProbe();
+        }
+    }
+
+    /**
+     * Enumera i comandi registrati via packet CommandSuggestions (tab-completion).
+     * Non esegue alcun comando: invia solo richieste di completamento ("", a..z, 0..9)
+     * e legge la lista dei comandi nella risposta. I server Bukkit/Paper rispondono
+     * anche quando /plugins e' nascosto o disabilitato.
+     */
+    public void startTabProbe() {
+        if (probingTab || mc.getConnection() == null) return;
+        probingTab = true;
+        tabTick = 0;
+        tabQueries.clear();
+        tabQueries.add("");
+        for (char c = 'a'; c <= 'z'; c++) tabQueries.add(String.valueOf(c));
+        for (char c = '0'; c <= '9'; c++) tabQueries.add(String.valueOf(c));
+        displayMessage("§8[§bPluginScanner§8] §7Tab-probe avviato (enumera comandi, niente /plugins)...");
+    }
+
+    private void sendTabQuery(String query) {
+        if (mc.getConnection() == null) { probingTab = false; return; }
+        try {
+            mc.getConnection().send(new ServerboundCommandSuggestionPacket(tabSequence++, query));
+        } catch (Exception ignored) { probingTab = false; }
+    }
+
+    /** Chiamato dal mixin quando il server risponde a una richiesta di completamento. */
+    public void onCommandSuggestions(ClientboundCommandSuggestionsPacket packet) {
+        if (!isEnabled()) return;
+        Set<String> fresh = new HashSet<>();
+        for (ClientboundCommandSuggestionsPacket.Entry e : packet.suggestions()) {
+            String text = e.text();
+            if (text == null) continue;
+            String token = text.trim().split(" ")[0];
+            if (token.isEmpty()) continue;
+            if (token.contains(":")) {
+                // Comando namespaced: "essentials:fly" -> plugin "essentials"
+                String ns = token.split(":")[0];
+                if (!ns.equals("minecraft") && !ns.equals("bukkit") && !ns.equals("spigot")) {
+                    fresh.add(ns);
+                }
+            } else if (!VANILLA_COMMANDS.contains(token.toLowerCase(Locale.ROOT))) {
+                // Comando root non-vanilla: alias plugin (es. "lp", "fly", "heal")
+                fresh.add(token);
+            }
+        }
+        if (fresh.isEmpty()) return;
+        boolean added = false;
+        for (String f : fresh) {
+            if (!foundPlugins.contains(f)) { foundPlugins.add(f); added = true; }
+        }
+        probingTab = false;
+        tabQueries.clear();
+        displayMessage("§8[§bPluginScanner§8] §fComandi rilevati: §7" + String.join("§7, §a", fresh));
+        analyzePlugins();
+    }
+
+    /** Chiamato dal mixin: sniffa il brand del server (minecraft:brand). */
+    public void onCustomPayload(ClientboundCustomPayloadPacket packet) {
+        if (!isEnabled()) return;
+        try {
+            var payload = packet.payload();
+            if (payload instanceof BrandPayload brand) {
+                onBrand(brand.brand());
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private void onBrand(String brand) {
+        if (brand == null || brand.isEmpty() || brand.equals(serverBrand)) return;
+        serverBrand = brand;
+        String lower = brand.toLowerCase(Locale.ROOT);
+        boolean pluginServer = lower.contains("paper") || lower.contains("spigot")
+                || lower.contains("purpur") || lower.contains("folia");
+        displayMessage("§8[§bPluginScanner§8] §fServer software: §a" + brand
+                + (pluginServer ? " §7(server a plugin)" : ""));
+    }
+
+    public void onRegisterChannels(List<String> channels) {
+        boolean added = false;
+        List<String> shown = new ArrayList<>();
+        for (String ch : channels) {
+            if (!ch.contains(":")) continue;
+            String ns = ch.split(":")[0];
+            if (ns.equals("minecraft") || ns.equals("bukkit") || ns.equals("fabric")) continue;
+            if (ns.equals("bungeecord")) {
+                displayMessage("§8[§bPluginScanner§8] §fProxy rilevato: §aBungeeCord §7(plugin channels attivi)");
+            }
+            if (!foundPlugins.contains(ch)) {
+                foundPlugins.add(ch);
+                shown.add(ch);
+                added = true;
+            }
+        }
+        if (added) {
+            displayMessage("§8[§bPluginScanner§8] §fPlugin channels: §7" + String.join("§7, §a", shown));
+            analyzePlugins();
         }
     }
 
@@ -103,8 +255,9 @@ public class PluginScanner extends Module {
         else if (lower.contains("unknown command") || lower.contains("sconosciuto") || lower.contains("non esiste")) {
             if (waitingForResponse) {
                 waitingForResponse = false;
-                displayMessage("§7Il server nasconde §f/plugins§7 — uso l'analisi dei command dispatcher.");
+                displayMessage("§7Il server nasconde §f/plugins§7 — uso l'analisi dei command dispatcher + tab-probe.");
                 scanViaCommands();
+                startTabProbe();
             }
         }
     }
@@ -164,9 +317,17 @@ public class PluginScanner extends Module {
         boolean permPlugin = false;
         for (String plug : foundPlugins) {
             String p = plug.toLowerCase(Locale.ROOT);
-            if (PERMISSION_PLUGINS.containsKey(p)) {
+            String[] probes = null;
+            for (Map.Entry<String, String[]> e : PERMISSION_PLUGINS.entrySet()) {
+                String k = e.getKey();
+                // match esatto, contenuto o prefisso breve ("lp" -> luckperms, "pex" -> permissionsex)
+                if (p.equals(k) || p.contains(k) || (p.length() >= 2 && k.startsWith(p))) {
+                    probes = e.getValue();
+                    break;
+                }
+            }
+            if (probes != null) {
                 permPlugin = true;
-                String[] probes = PERMISSION_PLUGINS.get(p);
                 displayMessage("§e[PluginScanner] §fPlugin permessi: §b" + plug + "§f!");
                 if (showSuggestions.isOn()) {
                     displayMessage("§7  Probe: §f/" + probes[1] + "§8 | §f/" + probes[2] + "§8 | §f/" + probes[0]);

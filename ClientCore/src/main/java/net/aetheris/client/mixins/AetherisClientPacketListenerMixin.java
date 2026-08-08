@@ -6,6 +6,8 @@ import net.aetheris.client.modules.impl.world.PluginScanner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+import net.minecraft.network.protocol.game.ClientboundCommandSuggestionsPacket;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
@@ -38,6 +40,24 @@ public class AetherisClientPacketListenerMixin {
             if (content != null) {
                 ps.onSystemChat(content);
             }
+        }
+    }
+
+    /** Risposta a una richiesta di tab-completion: PluginScanner enumera i comandi (niente /plugins). */
+    @Inject(method = "handleCommandSuggestions", at = @At("HEAD"))
+    private void onCommandSuggestions(ClientboundCommandSuggestionsPacket packet, CallbackInfo ci) {
+        PluginScanner ps = PluginScanner.getInstance();
+        if (ps != null && ps.isEnabled()) {
+            ps.onCommandSuggestions(packet);
+        }
+    }
+
+    /** Payload custom inbound: PluginScanner sniffa brand server (minecraft:brand) e channel (minecraft:register). */
+    @Inject(method = "handleCustomPayload", at = @At("HEAD"))
+    private void onCustomPayload(ClientboundCustomPayloadPacket packet, CallbackInfo ci) {
+        PluginScanner ps = PluginScanner.getInstance();
+        if (ps != null && ps.isEnabled()) {
+            ps.onCustomPayload(packet);
         }
     }
 }

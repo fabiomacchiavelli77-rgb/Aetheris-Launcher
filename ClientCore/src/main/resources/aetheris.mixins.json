@@ -27,7 +27,8 @@
     "CameraMixin",
     "AntiDetectMixin",
     "ChatSignatureMixin",
-    "AbstractFurnaceMenuAccessor"
+    "AbstractFurnaceMenuAccessor",
+    "DiscardedPayloadMixin"
   ],
   "injectors": {
     "defaultRequire": 1
