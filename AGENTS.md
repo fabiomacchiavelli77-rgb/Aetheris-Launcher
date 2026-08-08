@@ -71,6 +71,7 @@ All hacks extend `modules.Module` (abstract: `onEnable()`, `onDisable()`, `onTic
 - `ConnectionMixin` — PacketLogger outbound+inbound (`send` + `channelRead0`), FreeCam (cancella move/interact packet), NoFall (riscrive `ServerboundMovePlayerPacket` con `onGround=true`). Moduli cached via `ModuleManager.getModule(Class)` per performance.
 - `CameraMixin` — CameraClip (override `getMaxZoom`)
 - `AbstractFurnaceMenuAccessor` — AutoSmelter (accessor for furnace slot access)
+- `DiscardedPayloadMixin` — PluginScanner (sniffa i canali registrati dal server via `minecraft:register`)
 
 *Note: `Reach` uses native Minecraft 1.21.4 `Attributes.ENTITY_INTERACTION_RANGE` & `Attributes.BLOCK_INTERACTION_RANGE` directly in `Reach.onTick()`, requiring no Mixin.*
 
