@@ -3,7 +3,7 @@
   "id": "aetheris-core",
   "version": "${version}",
   "name": "Aetheris Client",
-  "description": "Aetheris Client — Minecraft 1.21.4 hacked client with SeedCrackerX integrated. Fork of Aristois.",
+  "description": "Aetheris Client — Minecraft 1.21.11 (26.2) hacked client with SeedCrackerX integrated. Fork of Aristois.",
   "authors": [
     "Aetheris Team"
   ],
@@ -23,7 +23,7 @@
   },
   "depends": {
     "fabricloader": ">=0.19.3",
-    "minecraft": "1.21.4",
+    "minecraft": ">=1.21.11",
     "java": ">=21"
   },
   "mixins": [
