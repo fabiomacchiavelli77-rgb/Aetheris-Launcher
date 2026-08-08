@@ -54,10 +54,10 @@ public class AetherisClientPacketListenerMixin {
 
     /** Payload custom inbound: PluginScanner sniffa brand server (minecraft:brand) e channel (minecraft:register). */
     @Inject(method = "handleCustomPayload", at = @At("HEAD"))
-    private void onCustomPayload(ClientboundCustomPayloadPacket packet, CallbackInfo ci) {
+    private void onCustomPayload(net.minecraft.network.protocol.common.custom.CustomPacketPayload payload, CallbackInfo ci) {
         PluginScanner ps = PluginScanner.getInstance();
         if (ps != null && ps.isEnabled()) {
-            ps.onCustomPayload(packet);
+            ps.onCustomPayload(payload);
         }
     }
 }

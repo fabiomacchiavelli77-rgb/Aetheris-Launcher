@@ -195,10 +195,9 @@ public class PluginScanner extends Module {
     }
 
     /** Chiamato dal mixin: sniffa il brand del server (minecraft:brand). */
-    public void onCustomPayload(ClientboundCustomPayloadPacket packet) {
+    public void onCustomPayload(net.minecraft.network.protocol.common.custom.CustomPacketPayload payload) {
         if (!isEnabled()) return;
         try {
-            var payload = packet.payload();
             if (payload instanceof BrandPayload brand) {
                 onBrand(brand.brand());
             }
