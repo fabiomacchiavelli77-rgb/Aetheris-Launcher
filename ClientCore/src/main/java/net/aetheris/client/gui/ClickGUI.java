@@ -5,6 +5,7 @@ import net.aetheris.client.modules.Category;
 import net.aetheris.client.modules.Module;
 import net.aetheris.client.modules.ModuleManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -392,10 +393,9 @@ public class ClickGUI extends Screen {
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
         if (infoModule != null && button == 0) {
-            int mW = 340;
-            int settingsCount = infoModule.hasSettings() ? infoModule.getSettings().size() : 0;
-            int settingsExtra = settingsCount > 0 ? (24 + settingsCount * 22) : 0;
-            int mH = 175 + settingsExtra;
+            ModalLayoutInfo layout = new ModalLayoutInfo(font, infoModule);
+            int mW = layout.width;
+            int mH = layout.height;
             if (modalX == -1 || modalY == -1) {
                 modalX = (width - mW) / 2;
                 modalY = (height - mH) / 2;
@@ -430,7 +430,7 @@ public class ClickGUI extends Screen {
 
             // Modal settings interaction
             if (infoModule.hasSettings()) {
-                int sy = mY + 168; // mY + 152 + 16
+                int sy = mY + layout.settingsStartY + 16;
                 for (Setting<?> setting : infoModule.getSettings()) {
                     if (my >= sy && my < sy + 22) {
                         if (setting instanceof BooleanSetting bs) {
@@ -723,16 +723,33 @@ public class ClickGUI extends Screen {
     }
 
     // ── Info & Settings Modal Overlay ──────────────────────────────────
+    private static class ModalLayoutInfo {
+        final int width = 340;
+        final int height;
+        final int descHeight;
+        final int settingsStartY;
+        final String activeDesc;
+
+        ModalLayoutInfo(Font font, Module mod) {
+            this.activeDesc = AetherisLang.isIT() ? getModuleDescIT(mod) : getModuleDescEN(mod);
+            List<FormattedCharSequence> descLines = font.split(Component.literal(activeDesc), width - 20);
+            this.descHeight = Math.max(18, descLines.size() * 10);
+            int settingsCount = mod.hasSettings() ? mod.getSettings().size() : 0;
+            int settingsExtra = settingsCount > 0 ? (24 + settingsCount * 22) : 0;
+            this.height = 100 + descHeight + settingsExtra;
+            this.settingsStartY = 88 + descHeight;
+        }
+    }
+
     private void renderInfoModal(GuiGraphics g, int mouseX, int mouseY) {
         if (infoModule == null) return;
 
-        // Dark dim backdrop for modal
-        g.fill(0, 0, width, height, 0xCC000000);
+        ModalLayoutInfo layout = new ModalLayoutInfo(font, infoModule);
+        int mW = layout.width;
+        int mH = layout.height;
 
-        int mW = 340;
-        int settingsCount = infoModule.hasSettings() ? infoModule.getSettings().size() : 0;
-        int settingsExtra = settingsCount > 0 ? (24 + settingsCount * 22) : 0;
-        int mH = 175 + settingsExtra;
+        // Dark dim backdrop for modal
+        g.fill(0, 0, width, height, 0xE0000000);
 
         if (modalX == -1 || modalY == -1) {
             modalX = (width - mW) / 2;
@@ -748,12 +765,12 @@ public class ClickGUI extends Screen {
         int mY = modalY;
         int accent = accentOf(infoModule.getCategory());
 
-        // Card shadow & background
-        g.fill(mX + 3, mY + 3, mX + mW + 3, mY + mH + 3, 0x60000000);
-        g.fill(mX, mY, mX + mW, mY + mH, 0xF0121620);
+        // Card shadow & 100% FULLY OPAQUE solid dark background (no text bleed-through)
+        g.fill(mX + 4, mY + 4, mX + mW + 4, mY + mH + 4, 0xCC000000);
+        g.fill(mX, mY, mX + mW, mY + mH, 0xFF0F131D);
 
         // Header bar with accent line
-        g.fill(mX, mY, mX + mW, mY + 24, 0xF01A202C);
+        g.fill(mX, mY, mX + mW, mY + 24, 0xFF181E2A);
         g.fill(mX, mY, mX + mW, mY + 2, accent);
 
         // Title text
@@ -773,59 +790,62 @@ public class ClickGUI extends Screen {
         boolean hoverToggle = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
         int btnBg = enabled ? (hoverToggle ? 0xFF358035 : 0xFF256025) : (hoverToggle ? 0xFF803535 : 0xFF602525);
         g.fill(btnX, btnY, btnX + btnW, btnY + btnH, btnBg);
-        String toggleLabel = enabled ? "✔ ABILITATO (ON)" : "✖ DISABILITATO (OFF)";
+        String toggleLabel = enabled ? (AetherisLang.isIT() ? "✔ ABILITATO (ON)" : "✔ ENABLED (ON)") : (AetherisLang.isIT() ? "✖ DISABILITATO (OFF)" : "✖ DISABLED (OFF)");
         g.drawCenteredString(font, toggleLabel, btnX + btnW / 2, btnY + 5, 0xFFFFFFFF);
 
         // Keybind info badge
-        String keyText = "Tasto: §e" + keyName(infoModule.getKeybind());
+        String keyText = (AetherisLang.isIT() ? "Tasto: §e" : "Key: §e") + keyName(infoModule.getKeybind());
         g.drawString(font, keyText, mX + 150, mY + 35, 0xFFCCCCCC);
 
         // Separator line
         g.fill(mX + 10, mY + 54, mX + mW - 10, mY + 55, 0x40FFFFFF);
 
-        // Description IT
-        String descIT = getModuleDescIT(infoModule);
-        g.drawString(font, "§6🇮🇹 Italiano:", mX + 10, mY + 60, 0xFFFFAA00);
-        drawWrappedText(g, descIT, mX + 10, mY + 72, mW - 20, 0xFFDDDDDD);
-
-        // Description EN
-        String descEN = getModuleDescEN(infoModule);
-        g.drawString(font, "§b🇬🇧 English:", mX + 10, mY + 106, 0xFF55FFFF);
-        drawWrappedText(g, descEN, mX + 10, mY + 118, mW - 20, 0xFFBBBBBB);
+        // Active Language Description (Single Language display based on active toggle)
+        int curY = mY + 60;
+        if (AetherisLang.isIT()) {
+            g.drawString(font, "§6🇮🇹 Descrizione:", mX + 10, curY, 0xFFFFAA00);
+            curY += 12;
+            drawWrappedText(g, layout.activeDesc, mX + 10, curY, mW - 20, 0xFFDDDDDD);
+        } else {
+            g.drawString(font, "§b🇬🇧 Description:", mX + 10, curY, 0xFF55FFFF);
+            curY += 12;
+            drawWrappedText(g, layout.activeDesc, mX + 10, curY, mW - 20, 0xFFBBBBBB);
+        }
 
         // ── Render Full Settings inside Modal Card ──
         if (infoModule.hasSettings()) {
-            int sy = mY + 152;
-            g.fill(mX + 10, sy - 4, mX + mW - 10, sy - 3, 0x40FFFFFF);
-            g.drawString(font, "§e⚙ Impostazioni / Settings:", mX + 10, sy, 0xFFFFAA00);
-            sy += 16;
+            curY = mY + layout.settingsStartY;
+            g.fill(mX + 10, curY - 4, mX + mW - 10, curY - 3, 0x40FFFFFF);
+            String settingsHeader = AetherisLang.isIT() ? "§e⚙ Impostazioni:" : "§e⚙ Settings:";
+            g.drawString(font, settingsHeader, mX + 10, curY, 0xFFFFAA00);
+            curY += 16;
 
             for (Setting<?> setting : infoModule.getSettings()) {
                 boolean hover = mouseX >= mX + 10 && mouseX <= mX + mW - 10
-                             && mouseY >= sy && mouseY < sy + 20;
+                             && mouseY >= curY && mouseY < curY + 20;
                 if (hover) {
-                    g.fill(mX + 10, sy, mX + mW - 10, sy + 20, 0x1AFFFFFF);
+                    g.fill(mX + 10, curY, mX + mW - 10, curY + 20, 0x1AFFFFFF);
                 }
 
-                // Full, un-truncated label
-                g.drawString(font, setting.getDisplayName(), mX + 14, sy + 5, 0xFFFFFFFF);
+                // Full, un-truncated label in active language
+                g.drawString(font, setting.getDisplayName(), mX + 14, curY + 5, 0xFFFFFFFF);
 
                 if (setting instanceof BooleanSetting bs) {
                     String toggle = bs.isOn() ? "§a[✔ ON]" : "§c[✖ OFF]";
                     int tw = font.width(toggle);
-                    g.drawString(font, toggle, mX + mW - 14 - tw, sy + 5, 0xFFFFFFFF);
+                    g.drawString(font, toggle, mX + mW - 14 - tw, curY + 5, 0xFFFFFFFF);
                 } else if (setting instanceof ModeSetting<?> ms) {
                     String modeText = "§7< §f" + ms.getValueDisplay() + " §7>";
                     int tw = font.width(modeText);
-                    g.drawString(font, modeText, mX + mW - 14 - tw, sy + 5, 0xFFFFFFFF);
+                    g.drawString(font, modeText, mX + mW - 14 - tw, curY + 5, 0xFFFFFFFF);
                 } else if (setting instanceof SliderSetting ss) {
                     String valText = ss.getValueDisplay();
                     int valW = font.width(valText);
-                    g.drawString(font, valText, mX + mW - 14 - valW, sy + 5, 0xFF55FFFF);
+                    g.drawString(font, valText, mX + mW - 14 - valW, curY + 5, 0xFF55FFFF);
 
                     int trackW = 90;
                     int trackX = mX + mW - 20 - valW - trackW;
-                    int trackY = sy + 7;
+                    int trackY = curY + 7;
                     g.fill(trackX, trackY, trackX + trackW, trackY + 5, 0xFF111111);
                     int fillW = (int) (ss.getRatio() * trackW);
                     g.fill(trackX, trackY, trackX + fillW, trackY + 5, accent);
@@ -836,12 +856,13 @@ public class ClickGUI extends Screen {
                         ss.setFromRatio(newRatio);
                     }
                 }
-                sy += 22;
+                curY += 22;
             }
         }
 
         // Footer note
-        g.drawString(font, "§7(ESC o clicca fuori per chiudere / ESC or click outside to close)", mX + 10, mY + mH - 14, 0xFF666666);
+        String footerMsg = AetherisLang.isIT() ? "§7(ESC o clicca fuori per chiudere)" : "§7(ESC or click outside to close)";
+        g.drawString(font, footerMsg, mX + 10, mY + mH - 14, 0xFF666666);
     }
 
     private void drawWrappedText(GuiGraphics g, String text, int x, int y, int maxWidth, int color) {
