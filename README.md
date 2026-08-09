@@ -1,160 +1,105 @@
-# Aristois Installer + SeedCrackerX Enhanced
+# Aetheris Client & Web Installer (Minecraft 1.21.11 / 26.2)
 
-**Aristois Installer v1.1.0** con Seed Cracker migliorato integrato e anti-detection patching.
-
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.21.11-brightgreen.svg)](https://minecraft.net)
+[![Fabric Loader](https://img.shields.io/badge/Fabric-0.19.3-blue.svg)](https://fabricmc.net)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://adoptium.net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Cosa include
+**Aetheris Client** è un hacked client autonomo per Minecraft **1.21.11 (26.2)** basato su Fabric Loader e Mojang Official Mappings. Include **65 moduli di hack**, **SeedCrackerX integrato** nativamente e un **Web Installer** moderno per l'installazione automatica.
 
-| Modulo | Descrizione |
-|--------|-------------|
-| **Installer** | Installer desktop per Aristois mod (Minecraft) con donor mode sempre attivo |
-| **SeedCrackerX** | Fork migliorato del seed cracker con slime chunk cracking (16x più denso) |
-| **Anti-Detection** | Patching JAR automatico per offuscare metadata mod (fabric.mod.json / mcmod.info) |
+---
 
-## Novità v1.1.0
+## 🌟 Caratteristiche Principali
 
-### Donor Mode Sbloccato
-L'installer originale Aristois limitava alcune funzionalità solo agli utenti "donor" (a pagamento). **Abbiamo rimosso completamente il sistema donor** — tutte le funzionalità sono sbloccate per tutti. Nessun login, nessuna chiave, nessun paywall.
+- **Full Native 1.21.11 (26.2)**: Totalmente compilato con **Mojang Official Mappings** e Java 21.
+- **65 Moduli Hack**:
+  - **Combat**: KillAura, CrystalAura (con auto-placement), Velocity, BowAimbot (con calcolo anticipo), BedAura, Reach, TriggerBot, Surround, AimAssist, ecc.
+  - **Movement**: AutoSprint, Speed, Fly, NoFall, BunnyJump, Jetpack, Step, NoSlowdown, NoClip, AutoWalk, Sneak.
+  - **Render**: FullBright, ESP, StorageESP (con filtro vuote), Xray, Tracers, NameTags, FreeCam, CameraClip, Trajectories, Waypoints (marcatura 3D).
+  - **World**: FastBreak, Scaffold, Timer, LiquidInteract, AutoSign, AutoFarm, AirPlace, AutoBrewer, AutoSmelter, StrongholdFinder, PluginScanner, PacketLogger, ServerFinder.
+  - **Player**: AutoEat, AutoFish, InventoryCleaner, AntiAFK, InventorySort, AntiDetect, NoChatReports, AutoRespawn, FastPlace, NoHunger, ChestStealer.
+  - **SeedCracker**: Modulo dedicato con interfaccia nativa per SeedCrackerX.
+- **SeedCrackerX Integrato**: Seed cracking nativo in-game con comandi `/seedcracker` e menu dedicato senza mod esterne.
+- **Interfaccia Grafica Doppia**:
+  - **ClickGUI** (`Right Shift`): Interfaccia moderna responsive stile Aristois/Wurst/Meteor con colonne trascinabili, ricerca, drawer impostazioni e z-index layering dinamico.
+  - **Aetheris Menu** (`Right Ctrl` + `Right Shift`): Menu classico a categorie rapide con navigazione rapida e Keybind Manager.
+  - **Pause Menu**: Bottoni di avvio rapido integrati nel menu di pausa di Minecraft.
+- **Bypass & Stealth**:
+  - **AntiDetect**: Spoof del brand client (`vanilla`) e blocco dei pacchetti `fabric:*`.
+  - **NoChatReports**: Stripping delle firme digitali per prevenire report su server 1.21+.
+  - **PluginScanner**: Rilevamento passivo dei plugin server e permessi (PEX, LuckPerms) via command suggestions e tab probing.
 
-### Seed Cracker Migliorato
-- **Slime Chunk Cracking** — cracca il seed senza bisogno di strutture, osservando solo slime spawn
-- **256 punti/chunk** — raccolta biomi 16x più densa dell'originale (16 → 256)
-- Biome finder abilitato di default
-- Cracking automatico da 15-18 slime chunk
-- Embedded nell'installer — nessun download esterno
+---
 
-### Anti-Detection
-- Offusca `id` mod con suffisso random (6 char UUID)
-- Compatibile Fabric e Forge
-- Non modifica bytecode — solo metadata
-- Opzionale: checkbox in SetupScene
+## 🛠️ Requisiti di Sistema
 
-## Download & Installazione Rapida
+- **Minecraft Java Edition**: Versioni supportate fino a 1.21.11 (26.2).
+- **Java**: JDK 21 (o superiore).
+- **Node.js**: v18+ (necessario per avviare o compilare il Web Installer).
 
-1. Scarica `Aristois-Donor.jar` dalla [pagina Releases](https://github.com/fabiomacchiavelli77-rgb/AristoSeedCrack/releases/latest)
-2. Scarica anche `AristoSeedCrack.bat` (Windows) o `AristoSeedCrack.sh` (Linux/macOS) — sono i launcher
-3. **Windows:** Doppio click su `AristoSeedCrack.bat`
-4. **Linux/macOS:** `chmod +x AristoSeedCrack.sh && ./AristoSeedCrack.sh`
-5. In alternativa: `java -jar Aristois-Donor.jar`
-6. Seleziona versione Minecraft, launcher, opzioni → clicca **Install**
+---
 
-> 📖 **Manuale completo:** [docs/MANUAL.html](docs/MANUAL.html) — aprilo nel browser, usa Stampa → Salva come PDF
+## 🚀 Guida Rapida / Installazione
 
-## Requisiti
+### Metodo 1: Avvio tramite Web Installer (Consigliato)
 
-- Java 8+ (Installer)
-- JDK 25+ (compilazione SeedCrackerX)
-- Minecraft Java Edition
-- Launcher: Vanilla, MultiMC, o Prism
+1. Scarica/clona la repository.
+2. Esegui il file batch principale:
+   ```cmd
+   AVVIA_INSTALLER.bat
+   ```
+3. Nel browser si aprirà l'interfaccia dell'installer su `http://localhost:3000`.
+4. Clicca **Install Aetheris** per installare automaticamente il profilo `Aetheris-1.21.11` e il JAR nella cartella `.minecraft`.
 
-### Versioni Minecraft Supportate
+### Metodo 2: Compilazione Manuale (Developer Mode)
 
-| Componente | Versioni |
-|------------|----------|
-| **Aristois Installer** | Tutte (1.8 → latest) — lista versioni da Mojang PistonMeta |
-| **SeedCrackerX** | 1.14 → 1.21.x (richiede Fabric) |
-| **Slime Chunk Cracking** | 1.14 → 1.21.x |
-| **Anti-Detection** | Tutte le versioni |
-
-## Build
-
-### Installer
 ```bash
-./gradlew shadowJar
-# Output: packager/Aristois-Donor.jar
-```
+# Entra nella cartella del client core
+cd ClientCore
 
-### SeedCrackerX
-```bash
-cd seedcracker
+# Compila il JAR (.jar prodotto in build/libs/aetheris-core-1.0.0.jar)
 ./gradlew build
-# Output: seedcracker/build/libs/seedcrackerX-2.16.1.jar
+
+# Testa direttamente in ambiente dev
+./gradlew runClient
 ```
 
-### Aggiornare Seed Cracker nell'Installer
-```bash
-cp seedcracker/build/libs/seedcrackerX-2.16.1.jar \
-   src/main/resources/aristois-seed-cracker.jar
-./gradlew shadowJar
-```
+Una volta compilato, copia `build/libs/aetheris-core-1.0.0.jar` all'interno della cartella `.minecraft/mods/` con Fabric Loader 0.19.3 per 1.21.11.
 
-## Utilizzo
+---
 
-1. Avvia l'installer: `java -jar Aristois-Donor.jar`
-2. Seleziona versione Minecraft e launcher
-3. Opzioni:
-   - `Clean install` — rimuove versioni precedenti
-   - `Forge` — supporto Forge (EMC Framework)
-   - `Install SeedCrackerX` — seed cracker migliorato
-   - `Anti-detection patch` — offusca metadata JAR
-4. Scegli cartella launcher (auto-rilevata)
-5. Clicca **Install**
+## 🎮 Controlli & Keybinds
 
-## Comandi Seed Cracker
+| Azione | Keybind Predefinito |
+|--------|---------------------|
+| **Apri ClickGUI** (Nuova GUI) | `Right Shift` |
+| **Apri Aetheris Menu** (Vecchia GUI) | `Right Ctrl` + `Right Shift` |
+| **Imposta Keybind su Modulo** | `Shift` + Click sul modulo nel menu |
+| **Pause Menu Quick Bar** | `ESC` in gioco ➔ Bottoni rapidi in alto |
 
-| Comando | Descrizione |
-|---------|-------------|
-| `/seedcracker gui` | Apre interfaccia configurazione |
-| `/seedcracker data` | Mostra dati raccolti |
-| `/seedcracker finder` | Stato finder attivi |
-| `/seedcracker render` | Attiva/disattiva rendering cuboid |
+---
 
-## Metodi di Cracking
-
-### Slime Chunk (nessuna struttura richiesta)
-Esplora in biomi palude o sottoterra (Y < 40). Quando uno slime spawna, il chunk viene registrato automaticamente. Cuboid **blu** = slime chunk confermato. Servono 15-18 osservazioni.
-
-### Strutture (metodo classico)
-Trova templi, piramidi, monumenti, navi, avamposti, igloo. Cuboid **verdi** = strutture rilevate. Servono 32 bit regolari + 40 bit liftable.
-
-### End
-I pilastri dell'End vengono analizzati automaticamente. Le città forniscono dati aggiuntivi.
-
-## Struttura Progetto
+## 📁 Struttura Progetto
 
 ```
-├── src/                          ← Installer sorgente Java
-│   └── main/
-│       ├── java/me/deftware/installer/
-│       │   ├── model/
-│       │   │   ├── Configuration.java
-│       │   │   ├── JarPatcher.java      ← Anti-detection patching
-│       │   │   └── provider/
-│       │   └── view/scenes/
-│       │       ├── SetupScene.java      ← Checkbox SeedCrackerX + Anti-detection
-│       │       ├── InstallingScene.java ← Wiring installazione
-│       │       └── WelcomeScene.java
-│       └── resources/
-│           └── aristois-seed-cracker.jar  ← Seed Cracker embedded
-├── seedcracker/                  ← Fork SeedCrackerX
-│   └── src/main/java/kaptainwutax/seedcrackerX/
-│       ├── cracker/
-│       │   ├── SlimeChunkCracker.java   ← NUOVO
-│       │   └── SlimeChunkData.java      ← NUOVO
-│       ├── finder/
-│       │   ├── SlimeChunkFinder.java    ← NUOVO
-│       │   └── BiomeFinder.java         ← MODIFICATO (256 punti)
-│       └── mixin/
-│           └── SlimeEntityMixin.java    ← NUOVO
-├── docs/
-│   ├── GUIDA.md                  ← Guida completa
-│   └── ROADMAP.md                ← Checklist sviluppo
-└── packager/
-    └── Aristois-Donor.jar        ← Build finale
+Aetheris/
+├── ClientCore/               ← Core Mod Client (Fabric 1.21.11, Java 21)
+│   ├── src/main/java/net/aetheris/client/
+│   │   ├── modules/          ← 65 Moduli Hack divisi per Categoria
+│   │   ├── gui/              ← ClickGUI, AetherisMenu, Xray, AltManager, etc.
+│   │   ├── mixins/           ← Mixin di sistema (Render, Network, Input)
+│   │   └── config/           ← Gestione profilo utente (profile.json)
+│   └── src/main/java/kaptainwutax/seedcrackerX/ ← SeedCrackerX integrato
+├── Installer/                ← Web Installer (Express + Vite JS)
+│   ├── server.js             ← Backend Express per installazione silente Fabric
+│   └── dist/                 ← Frontend statico compilato dell'installer
+├── AVVIA_INSTALLER.bat       ← Launcher script rapido per Windows
+├── AGENTS.md / CLAUDE.md     ← Documentazione per sviluppatori e AI Agents
+└── Aetheris_Checklist_Test.xlsx ← Excel di tracking per i test e verifica moduli
 ```
 
-## Crediti
+---
 
-- **Aristois Installer** — Deftware & community Aristois
-- **SeedCrackerX originale** — KaptainWutax, 19MisterX98
-- **ChunkRandomReversal** — mjtb49
-- **LattiCG** — seedfinding community
-- **Migliorie Seed Cracker + Anti-Detection** — Integrazione slime chunk cracking, biome finder denso, patching JAR automatico
+## 📄 Licenza
 
-## Licenza
-
-MIT — vedi [LICENSE](LICENSE) per i dettagli.
-
-Copyright (c) 2020 Aristois — Installer originale
-Copyright (c) 2020 KaptainWutax — SeedCrackerX originale
+Questo progetto è distribuito sotto licenza **MIT**. Consulta il file [LICENSE](LICENSE) per i dettagli.
