@@ -18,8 +18,8 @@ public class StorageESPMixin {
 
     @Inject(method = "renderLevel", at = @At("TAIL"))
     private void onRenderLevel(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker,
-                               boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer,
-                               Matrix4f projectionMatrix, Matrix4f projectionMatrix2, CallbackInfo ci) {
+                               boolean arg3, Camera camera, Matrix4f arg5, Matrix4f arg6, Matrix4f arg7,
+                               com.mojang.blaze3d.buffers.GpuBufferSlice arg8, org.joml.Vector4f arg9, boolean arg10, CallbackInfo ci) {
         for (var mod : ModuleManager.getModules()) {
             if (mod instanceof StorageESP se && se.isEnabled()) {
                 se.render(camera, deltaTracker);

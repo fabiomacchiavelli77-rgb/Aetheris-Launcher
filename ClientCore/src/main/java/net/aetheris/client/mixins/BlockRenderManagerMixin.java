@@ -21,7 +21,7 @@ public class BlockRenderManagerMixin {
     @Inject(method = "renderBatched", at = @At("HEAD"), cancellable = true)
     private void onRenderBatched(BlockState state, BlockPos pos, BlockAndTintGetter level,
                                   PoseStack poseStack, VertexConsumer consumer,
-                                  boolean checkSides, RandomSource random, CallbackInfo ci) {
+                                  boolean checkSides, java.util.List<?> someList, CallbackInfo ci) {
         for (var mod : ModuleManager.getModules()) {
             if (mod instanceof Xray && mod.isEnabled()) {
                 if (!Xray.isXrayBlock(state.getBlock())) {
