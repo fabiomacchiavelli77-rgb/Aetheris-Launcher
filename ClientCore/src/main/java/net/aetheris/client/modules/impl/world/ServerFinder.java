@@ -78,9 +78,11 @@ public class ServerFinder extends Module {
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress(ip, port), timeoutMs);
             foundServers.incrementAndGet();
-            if (mc.player != null) {
-                mc.player.displayClientMessage(Component.literal("§a[ServerFinder] §fTrovato server attivo: §e" + ip + ":" + port), false);
-            }
+            mc.execute(() -> {
+                if (mc.player != null) {
+                    mc.player.displayClientMessage(Component.literal("§a[ServerFinder] §fTrovato server attivo: §e" + ip + ":" + port), false);
+                }
+            });
         } catch (Exception ignored) {
         } finally {
             scannedCount.incrementAndGet();
@@ -92,9 +94,11 @@ public class ServerFinder extends Module {
         if (executor != null && !executor.isShutdown()) {
             executor.shutdownNow();
         }
-        if (mc.player != null) {
-            mc.player.displayClientMessage(Component.literal("§6[ServerFinder] §7Scansione terminata. Server trovati: §a" + foundServers.get()), false);
-        }
+        mc.execute(() -> {
+            if (mc.player != null) {
+                mc.player.displayClientMessage(Component.literal("§6[ServerFinder] §7Scansione terminata. Server trovati: §a" + foundServers.get()), false);
+            }
+        });
     }
 
     private String getSubnet(String ip) {

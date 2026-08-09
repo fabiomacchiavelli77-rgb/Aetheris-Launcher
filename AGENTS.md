@@ -85,12 +85,12 @@ All hacks extend `modules.Module` (abstract: `onEnable()`, `onDisable()`, `onTic
 
 ### Web Installer Architecture (`Installer/`)
 
-Express backend (`server.js`) + Vite frontend. Automatically installs Fabric 0.19.3 for MC 1.21.4, creates custom `Aetheris-1.21.4` profile, and copies `aetheris-core-1.0.0.jar` into `.minecraft/mods/`.
+Express backend (`server.js`) + Vite frontend. Automatically installs Fabric 0.19.3 for MC 1.21.11, creates custom `Aetheris-1.21.11` profile, and copies `aetheris-core-1.0.0.jar` into `.minecraft/mods/`.
 `server.js` resolves `sourceJar` path dynamically relative to `__dirname` (`path.resolve(__dirname, '../ClientCore/build/libs/aetheris-core-1.0.0.jar')`).
 
-### Mapping Critical Note
+### Mapping & 1.21.11 API Critical Note
 
-**The entire ClientCore uses Mojang official mappings** (`loom.officialMojangMappings()` in build.gradle). Switched from Yarn to unify with SeedCrackerX. Key class names & changes in 1.21.4:
+**The entire ClientCore uses Mojang official mappings** (`loom.officialMojangMappings()` in build.gradle). Switched from Yarn to unify with SeedCrackerX. Key class names & changes in 1.21.11 (26.2):
 - `Minecraft` (not `MinecraftClient`)
 - `LocalPlayer` (not `ClientPlayerEntity`)
 - `MultiPlayerGameMode` (not `ClientPlayerInteractionManager`)
@@ -102,6 +102,17 @@ Express backend (`server.js`) + Vite frontend. Automatically installs Fabric 0.1
 - `mc.player.onGround()` (field `onGround`, not method)
 - `mc.player.getAttackStrengthScale()` (not `getAttackCooldownProgress()`)
 - `InteractionHand` (not `Hand`)
+- **Screen Input Events (1.21.11)**:
+  - `mouseClicked(MouseButtonEvent event, boolean isDoubleClick)` (was `mouseClicked(double, double, int)`)
+  - `mouseReleased(MouseButtonEvent event)` (was `mouseReleased(double, double, int)`)
+  - `mouseDragged(MouseButtonEvent event, double deltaX, double deltaY)` (was `mouseDragged(double, double, int, double, double)`)
+  - `keyPressed(KeyEvent event)` (was `keyPressed(int, int, int)`)
+  - `charTyped(CharacterEvent event)` (was `charTyped(char, int)`)
+- **Rendering & Mixins (1.21.11)**:
+  - `KeyboardHandler.keyPress`: takes `(long, int, KeyEvent)`
+  - `BlockRenderDispatcher.renderBatched`: uses `List<?>` parameter instead of `RandomSource`
+  - `LevelRenderer`: `collectVisibleEntities` replaced by `extractVisibleEntities(Camera, Frustum, DeltaTracker, LevelRenderState)` populating `state.entityRenderStates`
+  - `LevelRenderer.renderLevel`: updated parameters signature (no `GameRenderer` parameter)
 - Armor defense uses `DataComponents.EQUIPPABLE` and `Attributes.ARMOR` via `DataComponents.ATTRIBUTE_MODIFIERS`.
 - Block colors use explicit constants (e.g. `Blocks.BLUE_TERRACOTTA`, `Blocks.WAXED_COPPER_BULB`).
 - `fabric.mod.json` `depends` block specifies only `fabricloader`, `minecraft`, and `java` to prevent sub-module dependency conflicts.
@@ -112,7 +123,8 @@ Each module has a `keybind` field (int, GLFW code). Default `GLFW.GLFW_KEY_UNKNO
 - **Shift+Click** on a module in the menu opens keybind recording. Press key to assign, ESC to clear.
 - Dedicated `KeybindManagerScreen` provides a searchable list to bind/unbind module keys.
 - `KeyboardMixin` intercepts keys: if no screen is open, toggles module.
-- Left Shift, Right Shift, and the Pause Menu's **Aetheris Menu** button open the same **ClickGUI**.
+- **Right Shift** opens **ClickGUI** (modern GUI).
+- **Right Ctrl + Right Shift** opens **AetherisMenuScreen** (classic menu).
 
 ## Profile System
 
@@ -123,12 +135,12 @@ Each module has a `keybind` field (int, GLFW code). Default `GLFW.GLFW_KEY_UNKNO
 ## GUI System
 
 Multiple GUIs available:
-- **PauseScreen Quick Buttons** (Pause Menu) — Quick access to Aetheris Menu, SeedCracker Config, Xray Ores, Alt Manager.
-- **AetherisMenuScreen** (Right Shift) — Simple category list with scrolling, toggle, keybind assignment, and bottom quick navigation bar.
-- **ClickGUI** (Left/Right Shift and Pause Menu) — Aristois/Wurst/Meteor-inspired premium GUI. It uses responsive horizontal category columns, a compact Keybinds/Xray/Alts/Seed command dock, direct-drawn module rows, per-column scrolling, search, inline keybind/settings drawers, and a fade-in overlay.
+- **PauseScreen Quick Buttons** (Pause Menu) — Quick access to ClickGUI, SeedCracker Config, Xray Ores, Alt Manager.
+- **AetherisMenuScreen** (Right Ctrl + Right Shift) — Simple category list with scrolling, toggle, keybind assignment, and bottom quick navigation bar.
+- **ClickGUI** (Right Shift and Pause Menu) — Aristois/Wurst/Meteor-inspired premium GUI. It uses responsive horizontal category columns (top-most z-index click detection), a compact Keybinds/Xray/Alts/Seed command dock, direct-drawn module rows, per-column scrolling, search, inline keybind/settings drawers, and a fade-in overlay.
 - **AltManagerScreen** — Offline account profile switcher for dynamic username changes.
 - **XrayBlockSelectorScreen** — Full Minecraft block registry selector with 3-column layout (block icon, name EN/IT, checkbox), search/filter, and buttons for Default/Clear All/Select All.
-- **KeybindManagerScreen** — Searchable keybind manager for all 61 modules.
+- **KeybindManagerScreen** — Searchable keybind manager for all modules.
 - **SeedCrackerConfigScreen** — Native SeedCrackerX config and seed display GUI.
 
 ## Key File Locations
@@ -159,18 +171,19 @@ Multiple GUIs available:
 - **Testing Checklist**: Track testing progress and bug notes in `Aetheris_Checklist_Test.xlsx`.
 - **Guidance for AI Assistants / LLMs**:
   1. When continuing development or debugging, read `Aetheris_Checklist_Test.xlsx` to understand current module verification status.
-  2. Always use **Mojang Official Mappings** for Minecraft 1.21.4 (Java 21). Do not mix Yarn mapping class names.
+  2. Always use **Mojang Official Mappings** for Minecraft 1.21.11 (Java 21). Do not mix Yarn mapping class names.
   3. Keep `AGENTS.md` and `CLAUDE.md` synchronized whenever project structure, architecture, or key guidelines change.
-  4. **CRITICAL DEBUGGING NOTE FOR MIXINS**: In Minecraft 1.21.4, if a Mixin fails to apply at runtime (e.g. an `@Accessor` method is not marked `abstract`), Fabric throws a `RuntimeException`. If this happens while connected to a world, the networking thread catches it, forcefully disconnects the player, and triggers `clearClientLevel()`. This causes `updateScreenAndTick()` to tick the world with `mc.player == null`, resulting in cascaded `NullPointerException`s in `GameRenderer.renderLevel` and `MultiPlayerGameMode.ensureHasSentCarriedItem`. **If you see an NPE involving a null player or camera entity, ALWAYS check the start of `latest.log` for a Mixin application failure.**
+  4. **CRITICAL DEBUGGING NOTE FOR MIXINS**: In Minecraft 1.21.11, if a Mixin fails to apply at runtime (e.g. an `@Accessor` method is not marked `abstract`), Fabric throws a `RuntimeException`. If this happens while connected to a world, the networking thread catches it, forcefully disconnects the player, and triggers `clearClientLevel()`. This causes `updateScreenAndTick()` to tick the world with `mc.player == null`, resulting in cascaded `NullPointerException`s in `GameRenderer.renderLevel` and `MultiPlayerGameMode.ensureHasSentCarriedItem`. **If you see an NPE involving a null player or camera entity, ALWAYS check the start of `latest.log` for a Mixin application failure.**
   5. **Mixin Accessors**: Always ensure that `@Accessor` and `@Invoker` methods in Mixins are strictly `abstract` to prevent the aforementioned crash.
 
-## Module List (62 total)
+## Module List (65 total)
 
 **Combat (14):** KillAura, Velocity, Criticals, Reach, AutoArmor, AutoTotem, TriggerBot, Surround, AimAssist, SelfTrap, BedAura, BedTrap, CrystalAura (con auto-placement), BowAimbot (con anticipo balistico)
 **Movement (11):** AutoSprint, Speed, Fly, NoFall, Step, NoSlowdown, NoClip, BunnyJump, Jetpack, Sneak, AutoWalk
 **Render (12):** FullBright, ESP, NoHurtCam, Xray, NameTags, Tracers, FreeCam, ItemESP, StorageESP (con hideEmpty), CameraClip, Trajectories, Waypoints (marcatura 3D)
 **World (15):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins, LiquidInteract, AutoSign, AutoFarm, AirPlace, AutoBrewer, AutoSmelter, StrongholdFinder, PacketLogger, ServerFinder, PluginScanner
-**Player (10):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat, InventorySort, AntiDetect, NoChatReports
+**Player (11):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat, InventorySort, AntiDetect, NoChatReports
+**SeedCracker (1):** SeedCrackerModule
 
 *Batch 2026-08 (Mappatura Qwen3.8-max): AutoBrewer, AutoSmelter, StrongholdFinder, PacketLogger, ServerFinder, Waypoints, NoChatReports, BowAimbot, AutoWalk.*
 *PluginScanner (PluginScanner.java + DiscardedPayloadMixin + hook handleSystemChat in AetherisClientPacketListenerMixin): scan /plugins, tab-probe comandi, brand payload, plugin channels, rileva PEX/LuckPerms/GroupManager, probe comandi permessi.*

@@ -36,7 +36,11 @@ public class PacketLogger extends Module {
     private void logPacket(String direction, Packet<?> packet) {
         if (mc.player != null) {
             String name = packet.getClass().getSimpleName();
-            mc.player.displayClientMessage(Component.literal("§8[§bPacketLogger§8] §7[" + direction + "] §f" + name), false);
+            mc.execute(() -> {
+                if (mc.player != null) {
+                    mc.player.displayClientMessage(Component.literal("§8[§bPacketLogger§8] §7[" + direction + "] §f" + name), false);
+                }
+            });
         }
     }
 }

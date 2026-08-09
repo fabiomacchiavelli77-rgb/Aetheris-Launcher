@@ -10,6 +10,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.client.input.MouseButtonEvent;
 import org.lwjgl.glfw.GLFW;
 
 import net.aetheris.client.settings.AetherisLang;
@@ -390,7 +391,11 @@ public class ClickGUI extends Screen {
     }
 
     // ── mouse handling ─────────────────────────────────────────────────
-    public boolean mouseClicked(double mx, double my, int button) {
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean focused) {
+        double mx = event.x();
+        double my = event.y();
+        int button = event.button();
         if (infoModule != null && button == 0) {
             ModalLayoutInfo layout = new ModalLayoutInfo(font, infoModule);
             int mW = layout.width;
@@ -511,8 +516,9 @@ public class ClickGUI extends Screen {
             }
         }
 
-        // Columns
-        for (Column col : columns) {
+        // Columns (iterate backwards so top-most column handles clicks first)
+        for (int c = columns.size() - 1; c >= 0; c--) {
+            Column col = columns.get(c);
             int cx = col.x;
             int cy = col.y;
             List<Module> mods = col.filteredModules(searchQuery);
@@ -557,9 +563,10 @@ public class ClickGUI extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        // Find which column the mouse is over
+        // Find which column the mouse is over (iterate backwards for top-most column)
         ClickGUILayout.Layout l = layout();
-        for (Column col : columns) {
+        for (int c = columns.size() - 1; c >= 0; c--) {
+            Column col = columns.get(c);
             int cx = col.x;
             int cy = col.y;
             List<Module> mods = col.filteredModules(searchQuery);
@@ -577,7 +584,11 @@ public class ClickGUI extends Screen {
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
-    public boolean mouseDragged(double mx, double my, int button, double deltaX, double deltaY) {
+    @Override
+    public boolean mouseDragged(MouseButtonEvent event, double deltaX, double deltaY) {
+        double mx = event.x();
+        double my = event.y();
+        int button = event.button();
         if (draggingColumn != null && button == 0) {
             int maxColX = Math.max(0, width - layout().columnWidth());
             int maxColY = Math.max(0, height - HEADER_H);
@@ -592,7 +603,11 @@ public class ClickGUI extends Screen {
         return false;
     }
 
-    public boolean mouseReleased(double mx, double my, int button) {
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        double mx = event.x();
+        double my = event.y();
+        int button = event.button();
         if (draggingModal && button == 0) {
             draggingModal = false;
             return true;

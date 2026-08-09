@@ -342,8 +342,10 @@ public class PluginScanner extends Module {
     }
 
     private void displayMessage(String msg) {
-        if (mc.player != null) {
-            mc.player.displayClientMessage(Component.literal(msg), false);
-        }
+        mc.execute(() -> {
+            if (mc.player != null) {
+                mc.player.displayClientMessage(Component.literal(msg), false);
+            }
+        });
     }
 }

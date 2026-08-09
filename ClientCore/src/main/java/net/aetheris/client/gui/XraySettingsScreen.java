@@ -194,7 +194,11 @@ public class XraySettingsScreen extends Screen {
     }
 
     // ── Mouse interaction ────────────────────────────────────────────
-    public boolean mouseClicked(double mx, double my, int button) {
+    @Override
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean focused) {
+        double mx = event.x();
+        double my = event.y();
+        int button = event.button();
         if (button != 0) return false;
 
         int cardH = 260;
@@ -252,7 +256,11 @@ public class XraySettingsScreen extends Screen {
         return false;
     }
 
-    public boolean mouseDragged(double mx, double my, int button, double deltaX, double deltaY) {
+    @Override
+    public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double deltaX, double deltaY) {
+        double mx = event.x();
+        double my = event.y();
+        int button = event.button();
         if (draggingSlider && button == 0) {
             updateSliderValue(mx);
             return true;
@@ -260,7 +268,11 @@ public class XraySettingsScreen extends Screen {
         return false;
     }
 
-    public boolean mouseReleased(double mx, double my, int button) {
+    @Override
+    public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
+        double mx = event.x();
+        double my = event.y();
+        int button = event.button();
         if (draggingSlider && button == 0) {
             draggingSlider = false;
             return true;

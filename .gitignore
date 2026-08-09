@@ -33,4 +33,5 @@ seedcracker/build/
 seedcracker/.gradle/
 
 /local.properties*.bak
+.vscode/
 ~
