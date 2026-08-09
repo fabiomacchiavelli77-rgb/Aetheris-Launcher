@@ -161,11 +161,13 @@ public class Trajectories extends Module {
 
             vc.addVertex(pose, (float) p1.x, (float) p1.y, (float) p1.z)
               .setColor(r, g, b, a)
-              .setNormal(pose, 0f, 1f, 0f);
+              .setNormal(pose, 0f, 1f, 0f)
+              .setLineWidth(1.0f);
 
             vc.addVertex(pose, (float) p2.x, (float) p2.y, (float) p2.z)
               .setColor(r, g, b, a)
-              .setNormal(pose, 0f, 1f, 0f);
+              .setNormal(pose, 0f, 1f, 0f)
+              .setLineWidth(1.0f);
         }
 
         if (landingBox.isOn() && hitResult != null) {
@@ -195,8 +197,8 @@ public class Trajectories extends Module {
         for (int[] edge : edges) {
             float[] p1 = corners[edge[0]];
             float[] p2 = corners[edge[1]];
-            vc.addVertex(pose, p1[0], p1[1], p1[2]).setColor(r, g, b, a).setNormal(pose, 0f, 1f, 0f);
-            vc.addVertex(pose, p2[0], p2[1], p2[2]).setColor(r, g, b, a).setNormal(pose, 0f, 1f, 0f);
+            vc.addVertex(pose, p1[0], p1[1], p1[2]).setColor(r, g, b, a).setNormal(pose, 0f, 1f, 0f).setLineWidth(1.0f);
+            vc.addVertex(pose, p2[0], p2[1], p2[2]).setColor(r, g, b, a).setNormal(pose, 0f, 1f, 0f).setLineWidth(1.0f);
         }
     }
 

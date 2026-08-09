@@ -178,8 +178,8 @@ public class StorageESP extends Module {
         for (int[] edge : edges) {
             float[] a = corners[edge[0]];
             float[] b2 = corners[edge[1]];
-            vc.addVertex(pose, a[0], a[1], a[2]).setColor(r, g, b, 255).setNormal(pose, 0f, 1f, 0f);
-            vc.addVertex(pose, b2[0], b2[1], b2[2]).setColor(r, g, b, 255).setNormal(pose, 0f, 1f, 0f);
+            vc.addVertex(pose, a[0], a[1], a[2]).setColor(r, g, b, 255).setNormal(pose, 0f, 1f, 0f).setLineWidth(1.0f);
+            vc.addVertex(pose, b2[0], b2[1], b2[2]).setColor(r, g, b, 255).setNormal(pose, 0f, 1f, 0f).setLineWidth(1.0f);
         }
     }
 }

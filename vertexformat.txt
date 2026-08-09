@@ -1,0 +1,30 @@
+Compiled from "VertexFormat.java"
+public class com.mojang.blaze3d.vertex.VertexFormat {
+  public static final int UNKNOWN_ELEMENT;
+  private final java.util.List<com.mojang.blaze3d.vertex.VertexFormatElement> elements;
+  private final java.util.List<java.lang.String> names;
+  private final int vertexSize;
+  private final int elementsMask;
+  private final int[] offsetsByElement;
+  private com.mojang.blaze3d.buffers.GpuBuffer immediateDrawVertexBuffer;
+  private com.mojang.blaze3d.buffers.GpuBuffer immediateDrawIndexBuffer;
+  com.mojang.blaze3d.vertex.VertexFormat(java.util.List<com.mojang.blaze3d.vertex.VertexFormatElement>, java.util.List<java.lang.String>, it.unimi.dsi.fastutil.ints.IntList, int);
+  public static com.mojang.blaze3d.vertex.VertexFormat$Builder builder();
+  public java.lang.String toString();
+  public int getVertexSize();
+  public java.util.List<com.mojang.blaze3d.vertex.VertexFormatElement> getElements();
+  public java.util.List<java.lang.String> getElementAttributeNames();
+  public int[] getOffsetsByElement();
+  public int getOffset(com.mojang.blaze3d.vertex.VertexFormatElement);
+  public boolean contains(com.mojang.blaze3d.vertex.VertexFormatElement);
+  public int getElementsMask();
+  public java.lang.String getElementName(com.mojang.blaze3d.vertex.VertexFormatElement);
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+  private static com.mojang.blaze3d.buffers.GpuBuffer uploadToBuffer(com.mojang.blaze3d.buffers.GpuBuffer, java.nio.ByteBuffer, int, java.util.function.Supplier<java.lang.String>);
+  public com.mojang.blaze3d.buffers.GpuBuffer uploadImmediateVertexBuffer(java.nio.ByteBuffer);
+  public com.mojang.blaze3d.buffers.GpuBuffer uploadImmediateIndexBuffer(java.nio.ByteBuffer);
+  private java.lang.String lambda$uploadImmediateIndexBuffer$2();
+  private java.lang.String lambda$uploadImmediateVertexBuffer$1();
+  private static int lambda$new$0(int, int);
+}
