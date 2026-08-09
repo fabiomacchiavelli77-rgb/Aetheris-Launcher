@@ -44,13 +44,17 @@ public class InstalledPlugins extends Module {
             }
         } catch (Exception e) {}
 
-        if (plugins.isEmpty()) {
-            if (mc.player != null) mc.player.displayClientMessage(Component.literal("§cNo plugins found or server hides commands."), false);
-        } else {
-            if (mc.player != null) mc.player.displayClientMessage(Component.literal("§aFound Plugins (" + plugins.size() + "): §7" + String.join(", ", plugins)), false);
-        }
+        mc.execute(() -> {
+            if (mc.player != null) {
+                if (plugins.isEmpty()) {
+                    mc.player.displayClientMessage(Component.literal("§cNo plugins found or server hides commands."), false);
+                } else {
+                    mc.player.displayClientMessage(Component.literal("§aFound Plugins (" + plugins.size() + "): §7" + String.join(", ", plugins)), false);
+                }
+            }
+        });
 
         // Auto-disable because it's a one-time action
-        this.toggle();
+        this.setEnabled(false);
     }
 }
