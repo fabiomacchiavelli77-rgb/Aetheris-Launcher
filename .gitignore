@@ -35,3 +35,7 @@ seedcracker/.gradle/
 /local.properties*.bak
 .vscode/
 ~
+
+# Python
+__pycache__/
+*.pyc
