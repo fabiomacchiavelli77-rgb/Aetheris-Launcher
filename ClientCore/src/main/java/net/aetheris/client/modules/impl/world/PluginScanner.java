@@ -55,6 +55,36 @@ public class PluginScanner extends Module {
 
     private static final Pattern PLUGIN_LIST = Pattern.compile("[A-Za-z0-9_\\-]+");
 
+    /**
+     * Firma-DB di plugin noti (solo dati pubblici: comandi, channel, brand).
+     * Chiave = match case-insensitive su nome/alias/channel namespace.
+     * Serve a categorizzare il report: permessi, anti-cheat, world-edit, economia.
+     */
+    private static final Map<String, String> PLUGIN_CATEGORIES = new LinkedHashMap<>();
+    static {
+        // Gestione permessi
+        for (String k : new String[]{"luckperms", "permissionsex", "pex", "groupmanager",
+                "permissionsbukkit", "zpermissions", "bpermissions", "ultrapermissions", "vault"})
+            PLUGIN_CATEGORIES.put(k, "Permessi");
+        // Anti-cheat (informazione utile: sapere quale AC gira è pubblico)
+        for (String k : new String[]{"grim", "grimac", "vulcan", "matrix", "polar", "verus",
+                "aac", "negativity", "spartan", "hawk", "intuition", "hecca"})
+            PLUGIN_CATEGORIES.put(k, "Anti-cheat");
+        // World management / build
+        for (String k : new String[]{"worldedit", "fastasyncworldedit", "fawe", "worldguard", "go brush", "gobrush", "ares"})
+            PLUGIN_CATEGORIES.put(k, "World-edit");
+        // Economia / shop
+        for (String k : new String[]{"essentials", "essentialsx", "essentialschat", "cmi", "vaulteco",
+                "shopguiplus", "chestshop", "quickshop", "playerpoints"})
+            PLUGIN_CATEGORIES.put(k, "Economia");
+        // Moderazione / logging
+        for (String k : new String[]{"coreprotect", "litebans", "advancedban"})
+            PLUGIN_CATEGORIES.put(k, "Moderazione");
+        // Proxy / performance
+        for (String k : new String[]{"bungeecord", "velocity", "spark", "timings", "placeholderapi", "viaversion", "protocollib"})
+            PLUGIN_CATEGORIES.put(k, "Infrastruttura");
+    }
+
     /** Comandi vanilla/Bukkit: esclusi dal tab-probe per non inquinare il report. */
     private static final Set<String> VANILLA_COMMANDS = new HashSet<>(List.of(
             "help", "msg", "teammsg", "say", "me", "tell", "trigger", "seed", "list",
@@ -304,14 +334,16 @@ public class PluginScanner extends Module {
 
     private void analyzePlugins() {
         if (foundPlugins.isEmpty()) {
-            displayMessage("§8[§bPluginScanner§8] §Non ho rilevato plugin (server nascosto).");
+            displayMessage("§8[§bPluginScanner§8] §7Nessun plugin rilevato (server nascosto).");
             return;
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("§ePluginServer: §7").append(foundPlugins.size()).append(" §f- §a");
+        sb.append("§8[§bPluginScanner§8] §ePlugin trovati: §7").append(foundPlugins.size()).append(" §f- §a");
         sb.append(String.join("§7, §a", foundPlugins));
         displayMessage(sb.toString());
+
+        reportCategories();
 
         boolean permPlugin = false;
         for (String plug : foundPlugins) {
@@ -327,7 +359,7 @@ public class PluginScanner extends Module {
             }
             if (probes != null) {
                 permPlugin = true;
-                displayMessage("§e[PluginScanner] §fPlugin permessi: §b" + plug + "§f!");
+                displayMessage("§8[§bPluginScanner§8] §fPlugin permessi: §b" + plug);
                 if (showSuggestions.isOn()) {
                     displayMessage("§7  Probe: §f/" + probes[1] + "§8 | §f/" + probes[2] + "§8 | §f/" + probes[0]);
                 }
@@ -339,6 +371,48 @@ public class PluginScanner extends Module {
         if (!permPlugin) {
             displayMessage("§8[§bPluginScanner§8] §7Nessun plugin permessi noto tra quelli visibili. Usa §f/plugins§7 §8oppure §f/help§8.");
         }
+    }
+
+    /**
+     * Report categorizzato basato sulla firma-DB (nome/alias/channel -> categoria).
+     * Evidenzia in particolare gli anti-cheat attivi: informazione pubblica,
+     * utile per capire il livello di enforcement del server.
+     */
+    private void reportCategories() {
+        Map<String, Integer> counts = new LinkedHashMap<>();
+        List<String> antiCheats = new ArrayList<>();
+        for (String plug : foundPlugins) {
+            String category = lookupCategory(plug);
+            if (category == null) continue;
+            counts.merge(category, 1, Integer::sum);
+            if (category.equals("Anti-cheat")) antiCheats.add(plug);
+        }
+        if (!counts.isEmpty()) {
+            StringBuilder sb = new StringBuilder("§8[§bPluginScanner§8] §7Categorie: ");
+            boolean first = true;
+            for (Map.Entry<String, Integer> e : counts.entrySet()) {
+                if (!first) sb.append("§8 | §7");
+                sb.append("§f").append(e.getKey()).append("§8(§7").append(e.getValue()).append("§8)");
+                first = false;
+            }
+            displayMessage(sb.toString());
+        }
+        if (!antiCheats.isEmpty()) {
+            displayMessage("§8[§bPluginScanner§8] §6Anti-cheat rilevati: §e" + String.join("§7, §e", antiCheats));
+        }
+    }
+
+    /** Match esatto, contenuto o prefisso tra nome plugin e firma-DB. */
+    private String lookupCategory(String plugin) {
+        String p = plugin.toLowerCase(Locale.ROOT);
+        if (p.length() < 3) return null; // evita match ambigui su nomi corti
+        for (Map.Entry<String, String> e : PLUGIN_CATEGORIES.entrySet()) {
+            String key = e.getKey();
+            if (p.equals(key) || p.contains(key) || (key.contains(p) && p.length() >= 4)) {
+                return e.getValue();
+            }
+        }
+        return null;
     }
 
     private void displayMessage(String msg) {
