@@ -40,7 +40,7 @@ public class ModuleManager {
         addModule(new BedTrap());
         addModule(new CrystalAura());
 
-        // === MOVEMENT (11) ===
+        // === MOVEMENT (12) ===
         addModule(new AutoSprint());
         addModule(new Speed());
         addModule(new Fly());
@@ -52,6 +52,7 @@ public class ModuleManager {
         addModule(new Jetpack());
         addModule(new Sneak());
         addModule(new AutoWalk());
+        addModule(new Gesu());
 
         // === RENDER (12) ===
         addModule(new FullBright());
