@@ -5,19 +5,19 @@
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://adoptium.net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Aetheris Client** è un hacked client autonomo per Minecraft **1.21.11 (26.2)** basato su Fabric Loader e Mojang Official Mappings. Include **65 moduli di hack**, **SeedCrackerX integrato** nativamente e un **Web Installer** moderno per l'installazione automatica.
+**Aetheris Client** è un hacked client autonomo per Minecraft **1.21.11 (26.2)** basato su Fabric Loader e Mojang Official Mappings. Include **66 moduli di hack**, **SeedCrackerX integrato** nativamente e un **Web Installer** moderno per l'installazione automatica.
 
 ---
 
 ## 🌟 Caratteristiche Principali
 
 - **Full Native 1.21.11 (26.2)**: Totalmente compilato con **Mojang Official Mappings** e Java 21.
-- **65 Moduli Hack**:
+- **66 Moduli Hack**:
   - **Combat**: KillAura, CrystalAura (con auto-placement), Velocity, BowAimbot (con calcolo anticipo), BedAura, Reach, TriggerBot, Surround, AimAssist, ecc.
-  - **Movement**: AutoSprint, Speed, Fly, NoFall, BunnyJump, Jetpack, Step, NoSlowdown, NoClip, AutoWalk, Sneak.
+  - **Movement**: AutoSprint, Speed, Fly, NoFall, BunnyJump, Jetpack, Step, NoSlowdown, NoClip, AutoWalk, Sneak, Gesu (cammina sull'acqua).
   - **Render**: FullBright, ESP, StorageESP (con filtro vuote), Xray, Tracers, NameTags, FreeCam, CameraClip, Trajectories, Waypoints (marcatura 3D).
   - **World**: FastBreak, Scaffold, Timer, LiquidInteract, AutoSign, AutoFarm, AirPlace, AutoBrewer, AutoSmelter, StrongholdFinder, PluginScanner, PacketLogger, ServerFinder.
-  - **Player**: AutoEat, AutoFish, InventoryCleaner, AntiAFK, InventorySort, AntiDetect, NoChatReports, AutoRespawn, FastPlace, NoHunger, ChestStealer.
+  - **Player**: AutoEat, AutoFish, InventoryCleaner, AntiAFK, InventorySort, AntiDetect, NoChatReports, AutoRespawn, FastPlace, NoHunger, ChestStealer, PermissionViewer.
   - **SeedCracker**: Modulo dedicato con interfaccia nativa per SeedCrackerX.
 - **SeedCrackerX Integrato**: Seed cracking nativo in-game con comandi `/seedcracker` e menu dedicato senza mod esterne.
 - **Interfaccia Grafica Doppia**:
@@ -27,7 +27,7 @@
 - **Bypass & Stealth**:
   - **AntiDetect**: Spoof del brand client (`vanilla`) e blocco dei pacchetti `fabric:*`.
   - **NoChatReports**: Stripping delle firme digitali per prevenire report su server 1.21+.
-  - **PluginScanner**: Rilevamento passivo dei plugin server e permessi (PEX, LuckPerms) via command suggestions e tab probing.
+  - **PluginScanner**: Rilevamento passivo dei plugin server via dati pubblici (brand, plugin channels, tab-complete) con report categorizzato (Permessi, Anti-cheat, World-edit, Economia).
 
 ---
 
@@ -79,13 +79,25 @@ Una volta compilato, copia `build/libs/aetheris-core-1.0.0.jar` all'interno dell
 
 ---
 
+## 🛡️ Server Audit (per amministratori)
+
+Nella cartella `tools/` è incluso **`aetheris_server_audit.py`**, un tool difensivo per chi **gestisce un proprio server Minecraft**: analizza localmente `server.properties`, `ops.json` e le configurazioni di **LuckPerms/PermissionsEx** per segnalare permessi wildcard pericolosi, ereditarietà rischiose, RCON debole e altre misconfigurazioni.
+
+```bash
+python tools/aetheris_server_audit.py /path/alla/cartella/server --md report.md
+```
+
+È un analizzatore **puramente locale** dei propri file: non esegue scanning remoto di server di terzi. Dettagli in [`tools/README.md`](tools/README.md).
+
+---
+
 ## 📁 Struttura Progetto
 
 ```
 Aetheris/
 ├── ClientCore/               ← Core Mod Client (Fabric 1.21.11, Java 21)
 │   ├── src/main/java/net/aetheris/client/
-│   │   ├── modules/          ← 65 Moduli Hack divisi per Categoria
+│   │   ├── modules/          ← 66 Moduli Hack divisi per Categoria
 │   │   ├── gui/              ← ClickGUI, AetherisMenu, Xray, AltManager, etc.
 │   │   ├── mixins/           ← Mixin di sistema (Render, Network, Input)
 │   │   └── config/           ← Gestione profilo utente (profile.json)
@@ -93,6 +105,7 @@ Aetheris/
 ├── Installer/                ← Web Installer (Express + Vite JS)
 │   ├── server.js             ← Backend Express per installazione silente Fabric
 │   └── dist/                 ← Frontend statico compilato dell'installer
+├── tools/                    ← Tool difensivi per admin (aetheris_server_audit.py)
 ├── AVVIA_INSTALLER.bat       ← Launcher script rapido per Windows
 ├── AGENTS.md / CLAUDE.md     ← Documentazione per sviluppatori e AI Agents
 └── Aetheris_Checklist_Test.xlsx ← Excel di tracking per i test e verifica moduli
