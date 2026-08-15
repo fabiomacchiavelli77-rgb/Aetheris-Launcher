@@ -96,6 +96,7 @@ public class ModuleManager {
         addModule(new InventorySort());
         addModule(new AntiDetect());
         addModule(new NoChatReports());
+        addModule(new PermissionViewer());
 
         // === SEEDCRACKER (1) ===
         addModule(new SeedCrackerModule());
