@@ -21,11 +21,9 @@ public class PlayerEntityMixin {
      */
     @Inject(method = "causeFoodExhaustion", at = @At("HEAD"), cancellable = true)
     private void onCauseFoodExhaustion(float exhaustion, CallbackInfo ci) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof NoHunger && mod.isEnabled()) {
-                ci.cancel();
-                return;
-            }
+        NoHunger noHunger = ModuleManager.getModule(NoHunger.class);
+        if (noHunger != null && noHunger.isEnabled()) {
+            ci.cancel();
         }
     }
 }

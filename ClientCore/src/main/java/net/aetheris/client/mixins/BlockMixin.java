@@ -15,16 +15,14 @@ public class BlockMixin {
 
     @Inject(method = "shouldRenderFace", at = @At("HEAD"), cancellable = true)
     private static void onShouldRenderFace(BlockState state, BlockState neighborState, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof Xray xray && xray.isEnabled()) {
-                if (Xray.isXrayBlock(state.getBlock())) {
-                    cir.setReturnValue(true); // Always render xray ore faces
-                } else {
-                    // If opacity > 0, still render the face (dimmed via shade brightness)
-                    // If opacity == 0, hide it completely
-                    cir.setReturnValue(Xray.getOpacity() > 0);
-                }
-                return;
+        Xray xray = ModuleManager.getModule(Xray.class);
+        if (xray != null && xray.isEnabled()) {
+            if (Xray.isXrayBlock(state.getBlock())) {
+                cir.setReturnValue(true); // Always render xray ore faces
+            } else {
+                // If opacity > 0, still render the face (dimmed via shade brightness)
+                // If opacity == 0, hide it completely
+                cir.setReturnValue(Xray.getOpacity() > 0);
             }
         }
     }

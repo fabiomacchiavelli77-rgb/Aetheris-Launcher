@@ -22,19 +22,17 @@ public class BlockRenderManagerMixin {
     private void onRenderBatched(BlockState state, BlockPos pos, BlockAndTintGetter level,
                                   PoseStack poseStack, VertexConsumer consumer,
                                   boolean checkSides, java.util.List<?> someList, CallbackInfo ci) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof Xray && mod.isEnabled()) {
-                if (!Xray.isXrayBlock(state.getBlock())) {
-                    // If opacity is 0, hide the block completely (original behavior)
-                    if (Xray.getOpacity() == 0) {
-                        ci.cancel();
-                        return;
-                    }
-                    // If opacity > 0, let it render — brightness is controlled
-                    // via BlockStateBaseMixin.getShadeBrightness using the opacity factor
+        Xray xray = ModuleManager.getModule(Xray.class);
+        if (xray != null && xray.isEnabled()) {
+            if (!Xray.isXrayBlock(state.getBlock())) {
+                // If opacity is 0, hide the block completely (original behavior)
+                if (Xray.getOpacity() == 0) {
+                    ci.cancel();
+                    return;
                 }
-                return;
             }
+            // If opacity > 0, let it render — brightness is controlled
+            // via BlockStateBaseMixin.getShadeBrightness using the opacity factor
         }
     }
 }

@@ -33,10 +33,10 @@ public class ClientPlayerInteractionManagerMixin {
 
     @Inject(method = "startDestroyBlock", at = @At("HEAD"))
     private void onStartDestroyBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof net.aetheris.client.modules.impl.world.AutoTool autoTool && autoTool.isEnabled()) {
-                autoTool.updateTool(pos);
-            }
+        net.aetheris.client.modules.impl.world.AutoTool autoTool =
+                ModuleManager.getModule(net.aetheris.client.modules.impl.world.AutoTool.class);
+        if (autoTool != null && autoTool.isEnabled()) {
+            autoTool.updateTool(pos);
         }
     }
 
@@ -45,18 +45,17 @@ public class ClientPlayerInteractionManagerMixin {
      */
     @Inject(method = "continueDestroyBlock", at = @At("HEAD"))
     private void onContinueDestroyBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof net.aetheris.client.modules.impl.world.AutoTool autoTool && autoTool.isEnabled()) {
-                autoTool.updateTool(pos);
-            }
-            if (mod instanceof FastBreak fb && fb.isEnabled()) {
-                if (destroyProgress > 0f) {
-                    float extra = fb.getSpeedMultiplier() * 0.015f;
-                    destroyProgress += extra;
-                    if (destroyProgress >= 1.0f) {
-                        destroyProgress = 1.0f;
-                    }
-                }
+        net.aetheris.client.modules.impl.world.AutoTool autoTool =
+                ModuleManager.getModule(net.aetheris.client.modules.impl.world.AutoTool.class);
+        if (autoTool != null && autoTool.isEnabled()) {
+            autoTool.updateTool(pos);
+        }
+        FastBreak fastBreak = ModuleManager.getModule(FastBreak.class);
+        if (fastBreak != null && fastBreak.isEnabled() && destroyProgress > 0f) {
+            float extra = fastBreak.getSpeedMultiplier() * 0.015f;
+            destroyProgress += extra;
+            if (destroyProgress >= 1.0f) {
+                destroyProgress = 1.0f;
             }
         }
     }

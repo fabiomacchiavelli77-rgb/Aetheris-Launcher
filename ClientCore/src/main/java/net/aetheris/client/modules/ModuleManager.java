@@ -2,7 +2,9 @@ package net.aetheris.client.modules;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.aetheris.client.config.ProfileManager;
 import net.aetheris.client.modules.impl.combat.*;
@@ -18,6 +20,8 @@ import net.aetheris.client.modules.impl.world.InstalledPlugins;
 
 public class ModuleManager {
     private static final List<Module> modules = new ArrayList<>();
+    /** Indice classi -> modulo per lookup O(1) negli hot-path (render/tick/rete). */
+    private static final Map<Class<?>, Module> classIndex = new ConcurrentHashMap<>();
 
     public static void init() {
         // === COMBAT (12) ===
@@ -99,6 +103,7 @@ public class ModuleManager {
 
     public static void addModule(Module module) {
         modules.add(module);
+        classIndex.put(module.getClass(), module);
     }
 
     public static List<Module> getModules() {
@@ -113,11 +118,19 @@ public class ModuleManager {
         return modules.stream().filter(m -> m.getName().equalsIgnoreCase(name)).findFirst();
     }
 
-    /** Lookup diretto per classe: evita di iterare tutti i moduli negli hot-path (mixin di rete). */
+    /** Lookup diretto per classe O(1): usato dai mixin hot-path (render/tick/rete). */
     @SuppressWarnings("unchecked")
     public static <T extends Module> T getModule(Class<T> clazz) {
+        Module cached = classIndex.get(clazz);
+        if (cached != null) {
+            return (T) cached;
+        }
+        // Fallback lineare (es. sottoclassi registrate con classe diversa)
         for (Module m : modules) {
-            if (clazz.isInstance(m)) return (T) m;
+            if (clazz.isInstance(m)) {
+                classIndex.putIfAbsent(clazz, m);
+                return (T) m;
+            }
         }
         return null;
     }

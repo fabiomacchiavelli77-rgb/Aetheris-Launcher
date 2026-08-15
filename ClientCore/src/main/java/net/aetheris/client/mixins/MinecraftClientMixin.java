@@ -20,10 +20,10 @@ public class MinecraftClientMixin {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onTick(CallbackInfo ci) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof net.aetheris.client.modules.impl.player.FastPlace fp && fp.isEnabled()) {
-                rightClickDelay = fp.getDelay();
-            }
+        net.aetheris.client.modules.impl.player.FastPlace fastPlace =
+                ModuleManager.getModule(net.aetheris.client.modules.impl.player.FastPlace.class);
+        if (fastPlace != null && fastPlace.isEnabled()) {
+            rightClickDelay = fastPlace.getDelay();
         }
         ModuleManager.onTick();
     }
@@ -32,32 +32,28 @@ public class MinecraftClientMixin {
 
     @Inject(method = "getTickTargetMillis", at = @At("HEAD"), cancellable = true)
     private void onGetTickTargetMillis(float f, CallbackInfoReturnable<Float> cir) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof Timer timer && timer.isEnabled()) {
-                float normal = f;
-                Minecraft mc = Minecraft.getInstance();
-                if (mc.level != null && mc.level.tickRateManager().runsNormally()) {
-                    normal = Math.max(f, mc.level.tickRateManager().millisecondsPerTick());
-                }
-                cir.setReturnValue(normal / timer.getTimerSpeed());
-                return;
+        Timer timer = ModuleManager.getModule(Timer.class);
+        if (timer != null && timer.isEnabled()) {
+            float normal = f;
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.level != null && mc.level.tickRateManager().runsNormally()) {
+                normal = Math.max(f, mc.level.tickRateManager().millisecondsPerTick());
             }
+            cir.setReturnValue(normal / timer.getTimerSpeed());
         }
     }
 
     @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
     private void onStartAttack(CallbackInfoReturnable<Boolean> cir) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof Reach reach && reach.isEnabled()) {
-                Minecraft mc = Minecraft.getInstance();
-                if (mc.player != null && mc.gameMode != null) {
-                    Entity target = reach.getTargetInLookVector(reach.getReachDistance());
-                    if (target != null) {
-                        mc.gameMode.attack(mc.player, target);
-                        mc.player.swing(InteractionHand.MAIN_HAND);
-                        cir.setReturnValue(true);
-                        return;
-                    }
+        Reach reach = ModuleManager.getModule(Reach.class);
+        if (reach != null && reach.isEnabled()) {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null && mc.gameMode != null) {
+                Entity target = reach.getTargetInLookVector(reach.getReachDistance());
+                if (target != null) {
+                    mc.gameMode.attack(mc.player, target);
+                    mc.player.swing(InteractionHand.MAIN_HAND);
+                    cir.setReturnValue(true);
                 }
             }
         }
@@ -65,19 +61,16 @@ public class MinecraftClientMixin {
 
     @Inject(method = "shouldEntityAppearGlowing", at = @At("HEAD"), cancellable = true)
     private void onShouldEntityAppearGlowing(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof net.aetheris.client.modules.impl.render.ESP esp && esp.isEnabled()) {
-                if (esp.shouldGlow(entity)) {
-                    cir.setReturnValue(true);
-                    return;
-                }
-            }
-            if (mod instanceof net.aetheris.client.modules.impl.render.ItemESP itemEsp && itemEsp.isEnabled()) {
-                if (itemEsp.shouldGlow(entity)) {
-                    cir.setReturnValue(true);
-                    return;
-                }
-            }
+        net.aetheris.client.modules.impl.render.ESP esp =
+                ModuleManager.getModule(net.aetheris.client.modules.impl.render.ESP.class);
+        if (esp != null && esp.isEnabled() && esp.shouldGlow(entity)) {
+            cir.setReturnValue(true);
+            return;
+        }
+        net.aetheris.client.modules.impl.render.ItemESP itemEsp =
+                ModuleManager.getModule(net.aetheris.client.modules.impl.render.ItemESP.class);
+        if (itemEsp != null && itemEsp.isEnabled() && itemEsp.shouldGlow(entity)) {
+            cir.setReturnValue(true);
         }
     }
 }

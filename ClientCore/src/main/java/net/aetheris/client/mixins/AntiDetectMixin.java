@@ -35,10 +35,9 @@ public class AntiDetectMixin {
         if (!(packet instanceof ServerboundCustomPayloadPacket cp)) return packet;
         if (!(cp.payload() instanceof BrandPayload)) return packet;
 
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof AntiDetect ad && ad.isEnabled()) {
-                return new ServerboundCustomPayloadPacket(new BrandPayload(ClientBrandRetriever.VANILLA_NAME));
-            }
+        AntiDetect antiDetect = ModuleManager.getModule(AntiDetect.class);
+        if (antiDetect != null && antiDetect.isEnabled()) {
+            return new ServerboundCustomPayloadPacket(new BrandPayload(ClientBrandRetriever.VANILLA_NAME));
         }
         return packet;
     }
@@ -47,12 +46,10 @@ public class AntiDetectMixin {
     private void blockFabricPayloads(Packet<?> packet, CallbackInfo ci) {
         if (!(packet instanceof ServerboundCustomPayloadPacket cp)) return;
 
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof AntiDetect ad && ad.isEnabled()) {
-                if (cp.payload().type().id().getNamespace().equals("fabric")) {
-                    ci.cancel();
-                    return;
-                }
+        AntiDetect antiDetect = ModuleManager.getModule(AntiDetect.class);
+        if (antiDetect != null && antiDetect.isEnabled()) {
+            if (cp.payload().type().id().getNamespace().equals("fabric")) {
+                ci.cancel();
             }
         }
     }

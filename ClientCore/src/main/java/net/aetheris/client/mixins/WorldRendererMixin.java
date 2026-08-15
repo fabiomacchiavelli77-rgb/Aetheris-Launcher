@@ -23,13 +23,13 @@ public abstract class WorldRendererMixin {
 
     @Inject(method = "extractVisibleEntities", at = @At("TAIL"))
     private void onExtractVisibleEntities(Camera camera, Frustum frustum, DeltaTracker deltaTracker, LevelRenderState state, CallbackInfo ci) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof net.aetheris.client.modules.impl.render.FreeCam fc && fc.isEnabled()) {
-                Entity dummy = fc.getDummyEntity();
-                if (dummy != null) {
-                    float partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
-                    state.entityRenderStates.add(extractEntity(dummy, partialTick));
-                }
+        net.aetheris.client.modules.impl.render.FreeCam freeCam =
+                ModuleManager.getModule(net.aetheris.client.modules.impl.render.FreeCam.class);
+        if (freeCam != null && freeCam.isEnabled()) {
+            Entity dummy = freeCam.getDummyEntity();
+            if (dummy != null) {
+                float partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
+                state.entityRenderStates.add(extractEntity(dummy, partialTick));
             }
         }
     }
@@ -38,10 +38,10 @@ public abstract class WorldRendererMixin {
     private void onRenderLevel(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker,
                                boolean arg3, Camera camera, Matrix4f arg5, Matrix4f arg6, Matrix4f arg7,
                                com.mojang.blaze3d.buffers.GpuBufferSlice arg8, org.joml.Vector4f arg9, boolean arg10, CallbackInfo ci) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod.isEnabled() && mod instanceof net.aetheris.client.modules.impl.render.Trajectories trajectories) {
-                trajectories.render(camera, deltaTracker);
-            }
+        net.aetheris.client.modules.impl.render.Trajectories trajectories =
+                ModuleManager.getModule(net.aetheris.client.modules.impl.render.Trajectories.class);
+        if (trajectories != null && trajectories.isEnabled()) {
+            trajectories.render(camera, deltaTracker);
         }
     }
 }

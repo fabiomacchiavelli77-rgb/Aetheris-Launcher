@@ -17,22 +17,18 @@ public class ClientPlayerEntityMixin {
     // così non applica il moltiplicatore x0.2 alla velocità in LocalPlayer.aiStep()
     @Inject(method = "isUsingItem", at = @At("HEAD"), cancellable = true)
     private void onIsUsingItem(CallbackInfoReturnable<Boolean> cir) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof NoSlowdown ns && ns.isEnabled()) {
-                if (ns.getItems()) {
-                    cir.setReturnValue(false);
-                }
-            }
+        NoSlowdown noSlowdown = ModuleManager.getModule(NoSlowdown.class);
+        if (noSlowdown != null && noSlowdown.isEnabled() && noSlowdown.getItems()) {
+            cir.setReturnValue(false);
         }
     }
 
     // NoClip - Mantiene noPhysics = true durante aiStep per consentire di attraversare tutti i blocchi senza collisioni
     @Inject(method = "aiStep", at = @At("HEAD"))
     private void onAiStepHead(CallbackInfo ci) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof NoClip nc && nc.isEnabled()) {
-                ((LocalPlayer) (Object) this).noPhysics = true;
-            }
+        NoClip noClip = ModuleManager.getModule(NoClip.class);
+        if (noClip != null && noClip.isEnabled()) {
+            ((LocalPlayer) (Object) this).noPhysics = true;
         }
     }
 }

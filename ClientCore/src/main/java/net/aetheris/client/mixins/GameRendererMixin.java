@@ -18,11 +18,9 @@ public class GameRendererMixin {
      */
     @Inject(method = "bobHurt", at = @At("HEAD"), cancellable = true)
     private void onBobHurt(PoseStack poseStack, float partialTick, CallbackInfo ci) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof NoHurtCam && mod.isEnabled()) {
-                ci.cancel();
-                return;
-            }
+        NoHurtCam noHurtCam = ModuleManager.getModule(NoHurtCam.class);
+        if (noHurtCam != null && noHurtCam.isEnabled()) {
+            ci.cancel();
         }
     }
 

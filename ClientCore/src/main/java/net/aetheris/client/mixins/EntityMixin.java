@@ -23,11 +23,11 @@ public class EntityMixin {
     @Inject(method = "move", at = @At("HEAD"))
     private void onMove(MoverType moverType, Vec3 vec3, CallbackInfo ci) {
         if ((Object) this instanceof net.minecraft.world.entity.player.Player) {
-            for (var mod : ModuleManager.getModules()) {
-                if ((mod instanceof NoClip nc && nc.isEnabled()) ||
-                    (mod instanceof net.aetheris.client.modules.impl.render.FreeCam fc && fc.isEnabled())) {
-                    ((Entity) (Object) this).noPhysics = true;
-                }
+            NoClip noClip = ModuleManager.getModule(NoClip.class);
+            net.aetheris.client.modules.impl.render.FreeCam freeCam =
+                    ModuleManager.getModule(net.aetheris.client.modules.impl.render.FreeCam.class);
+            if ((noClip != null && noClip.isEnabled()) || (freeCam != null && freeCam.isEnabled())) {
+                ((Entity) (Object) this).noPhysics = true;
             }
         }
     }
@@ -38,12 +38,11 @@ public class EntityMixin {
     @Inject(method = "isInWall", at = @At("HEAD"), cancellable = true)
     private void onIsInWall(CallbackInfoReturnable<Boolean> cir) {
         if ((Object) this instanceof net.minecraft.world.entity.player.Player) {
-            for (var mod : ModuleManager.getModules()) {
-                if ((mod instanceof NoClip nc && nc.isEnabled()) ||
-                    (mod instanceof net.aetheris.client.modules.impl.render.FreeCam fc && fc.isEnabled())) {
-                    cir.setReturnValue(false);
-                    return;
-                }
+            NoClip noClip = ModuleManager.getModule(NoClip.class);
+            net.aetheris.client.modules.impl.render.FreeCam freeCam =
+                    ModuleManager.getModule(net.aetheris.client.modules.impl.render.FreeCam.class);
+            if ((noClip != null && noClip.isEnabled()) || (freeCam != null && freeCam.isEnabled())) {
+                cir.setReturnValue(false);
             }
         }
     }
@@ -54,11 +53,9 @@ public class EntityMixin {
     @Inject(method = "push(DDD)V", at = @At("HEAD"), cancellable = true)
     private void onPush(double x, double y, double z, CallbackInfo ci) {
         if ((Object) this == Minecraft.getInstance().player) {
-            for (var mod : ModuleManager.getModules()) {
-                if (mod instanceof Velocity && mod.isEnabled()) {
-                    ci.cancel();
-                    return;
-                }
+            Velocity velocity = ModuleManager.getModule(Velocity.class);
+            if (velocity != null && velocity.isEnabled()) {
+                ci.cancel();
             }
         }
     }

@@ -20,11 +20,9 @@ public class StorageESPMixin {
     private void onRenderLevel(GraphicsResourceAllocator allocator, DeltaTracker deltaTracker,
                                boolean arg3, Camera camera, Matrix4f arg5, Matrix4f arg6, Matrix4f arg7,
                                com.mojang.blaze3d.buffers.GpuBufferSlice arg8, org.joml.Vector4f arg9, boolean arg10, CallbackInfo ci) {
-        for (var mod : ModuleManager.getModules()) {
-            if (mod instanceof StorageESP se && se.isEnabled()) {
-                se.render(camera, deltaTracker);
-                return;
-            }
+        StorageESP storageEsp = ModuleManager.getModule(StorageESP.class);
+        if (storageEsp != null && storageEsp.isEnabled()) {
+            storageEsp.render(camera, deltaTracker);
         }
     }
 }

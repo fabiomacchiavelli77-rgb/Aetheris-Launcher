@@ -23,11 +23,9 @@ public class AetherisClientPacketListenerMixin {
     private void onHandleSetEntityMotion(ClientboundSetEntityMotionPacket packet, CallbackInfo ci) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null && packet.getId() == mc.player.getId()) {
-            for (var mod : ModuleManager.getModules()) {
-                if (mod instanceof Velocity && mod.isEnabled()) {
-                    ci.cancel();
-                    return;
-                }
+            Velocity velocity = ModuleManager.getModule(Velocity.class);
+            if (velocity != null && velocity.isEnabled()) {
+                ci.cancel();
             }
         }
     }

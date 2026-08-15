@@ -26,6 +26,7 @@ public class ProfileManager {
         return instance;
     }
 
+    @SuppressWarnings("unchecked")
     public void load() {
         try {
             if (!Files.exists(CONFIG_DIR)) Files.createDirectories(CONFIG_DIR);
