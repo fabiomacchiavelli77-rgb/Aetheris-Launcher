@@ -1,0 +1,9 @@
+name: default
+weight: 0
+permissions:
+- '*'
+- modifyworld.*
+- essentials.build
+parents: []
+prefixes: []
+meta: {}

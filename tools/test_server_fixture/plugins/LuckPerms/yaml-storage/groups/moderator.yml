@@ -1,0 +1,6 @@
+name: moderator
+weight: 50
+permissions:
+- essentials.kick
+parents:
+- admin

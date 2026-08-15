@@ -1,0 +1,9 @@
+groups:
+  default:
+    default: true
+    permissions:
+    - modifyworld.*
+    - 'bukkit.command.op'
+  vip:
+    permissions:
+    - essentials.gamemode.others
