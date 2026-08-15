@@ -53,6 +53,7 @@ All hacks extend `modules.Module` (abstract: `onEnable()`, `onDisable()`, `onTic
 
 **Mixin architecture** — Active Aetheris mixins in `net.aetheris.client.mixins`:
 - `MinecraftClientMixin` — module tick loop + Timer speed control
+- `ModuleManager` mantiene un indice `Class -> Module` (`ConcurrentHashMap`): i mixin hot-path (render, tick, rete) usano `ModuleManager.getModule(X.class)` O(1), NON loop su `getModules()`. I loop sono ammessi solo su eventi cold (screen open, place item).
 - `KeyboardMixin` — either Shift toggles `ClickGUI`; module keybinds work only while no screen is open.
 - `TitleScreenMixin` — watermark on title screen + Alt Manager button
 - `PauseScreenMixin` — in-game Pause Menu quick buttons (Aetheris Menu, SeedCracker, Xray Ores, Alt Manager)
@@ -158,6 +159,7 @@ Multiple GUIs available:
 | ChatSignature Mixin | `ClientCore/.../mixins/ChatSignatureMixin.java` |
 | SeedCracker Config GUI | `ClientCore/.../gui/SeedCrackerConfigScreen.java` |
 | Pause Menu Mixin | `ClientCore/.../mixins/PauseScreenMixin.java` |
+| Server Audit Tool (proprio server) | `tools/aetheris_server_audit.py` |
 | Client entrypoint | `ClientCore/.../AetherisClient.java` |
 | Aetheris mixin config | `ClientCore/src/main/resources/aetheris.mixins.json` |
 | SeedCracker mixin config | `ClientCore/src/main/resources/seedcracker.mixins.json` |
@@ -182,8 +184,8 @@ Multiple GUIs available:
 **Movement (11):** AutoSprint, Speed, Fly, NoFall, Step, NoSlowdown, NoClip, BunnyJump, Jetpack, Sneak, AutoWalk
 **Render (12):** FullBright, ESP, NoHurtCam, Xray, NameTags, Tracers, FreeCam, ItemESP, StorageESP (con hideEmpty), CameraClip, Trajectories, Waypoints (marcatura 3D)
 **World (15):** FastBreak, Scaffold, Timer, AutoTool, InstalledPlugins, LiquidInteract, AutoSign, AutoFarm, AirPlace, AutoBrewer, AutoSmelter, StrongholdFinder, PacketLogger, ServerFinder, PluginScanner
-**Player (11):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat, InventorySort, AntiDetect, NoChatReports
+**Player (12):** AutoRespawn, FastPlace, NoHunger, ChestStealer, AutoFish, InventoryCleaner, AntiAFK, AutoEat, InventorySort, AntiDetect, NoChatReports, PermissionViewer
 **SeedCracker (1):** SeedCrackerModule
 
 *Batch 2026-08 (Mappatura Qwen3.8-max): AutoBrewer, AutoSmelter, StrongholdFinder, PacketLogger, ServerFinder, Waypoints, NoChatReports, BowAimbot, AutoWalk.*
-*PluginScanner (PluginScanner.java + DiscardedPayloadMixin + hook handleSystemChat in AetherisClientPacketListenerMixin): scan /plugins, tab-probe comandi, brand payload, plugin channels, rileva PEX/LuckPerms/GroupManager, probe comandi permessi.*
+*PluginScanner (PluginScanner.java + DiscardedPayloadMixin + hook handleSystemChat in AetherisClientPacketListenerMixin): scan /plugins, tab-probe comandi, brand payload, plugin channels, rileva PEX/LuckPerms/GroupManager, probe comandi permessi. Firma-DB `PLUGIN_CATEGORIES` con report categorizzato (Permessi/Anti-cheat/World-edit/Economia/…) — solo dati pubblici, nessun accesso ai file del server.*
