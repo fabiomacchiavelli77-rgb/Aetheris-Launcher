@@ -24,7 +24,7 @@ public class ModuleManager {
     private static final Map<Class<?>, Module> classIndex = new ConcurrentHashMap<>();
 
     public static void init() {
-        // === COMBAT (12) ===
+        // === COMBAT (14) ===
         addModule(new KillAura());
         addModule(new Velocity());
         addModule(new Criticals());
@@ -54,7 +54,7 @@ public class ModuleManager {
         addModule(new AutoWalk());
         addModule(new Gesu());
 
-        // === RENDER (12) ===
+        // === RENDER (13) ===
         addModule(new FullBright());
         addModule(new ESP());
         addModule(new NoHurtCam());
@@ -67,8 +67,9 @@ public class ModuleManager {
         addModule(new CameraClip());
         addModule(new Trajectories());
         addModule(new Waypoints());
+        addModule(new SpectatorDetector());
 
-        // === WORLD (14) ===
+        // === WORLD (15) ===
         addModule(new FastBreak());
         addModule(new Scaffold());
         addModule(new Timer());
@@ -85,7 +86,7 @@ public class ModuleManager {
         addModule(new ServerFinder());
         addModule(new PluginScanner());
 
-        // === PLAYER (10) ===
+        // === PLAYER (12) ===
         addModule(new AutoRespawn());
         addModule(new FastPlace());
         addModule(new NoHunger());

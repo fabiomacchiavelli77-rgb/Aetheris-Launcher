@@ -5,17 +5,17 @@
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://adoptium.net)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Aetheris Client** è un hacked client autonomo per Minecraft **1.21.11 (26.2)** basato su Fabric Loader e Mojang Official Mappings. Include **66 moduli di hack**, **SeedCrackerX integrato** nativamente e un **Web Installer** moderno per l'installazione automatica.
+**Aetheris Client** è un hacked client autonomo per Minecraft **1.21.11 (26.2)** basato su Fabric Loader e Mojang Official Mappings. Include **67 moduli di hack**, **SeedCrackerX integrato** nativamente e un **Web Installer** moderno per l'installazione automatica.
 
 ---
 
 ## 🌟 Caratteristiche Principali
 
 - **Full Native 1.21.11 (26.2)**: Totalmente compilato con **Mojang Official Mappings** e Java 21.
-- **66 Moduli Hack**:
+- **67 Moduli Hack**:
   - **Combat**: KillAura, CrystalAura (con auto-placement), Velocity, BowAimbot (con calcolo anticipo), BedAura, Reach, TriggerBot, Surround, AimAssist, ecc.
   - **Movement**: AutoSprint, Speed, Fly, NoFall, BunnyJump, Jetpack, Step, NoSlowdown, NoClip, AutoWalk, Sneak, Gesu (cammina sull'acqua).
-  - **Render**: FullBright, ESP, StorageESP (con filtro vuote), Xray, Tracers, NameTags, FreeCam, CameraClip, Trajectories, Waypoints (marcatura 3D).
+  - **Render**: FullBright, ESP, StorageESP (con filtro vuote), Xray, Tracers, NameTags, FreeCam, CameraClip, Trajectories, Waypoints (marcatura 3D), SpectatorDetector.
   - **World**: FastBreak, Scaffold, Timer, LiquidInteract, AutoSign, AutoFarm, AirPlace, AutoBrewer, AutoSmelter, StrongholdFinder, PluginScanner, PacketLogger, ServerFinder.
   - **Player**: AutoEat, AutoFish, InventoryCleaner, AntiAFK, InventorySort, AntiDetect, NoChatReports, AutoRespawn, FastPlace, NoHunger, ChestStealer, PermissionViewer.
   - **SeedCracker**: Modulo dedicato con interfaccia nativa per SeedCrackerX.
@@ -97,7 +97,7 @@ python tools/aetheris_server_audit.py /path/alla/cartella/server --md report.md
 Aetheris/
 ├── ClientCore/               ← Core Mod Client (Fabric 1.21.11, Java 21)
 │   ├── src/main/java/net/aetheris/client/
-│   │   ├── modules/          ← 66 Moduli Hack divisi per Categoria
+│   │   ├── modules/          ← 67 Moduli Hack divisi per Categoria
 │   │   ├── gui/              ← ClickGUI, AetherisMenu, Xray, AltManager, etc.
 │   │   ├── mixins/           ← Mixin di sistema (Render, Network, Input)
 │   │   └── config/           ← Gestione profilo utente (profile.json)
