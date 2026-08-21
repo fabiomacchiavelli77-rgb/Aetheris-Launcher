@@ -12,7 +12,7 @@ public class AetherisClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        LOGGER.info("Initializing Aetheris Client 1.21.4");
+        LOGGER.info("Initializing Aetheris Client 1.21.11");
         ModuleManager.init();
         ProfileManager.getInstance().load();
         LOGGER.info("Profile loaded. {} modules ready.", ModuleManager.getModules().size());

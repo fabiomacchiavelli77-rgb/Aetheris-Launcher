@@ -98,11 +98,15 @@ public class SpectatorDetector extends Module {
         if (mc.getConnection() == null) return spectators;
 
         Collection<PlayerInfo> players = mc.getConnection().getOnlinePlayers();
+        if (players == null) return spectators;
+
         for (PlayerInfo info : players) {
+            if (info == null) continue;
             if (info.getGameMode() == GameType.SPECTATOR) {
+                if (info.getProfile() == null || info.getProfile().name() == null) continue;
                 String name = info.getProfile().name();
                 // Exclude self
-                if (mc.player != null && name.equals(mc.player.getGameProfile().name())) continue;
+                if (mc.player != null && mc.player.getGameProfile() != null && name.equals(mc.player.getGameProfile().name())) continue;
                 spectators.add(name);
             }
         }
